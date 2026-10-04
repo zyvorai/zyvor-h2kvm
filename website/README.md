@@ -1,6 +1,6 @@
 # h2kvm docs site
 
-Built with [Docusaurus](https://docusaurus.io/). Same shape as the Netra docs site. Serves the live docs at https://zyvorai.github.io/h2kvm/.
+Built with [Docusaurus](https://docusaurus.io/). Same shape as the Netra docs site. Serves the live docs at https://zyvorai.github.io/zyvor-h2kvm/.
 
 Curated pages live in `website/docs/`. The repo's longer `docs/` tree stays in GitHub. Screenshots and share cards are not copied into `website/static/` — `staticDirectories` serves `docs/client-presentations/screenshots` and `docs/social` in place.
 

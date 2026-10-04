@@ -12,10 +12,10 @@ const config: Config = {
   },
 
   url: 'https://zyvorai.github.io',
-  baseUrl: '/h2kvm/',
+  baseUrl: '/zyvor-h2kvm/',
 
   organizationName: 'zyvorai',
-  projectName: 'h2kvm',
+  projectName: 'zyvor-h2kvm',
 
   onBrokenLinks: 'throw',
 
@@ -44,7 +44,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/zyvorai/h2kvm/tree/main/website/',
+          editUrl: 'https://github.com/zyvorai/zyvor-h2kvm/tree/main/website/',
         },
         blog: false,
         theme: {
@@ -57,7 +57,8 @@ const config: Config = {
   themeConfig: {
     image: 'h2kvm-vsphere-path.jpg',
     colorMode: {
-      respectPrefersColorScheme: true,
+      defaultMode: 'dark',
+      respectPrefersColorScheme: false,
     },
     navbar: {
       title: 'h2kvm',
@@ -83,7 +84,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://github.com/zyvorai/h2kvm',
+          href: 'https://github.com/zyvorai/zyvor-h2kvm',
           label: 'GitHub',
           position: 'right',
         },
@@ -109,11 +110,11 @@ const config: Config = {
         {
           title: 'Project',
           items: [
-            {label: 'GitHub', href: 'https://github.com/zyvorai/h2kvm'},
+            {label: 'GitHub', href: 'https://github.com/zyvorai/zyvor-h2kvm'},
             {label: 'PyPI', href: 'https://pypi.org/project/h2kvm/'},
             {
               label: 'License',
-              href: 'https://github.com/zyvorai/h2kvm/blob/main/LICENSE',
+              href: 'https://github.com/zyvorai/zyvor-h2kvm/blob/main/LICENSE',
             },
           ],
         },
