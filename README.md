@@ -1,9 +1,6 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/social/h2kvm-share-card-dark.png">
-  <img src="docs/social/h2kvm-share-card.png" alt="h2kvm — any hypervisor to KVM. Convert offline." width="820">
-</picture>
+<img src="docs/social/h2kvm-hero-dark.jpg" alt="h2kvm - Any hypervisor to KVM. Fixed before first boot." width="100%">
 
 # h2kvm
 
@@ -18,7 +15,7 @@ fix the guest offline, then land it on **KubeVirt, libvirt, or OpenStack**. Web 
 
 <br/>
 
-[![Release](https://img.shields.io/github/v/release/zyvorai/h2kvm?style=flat-square&color=0071e3&labelColor=1d1d1f)](https://github.com/zyvorai/h2kvm/releases/latest)
+[![Release](https://img.shields.io/github/v/release/zyvorai/zyvor-h2kvm?style=flat-square&color=0071e3&labelColor=1d1d1f)](https://github.com/zyvorai/zyvor-h2kvm/releases/latest)
 [![GuestKit](https://img.shields.io/pypi/v/zyvor-guestkit.svg?style=flat-square&color=0071e3&labelColor=1d1d1f&label=guestkit)](https://pypi.org/project/zyvor-guestkit/)
 [![Python](https://img.shields.io/badge/python-3.10+-0071e3.svg?style=flat-square&labelColor=1d1d1f)](https://www.python.org/)
 [![License: Zyvor Production License v1.0](https://img.shields.io/badge/license-Zyvor%20Production%20License%20v1.0-0071e3.svg?style=flat-square&labelColor=1d1d1f)](LICENSE)
@@ -172,7 +169,7 @@ GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvo
 
 </div>
 
-**VMware to KubeVirt on Zorvia:** [Transiva](https://github.com/zyvorai/transiva) (export, Apache-2.0) → h2kvm (convert and deploy, Zyvor Production License) → GuestKit (assure, Apache-2.0) → [Zorvia](https://github.com/zyvorai/zorvia/blob/main/docs/leave-openshift.md) to operate. Each is a separate tool with its own licence; h2kvm needs a paid licence for production use. Zorvia's own importer is Experimental, so use this suite.
+**VMware to KubeVirt on Zorvia:** [Transiva](https://github.com/zyvorai/zyvor-transiva) (export, Apache-2.0) → h2kvm (convert and deploy, Zyvor Production License) → GuestKit (assure, Apache-2.0) → [Zorvia](https://github.com/zyvorai/zyvor-zorvia/blob/main/docs/leave-openshift.md) to operate. Each is a separate tool with its own licence; h2kvm needs a paid licence for production use. Zorvia's own importer is Experimental, so use this suite.
 
 ## Documentation
 
@@ -191,7 +188,7 @@ GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvo
 | | |
 |---|---|
 | **Enterprise / PoC** | [Book a demo](https://zyvor.dev/schedule?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer) · [30-day PoC](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer) · [sales@zyvor.dev](mailto:sales@zyvor.dev) |
-| **Community** | [GitHub Issues](https://github.com/zyvorai/h2kvm/issues) |
+| **Community** | [GitHub Issues](https://github.com/zyvorai/zyvor-h2kvm/issues) |
 | **Product** | [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer) |
 
 ## License
