@@ -29,10 +29,22 @@ const FeatureList: FeatureItem[] = [
     to: '/docs/getting-started/quickstart',
   },
   {
-    title: 'Land it where you run VMs',
+    title: 'Land it on Kairon or Machina',
     description:
-      'KubeVirt clusters (Zorvia, Zeus OS), libvirt hosts (Machina), or OpenStack. One target per run.',
+      'Kairon through Veyron on Kubernetes, or a Machina private cloud on your own hosts. KubeVirt and OpenStack stay as legacy targets.',
     to: '/docs/how-it-works',
+  },
+  {
+    title: 'Why not KubeVirt?',
+    description:
+      'Kairon runs 0 pods per VM: a 14x lighter idle control plane and 7.4x faster to SSH for five VMs than KubeVirt v1.9.0.',
+    to: '/docs/how-it-works#why-kairon-and-machina-instead-of-kubevirt-and-openstack',
+  },
+  {
+    title: 'Why not OpenStack?',
+    description:
+      'Machina is four Rust services and one install command on a single KVM host, not nine services on MariaDB and RabbitMQ.',
+    to: '/docs/how-it-works#why-kairon-and-machina-instead-of-kubevirt-and-openstack',
   },
   {
     title: 'Web and CLI',

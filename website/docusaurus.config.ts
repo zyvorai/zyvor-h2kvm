@@ -36,6 +36,8 @@ const config: Config = {
     'static',
     '../docs/client-presentations/screenshots',
     '../docs/social',
+    '../docs/ux',
+    '../docs/assets/stack',
   ],
 
   presets: [

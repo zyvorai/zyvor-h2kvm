@@ -6,9 +6,9 @@ sidebar_position: 2
 
 ![h2kvm talks to vSphere over HTTPS. vCenter SOAP, ESXi NFC lease, then the disk.](/h2kvm-vsphere-path.jpg)
 
-The disk is fixed before it is powered on. h2kvm picks a disk up from wherever the VM lives today, repairs the guest offline, converts it to qcow2, and hands it to one deploy target.
+The disk is fixed before it is powered on. h2kvm picks a disk up from wherever the VM lives today, repairs the guest offline, converts it to qcow2, and lands it on Kairon (through Veyron) or a Machina libvirt host. KubeVirt and OpenStack remain as legacy targets.
 
-![h2kvm picks up disks from vSphere, ESXi, Azure and local files, repairs them offline with GuestKit, converts to qcow2, then deploys to a KubeVirt cluster (Zorvia, Zeus OS), a libvirt host (Machina) or OpenStack.](/h2kvm-flow.svg)
+![h2kvm picks up disks from vSphere, ESXi, Azure and local files, repairs them offline with GuestKit, converts to qcow2, then deploys to Kairon through the Veyron API or a Machina libvirt host, with KubeVirt and OpenStack as legacy targets.](/h2kvm-flow.svg)
 
 ## Where disks come from
 
@@ -37,15 +37,36 @@ There are no subcommands and no `--source` flag. Pick the mode with `--cmd`, or 
 
 ## Where the VM lands
 
+![Where it lands: Kairon + Veyron on Kubernetes, Machina as the private cloud, KubeVirt and OpenStack as legacy targets](/readme-where-it-lands.jpg)
+
 | Target | What h2kvm does | Enable with | Zyvor product on top |
 |---|---|---|---|
-| KubeVirt cluster | Uploads the disk (containerDisk, CDI `virtctl image-upload`, or a PVC copy), then creates a `kubevirt.io/v1` VirtualMachine on whatever cluster your kubeconfig points at | `--deploy-k8s` | Zorvia crafts and watches KubeVirt VMs. Zeus OS is the visual OS for the cluster |
-| libvirt host | Emits the domain XML and runs `virsh define`, optionally start, on the host h2kvm runs on | `--emit-domain-xml` | Machina is the control plane for libvirt hosts |
-| OpenStack | openstacksdk uploads the qcow2 to Glance and can boot a Nova server. Endpoints come from the Keystone catalog | `--deploy-openstack` | None. Third-party cloud |
+| Kairon on Kubernetes | Asks Veyron (`POST /api/v1/imports`) to create a Kairon `Machine` whose image points at the converted disk over HTTP(S), pinned by sha256. kairon-node boots it straight on KVM: no pod, no KubeVirt, no CDI, no PVC upload | `--deploy-kairon` | Kairon runs the VM; Veyron is the console, API and day-2 ops |
+| Machina libvirt host | Emits the domain XML and, with `--virsh-define`, runs `virsh define` on the host h2kvm runs on | `--emit-domain-xml` | Machina is the private cloud for those hosts: Fleet Cloud, HA/DRS, eBPF, Zyra AI |
 
 - **One target per run.** The CLI and web API reject combining them.
-- **h2kvm has no API link to Zorvia, Zeus OS or Machina.** It deploys to the cluster or host. Those products are what run or manage that endpoint afterwards.
-- **OpenStack failures are non-fatal by default.** A failed Glance or Nova step is logged, and the run still succeeds.
+- **Kairon is a native integration.** h2kvm calls the Veyron API with a key that has the write role (`--kairon-api-key` or `VEYRON_API_KEY`).
+- **Machina manages the host afterwards.** h2kvm defines the VM on a libvirt host; it has no API link to Machina itself.
+
+### Why Kairon and Machina instead of KubeVirt and OpenStack
+
+![Kairon vs KubeVirt and Machina vs OpenStack, side by side](/readme-vs-kubevirt-openstack.jpg)
+
+| | Ours | Legacy |
+|---|---|---|
+| VMs on Kubernetes | **Kairon**: 0 pods per VM, 63 MiB idle control plane, 24.8 s to SSH for 5 VMs (p50) | **KubeVirt**: a `virt-launcher` pod per VM, 905 MiB, 184.7 s |
+| Private cloud | **Machina**: 4 Rust services, embedded SQLite, `./machinactl deploy` on one host | **OpenStack**: 9+ services, MariaDB/Galera and RabbitMQ, a Kolla-Ansible project |
+
+Kairon numbers: same node and guest, run back to back against KubeVirt v1.9.0 on 2026-10-04 ([Kairon benchmark](https://github.com/zyvorai/kairon/blob/main/docs/benchmarks/kairon-vs-kubevirt.md)).
+
+### Legacy targets
+
+Still supported for teams that cannot move yet. New deployments should land on Kairon or Machina.
+
+| Target | What h2kvm does | Enable with | Notes |
+|---|---|---|---|
+| KubeVirt cluster | Uploads the disk (containerDisk, CDI `virtctl image-upload`, or a PVC copy), then creates a `kubevirt.io/v1` VirtualMachine on whatever cluster your kubeconfig points at | `--deploy-k8s` | Zorvia and Zeus OS can operate those VMs; no API link from h2kvm |
+| OpenStack | openstacksdk uploads the qcow2 to Glance and can boot a Nova server. Endpoints come from the Keystone catalog | `--deploy-openstack` | Third-party cloud. A failed Glance or Nova step is logged and the run still succeeds by default |
 
 ## The Zyvor products
 
@@ -53,8 +74,10 @@ There are no subcommands and no `--source` flag. Pick the mode with `--cmd`, or 
 |---|---|---|---|
 | GuestKit | Inspects the disk offline so you know it is safe before power-on | [zyvor.dev/guestkit](https://zyvor.dev/guestkit) | [zyvorai/guestkit](https://github.com/zyvorai/guestkit) |
 | h2kvm | Any hypervisor to KVM. The guest is fixed so the VM boots the first time | [zyvor.dev/h2kvm](https://zyvor.dev/h2kvm) | [zyvorai/h2kvm](https://github.com/zyvorai/h2kvm) |
-| Zorvia | Craft and run KubeVirt VMs without hand-written CRDs | [zyvor.dev/zorvia](https://zyvor.dev/zorvia) | [zyvorai/zorvia](https://github.com/zyvorai/zorvia) |
-| Zeus OS | The visual infrastructure OS for KubeVirt | [zyvor.dev/zeus-os](https://zyvor.dev/zeus-os) | [zyvorai/zeus-os](https://github.com/zyvorai/zeus-os) |
-| Machina | One control plane for the libvirt hosts you already run | [zyvor.dev/machina](https://zyvor.dev/machina) | [zyvorai/machina](https://github.com/zyvorai/machina) |
+| Kairon | Real VMs on Kubernetes, straight on KVM, 0 pods per VM | — | [zyvorai/kairon](https://github.com/zyvorai/kairon) |
+| Veyron | The command center for virtual machines on Kubernetes | [zyvorai.github.io/veyron](https://zyvorai.github.io/veyron/) | [zyvorai/veyron](https://github.com/zyvorai/veyron) |
+| Machina | Your metal, your cloud, one control plane | [zyvor.dev/machina](https://zyvor.dev/machina) | [zyvorai/machina](https://github.com/zyvorai/machina) |
+| Zorvia | Craft and run KubeVirt VMs (legacy KubeVirt target) | [zyvor.dev/zorvia](https://zyvor.dev/zorvia) | [zyvorai/zorvia](https://github.com/zyvorai/zorvia) |
+| Zeus OS | The visual infrastructure OS for KubeVirt (legacy KubeVirt target) | [zyvor.dev/zeus-os](https://zyvor.dev/zeus-os) | [zyvorai/zeus-os](https://github.com/zyvorai/zeus-os) |
 
-First boot fails when the bootloader, VirtIO, or Windows still points at the old hypervisor. GuestKit does that work before power-on.
+First boot fails when the bootloader, VirtIO, or Windows still points at the old hypervisor. GuestKit does that work before power-on. Kairon and Veyron keep the VM running on Kubernetes; Machina keeps it running on your own hosts.

@@ -52,8 +52,8 @@
   <div class="brand"><svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><defs><linearGradient id="zb" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff5a15"/><stop offset="1" stop-color="#cc420a"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#zb)"/><path d="M18.5,20.5 45.5,20.5 18.5,43.5 45.5,43.5" fill="none" stroke="#fff" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Zyvor</b><span>&middot;</span><span>Hypervisor to KVM migration</span></div>
   <div class="word">h2kvm</div>
   <div class="tag">Any hypervisor to KVM.<br><em>Fixed before first boot.</em></div>
-  <div class="lede">Pulls VMs from vSphere, ESXi, Azure or local disks, fixes the guest offline, converts to qcow2 and lands it on KubeVirt, libvirt or OpenStack.</div>
-  <div class="stats"><div class="stat"><b>13</b><span>--cmd modes</span></div><div class="stat"><b>3</b><span>deploy targets</span></div><div class="stat"><b>qcow2</b><span>output format</span></div></div>
+  <div class="lede">Pulls VMs from vSphere, ESXi, Azure or local disks, fixes the guest offline and lands it on <b style="color:#fff">Kairon</b> (Kubernetes, no KubeVirt) or <b style="color:#fff">Machina</b> (the private cloud OpenStack should have been).</div>
+  <div class="stats"><div class="stat"><b>0</b><span>pods per VM</span></div><div class="stat"><b>7.4x</b><span>faster SSH vs KubeVirt</span></div><div class="stat"><b>1</b><span>command cloud</span></div></div>
 </div>
 <div class="pill"><span class="b">github.com/zyvorai/zyvor-h2kvm</span><span>Zyvor Production</span></div>
 <script>
@@ -117,7 +117,7 @@ tg.forEach(function (ty) {
 Z.el('circle', { cx: jx, cy: jy, r: 4, fill: C.cyan, filter: 'url(#hpgl)' });
 Z.label(438, 300 - 30, 'qcow2', 'chip');
 var rowCss = 'height:88px;line-height:88px;margin:0';
-Z.label(562, 300, '<b style="' + rowCss + '">KubeVirt</b><b style="' + rowCss + '">libvirt</b><b style="' + rowCss + '">OpenStack</b>', 'left');
+Z.label(562, 300, '<b class="sig" style="' + rowCss + '">Kairon</b><b class="cy" style="' + rowCss + '">Machina</b><b style="' + rowCss + ';color:#636366;font-size:10px">legacy</b>', 'left');
 Z.label(306, 432, '<b>fix offline</b><span>guest repaired in flight</span>');
 })();
 </script>

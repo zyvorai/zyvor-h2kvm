@@ -32,8 +32,8 @@ MONO = "'Menlo','JetBrains Mono',monospace"
 # Facts come from README.md / docs/social/h2kvm-flow.svg.
 SOURCES = [("vSphere", "govc · datastore"), ("ESXi", "ssh stream"),
            ("Azure", "az snapshot"), ("Files", "VMDK · VHDX · OVA")]
-TARGETS = [("KubeVirt", "Zorvia · Zeus OS"), ("libvirt", "Machina"), ("OpenStack", "Glance · Nova")]
-CHIPS = [("GUESTKIT", 122), ("KUBERNETES", 142), ("OFFLINE", 108)]
+TARGETS = [("Kairon", "via Veyron · 0 pods"), ("Machina", "private cloud"), ("Legacy", "KubeVirt · OpenStack")]
+CHIPS = [("GUESTKIT", 122), ("KAIRON", 108), ("MACHINA", 116)]
 
 
 def pill(x, cy, w, name, sub, p):
@@ -49,7 +49,7 @@ def pill(x, cy, w, name, sub, p):
 def share_card(p, dark):
     src_x, src_w = 572, 152
     hub_x, hub_w, hub_cy = 780, 140, 315
-    dst_x, dst_w = 984, 144
+    dst_x, dst_w = 960, 168
     src_cy = [195, 275, 355, 435]
     dst_cy = [215, 315, 415]
     wires, dots, pills = [], [], []
@@ -75,7 +75,7 @@ def share_card(p, dark):
     hub_y = hub_cy - 56
     return f'''<!-- Copyright (c) 2026 ZyvorAI Labs Private Limited. -->
 <!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="h2kvm — Any hypervisor to KVM. Convert offline, fix the guest, deploy with confidence. vSphere, ESXi, Azure and files in; KubeVirt, libvirt and OpenStack out.">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="h2kvm — Any hypervisor to KVM. Convert offline, fix the guest, deploy with confidence. vSphere, ESXi, Azure and files in; Kairon and Machina out, with KubeVirt and OpenStack as legacy targets.">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="{p["bg0"]}"/>

@@ -24,7 +24,8 @@ function HomepageHeader() {
             </Heading>
             <p className="hero__subtitle">
               Convert the disk offline. Fix the guest before power-on. Then
-              land it on KubeVirt, libvirt, or OpenStack.
+              land it on Kairon (real VMs on Kubernetes, 0 pods per VM) or
+              Machina (the private cloud you install before lunch).
             </p>
             <div className={styles.buttons}>
               <Link
@@ -79,6 +80,41 @@ function ArchitectureDiagram() {
             <Link to="/docs/how-it-works">Read how it works</Link>
             <a href="https://zyvor.dev/h2kvm">zyvor.dev/h2kvm</a>
             <a href="https://github.com/zyvorai/h2kvm">github.com/zyvorai/h2kvm</a>
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function WhereItLands() {
+  const lands = useBaseUrl('/readme-where-it-lands.jpg');
+  const versus = useBaseUrl('/readme-vs-kubevirt-openstack.jpg');
+  return (
+    <section className={styles.diagram}>
+      <div className="container">
+        <Reveal>
+          <p className={styles.eyebrow}>Where it lands</p>
+          <Heading as="h2" className={styles.sectionHeading}>
+            Leave VMware. Skip the next lock-in.
+          </Heading>
+          <div className={styles.diagramFrame}>
+            <img
+              src={lands}
+              alt="Kairon + Veyron on Kubernetes and Machina as the private cloud, with KubeVirt and OpenStack as legacy targets."
+            />
+          </div>
+          <div className={styles.diagramFrame}>
+            <img
+              src={versus}
+              alt="Kairon vs KubeVirt: 0 pods per VM, 63 MiB vs 905 MiB idle, 24.8 s vs 184.7 s to SSH for 5 VMs. Machina vs OpenStack: 4 services vs 9+, one command vs a Kolla project."
+            />
+          </div>
+          <p className={styles.diagramLinks}>
+            <Link to="/docs/how-it-works#where-the-vm-lands">Where the VM lands</Link>
+            <a href="https://github.com/zyvorai/kairon">Kairon</a>
+            <a href="https://github.com/zyvorai/veyron">Veyron</a>
+            <a href="https://zyvor.dev/machina">Machina</a>
           </p>
         </Reveal>
       </div>
@@ -185,9 +221,10 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="h2kvm — any hypervisor to KVM"
-      description="Convert VMs from vSphere, Azure, and any disk image to KVM. The guest is fixed before power-on, then lands on KubeVirt, libvirt, or OpenStack.">
+      description="Convert VMs from vSphere, Azure, and any disk image to KVM. The guest is fixed before power-on, then lands on Kairon via Veyron or a Machina private cloud.">
       <HomepageHeader />
       <main>
+        <WhereItLands />
         <ArchitectureDiagram />
         <ProblemStatement />
         <Reveal>

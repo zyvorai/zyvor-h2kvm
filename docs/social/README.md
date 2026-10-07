@@ -6,6 +6,9 @@
 | `h2kvm-share-card-dark.png` / `.svg` | Dark variant, shown to dark-theme readers via `<picture>` |
 | `h2kvm-flow.svg` | README pipeline diagram (light, with a `prefers-color-scheme: dark` rule built in) |
 | `h2kvm-flow-dark.svg` | The same diagram, always dark, for `<picture>` use |
+| `h2kvm-hero-dark.html` / `.jpg` | README hero card, rendered by `build-hero-dark.sh` |
+| `migration-path-dark.html` / `.jpg` | VMware to Kairon or Machina path card, rendered by `build-hero-dark.sh` |
+| `migration-1200x630.png` / `-dark.png` | Older Zorvia "VMware to KubeVirt" card, no longer used by the README |
 | `h2kvm-pricing.jpg`, `h2kvm-vsphere-path.jpg` | Unchanged images used elsewhere |
 | `build-share-cards.py` | Generates the SVG cards and restyles the flow diagrams |
 

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-labelledby="t d">
   <title id="t">h2kvm: sources, pipeline and deploy targets</title>
-  <desc id="d">h2kvm picks up a disk from vSphere, ESXi over SSH, Azure, local files or a Nutanix export made by Transiva. It inspects and flattens it, repairs it offline with GuestKit, converts it to qcow2 and checks it. It then deploys to one of three targets per run: a KubeVirt cluster (Zorvia and Zeus OS), a libvirt host (Machina) or OpenStack Glance and Nova.</desc>
+  <desc id="d">h2kvm picks up a disk from vSphere, ESXi over SSH, Azure, local files or a Nutanix export made by Transiva. It inspects and flattens it, repairs it offline with GuestKit, converts it to qcow2 and checks it. It then deploys to one target per run: Kairon on Kubernetes through the Veyron API, a Machina-managed libvirt host, or the legacy KubeVirt and OpenStack targets.</desc>
   <style>
     text { font-family: "Helvetica Neue", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
     .box { stroke-width: 1.2; }
@@ -118,42 +118,44 @@
   <line class="ln" x1="606" y1="120" x2="606" y2="458"/>
   <line class="ln" x1="606" y1="120" x2="688" y2="120" marker-end="url(#ah)"/>
   <line class="ln" x1="606" y1="289" x2="688" y2="289" marker-end="url(#ah)"/>
-  <text class="lbl" x="648" y="113" text-anchor="middle">k8s API</text>
+  <text class="lbl" x="648" y="113" text-anchor="middle">Veyron API</text>
   <text class="lbl" x="648" y="282" text-anchor="middle">virsh</text>
-  <text class="lbl" x="648" y="451" text-anchor="middle">Glance, Nova</text>
+  <text class="lbl" x="648" y="451" text-anchor="middle">legacy</text>
   <text class="lbl" x="614" y="204" font-style="italic">one per run</text>
 
-  <!-- lane 1: KubeVirt -->
-  <rect class="box" x="690" y="50" width="250" height="140" rx="8"/>
-  <text class="t" x="704" y="76">KubeVirt cluster</text>
-  <text class="d" x="704" y="96">CDI upload (virtctl) or PVC copy,</text>
-  <text class="d" x="704" y="112">then a kubevirt.io/v1 VirtualMachine</text>
-  <text class="m" x="704" y="132">--deploy-k8s</text>
+  <!-- lane 1: Kairon via Veyron -->
+  <rect class="hot" x="690" y="50" width="250" height="140" rx="8"/>
+  <text class="t" x="704" y="76">Kairon on Kubernetes</text>
+  <text class="d" x="704" y="96">Veyron import → Kairon Machine on KVM</text>
+  <text class="d" x="704" y="112">0 pods per VM · no KubeVirt, CDI or PVC</text>
+  <text class="m" x="704" y="132">--deploy-kairon</text>
   <line class="div" x1="704" y1="146" x2="926" y2="146"/>
-  <rect class="chip" x="704" y="158" width="58" height="20" rx="10"/>
-  <text class="chipt" x="733" y="172">Zorvia</text>
-  <rect class="chip" x="770" y="158" width="66" height="20" rx="10"/>
-  <text class="chipt" x="803" y="172">Zeus OS</text>
+  <rect class="chip" x="704" y="158" width="60" height="20" rx="10"/>
+  <text class="chipt" x="734" y="172">Kairon</text>
+  <rect class="chip" x="772" y="158" width="62" height="20" rx="10"/>
+  <text class="chipt" x="803" y="172">Veyron</text>
 
-  <!-- lane 2: libvirt -->
-  <rect class="box" x="690" y="219" width="250" height="140" rx="8"/>
-  <text class="t" x="704" y="245">libvirt host</text>
-  <text class="d" x="704" y="265">virsh define, optional start</text>
-  <text class="d" x="704" y="281">on the host h2kvmctl runs on</text>
+  <!-- lane 2: Machina -->
+  <rect class="hot" x="690" y="219" width="250" height="140" rx="8"/>
+  <text class="t" x="704" y="245">Machina private cloud</text>
+  <text class="d" x="704" y="265">virsh define on a libvirt host, then</text>
+  <text class="d" x="704" y="281">Fleet Cloud, HA/DRS, eBPF, AI ops</text>
   <text class="m" x="704" y="301">--emit-domain-xml</text>
   <line class="div" x1="704" y1="315" x2="926" y2="315"/>
   <rect class="chip" x="704" y="327" width="66" height="20" rx="10"/>
   <text class="chipt" x="737" y="341">Machina</text>
 
-  <!-- lane 3: OpenStack -->
-  <rect class="box" x="690" y="388" width="250" height="140" rx="8"/>
-  <text class="t" x="704" y="414">OpenStack</text>
-  <text class="d" x="704" y="434">openstacksdk: qcow2 → Glance image,</text>
-  <text class="d" x="704" y="450">optional Nova server boot</text>
-  <text class="m" x="704" y="470">--deploy-openstack</text>
+  <!-- lane 3: legacy targets -->
+  <rect class="ext" x="690" y="388" width="250" height="140" rx="8"/>
+  <text class="t" x="704" y="414">Legacy targets</text>
+  <text class="d" x="704" y="434">KubeVirt: CDI upload + virt-launcher pod</text>
+  <text class="d" x="704" y="450">OpenStack: Glance image, Nova boot</text>
+  <text class="m" x="704" y="470">--deploy-k8s · --deploy-openstack</text>
   <line class="div" x1="704" y1="484" x2="926" y2="484"/>
-  <rect class="chipx" x="704" y="496" width="118" height="20" rx="10"/>
-  <text class="chipxt" x="763" y="510">third-party cloud</text>
+  <rect class="chipx" x="704" y="496" width="70" height="20" rx="10"/>
+  <text class="chipxt" x="739" y="510">KubeVirt</text>
+  <rect class="chipx" x="782" y="496" width="80" height="20" rx="10"/>
+  <text class="chipxt" x="822" y="510">OpenStack</text>
 
   <!-- left-bottom notes -->
   <rect class="box" x="20" y="427" width="230" height="66" rx="8"/>
@@ -163,7 +165,7 @@
 
   <!-- legend -->
   <rect class="chip" x="20" y="546" width="40" height="14" rx="7"/>
-  <text class="d" x="72" y="557">Zyvor product that runs or manages that endpoint. h2kvm deploys to the cluster or host, and has no API link to the product.</text>
+  <text class="d" x="72" y="557">Zyvor product. Kairon is driven through the Veyron API; Machina manages the libvirt host h2kvm defines the VM on.</text>
   <rect class="chipx" x="20" y="570" width="40" height="14" rx="7"/>
-  <text class="d" x="72" y="581">Dashed: not a Zyvor product, or not part of this repo.</text>
+  <text class="d" x="72" y="581">Dashed: legacy third-party target, or not part of this repo.</text>
 </svg>

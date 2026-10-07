@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>h2kvm migration path card</title>
+<!--
+  1200x630 dark card: VMware to Kairon or Machina, used in the README suite section.
+  Build: ./docs/social/build-hero-dark.sh  ->  migration-path-dark.jpg (2400x1260)
+-->
+<style>
+  :root { --blue:#0071e3; --signal:#2997ff; --cyan:#64d2ff; --violet:#bf5af2;
+    --sans:'SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif; --mono:'SF Mono',Menlo,Consolas,monospace; }
+  * { box-sizing:border-box; } html,body { margin:0; padding:0; }
+  body { width:1200px; height:630px; overflow:hidden; color:#f5f5f7; font-family:var(--sans); position:relative; background:#000; }
+  .aurora { position:absolute; inset:0;
+    background:radial-gradient(700px 420px at 90% 0%, rgba(41,151,255,.30), transparent 62%),
+               radial-gradient(600px 400px at 0% 110%, rgba(100,210,255,.16), transparent 60%); }
+  .wrap { position:absolute; inset:0; padding:40px 48px; }
+  .top { display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:#a1a1a6; }
+  .top .brand { display:flex; align-items:center; gap:10px; } .top b { color:#fff; } .top .k { color:var(--cyan); }
+  h1 { margin:22px 0 0; font-size:46px; line-height:1.05; font-weight:800; letter-spacing:-.03em; }
+  h1 em { font-style:normal; background:linear-gradient(92deg,var(--signal),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { margin:10px 0 0; font-size:18px; color:#a1a1a6; }
+  .steps { margin-top:28px; display:grid; grid-template-columns:1fr 1fr 1fr 1.35fr; gap:16px; align-items:stretch; }
+  .s { border-radius:16px; padding:18px 18px 16px; background:linear-gradient(180deg, rgba(28,30,36,.92), rgba(14,15,19,.95)); border:1px solid rgba(255,255,255,.12); }
+  .s.land { border-color:rgba(41,151,255,.6); box-shadow:0 0 36px rgba(41,151,255,.2); }
+  .n { display:inline-flex; width:26px; height:26px; border-radius:50%; align-items:center; justify-content:center; font-size:13px; font-weight:800; background:var(--blue); }
+  .s h2 { margin:12px 0 6px; font-size:25px; font-weight:800; letter-spacing:-.02em; }
+  .lic { display:inline-block; font-size:12px; font-weight:700; padding:4px 10px; border-radius:10px; background:var(--blue); }
+  .lic.p { background:var(--violet); }
+  .s p { margin:12px 0 0; font-size:15px; line-height:1.4; color:#c7c7cc; }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px; }
+  .pair div { border-radius:12px; padding:10px 12px; background:rgba(0,40,90,.35); border:1px solid rgba(41,151,255,.35); }
+  .pair b { display:block; font-size:19px; } .pair span { display:block; margin-top:4px; font-size:13px; color:#a1a1a6; line-height:1.35; }
+  .legacy { margin-top:18px; padding:12px 16px; border-radius:12px; border:1px dashed rgba(255,255,255,.18); font-size:15px; color:#8e8e93; }
+  .legacy b { color:#d1d1d6; }
+  .foot { position:absolute; left:48px; right:48px; bottom:28px; display:flex; justify-content:space-between; font-family:var(--mono); font-size:13px; color:#8e8e93; border-top:1px solid rgba(255,255,255,.08); padding-top:14px; }
+  .foot b { color:#f5f5f7; }
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="wrap">
+  <div class="top"><div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><defs><linearGradient id="zb" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff5a15"/><stop offset="1" stop-color="#cc420a"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#zb)"/><path d="M18.5,20.5 45.5,20.5 18.5,43.5 45.5,43.5" fill="none" stroke="#fff" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Zyvor</b><span>&middot; h2kvm</span></div><div class="k">Leaving VMware</div></div>
+  <h1>VMware to <em>Kairon or Machina.</em> One path.</h1>
+  <div class="sub">Export, convert, repair, land. No virt-launcher pods, no OpenStack project.</div>
+  <div class="steps">
+    <div class="s"><span class="n">1</span><h2>Transiva</h2><span class="lic">Apache-2.0</span><p>Export from vSphere and Nutanix. No guest agent.</p></div>
+    <div class="s"><span class="n">2</span><h2>h2kvm</h2><span class="lic p">Prod. licence</span><p>Convert to qcow2, fix drivers and boot, deploy in one run.</p></div>
+    <div class="s"><span class="n">3</span><h2>GuestKit</h2><span class="lic">Apache-2.0</span><p>Offline repair and boot-readiness before power-on.</p></div>
+    <div class="s land"><span class="n">4</span><h2>Land it</h2>
+      <div class="pair"><div><b>Kairon</b><span>via Veyron<br>0 pods per VM<br>--deploy-kairon</span></div><div><b>Machina</b><span>private cloud<br>4 Rust services<br>--emit-domain-xml</span></div></div></div>
+  </div>
+  <div class="legacy"><b>Legacy targets still work:</b> KubeVirt (--deploy-k8s) and OpenStack (--deploy-openstack), for teams that cannot move yet.</div>
+  <div class="foot"><span><b>zyvor.dev</b> &middot; github.com/zyvorai/zyvor-h2kvm</span><span>VMware is a trademark of Broadcom. Each tool has its own licence.</span></div>
+</div>
+</body>
+</html>

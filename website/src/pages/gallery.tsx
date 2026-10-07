@@ -18,6 +18,15 @@ const TOUR: Shot[] = [
   {src: '/06-settings.png', caption: 'Settings'},
 ];
 
+const LANDING: Shot[] = [
+  {src: '/readme-where-it-lands.jpg', caption: 'Where it lands: Kairon or Machina'},
+  {src: '/veyron-benchmark.jpg', caption: 'Kairon vs KubeVirt benchmark'},
+  {src: '/machina-vs-openstack.jpg', caption: 'Machina vs OpenStack'},
+  {src: '/machina-dashboard-dark.png', caption: 'Machina dashboard'},
+  {src: '/machina-fleet-cloud-dark.png', caption: 'Machina Fleet Cloud'},
+  {src: '/machina-zyra-dark.png', caption: 'Machina Zyra AI'},
+];
+
 function ShotCard({shot}: {shot: Shot}) {
   const src = useBaseUrl(shot.src);
   return (
@@ -33,7 +42,7 @@ export default function Gallery(): ReactNode {
   return (
     <Layout
       title="Gallery"
-      description="A walkthrough of the h2kweb dashboard, captured against a live lab deployment.">
+      description="Where h2kvm lands your VMs (Kairon and Machina) and a walkthrough of the h2kweb dashboard.">
       <header className={styles.header}>
         <div className="container">
           <Heading as="h1">Product tour</Heading>
@@ -45,13 +54,20 @@ export default function Gallery(): ReactNode {
       </header>
       <main className="container">
         <div className={styles.demo}>
-          <img src={card} alt="h2kvm picks up disks from vSphere, ESXi, Azure and local files, repairs them offline with GuestKit, converts to qcow2, then deploys to a KubeVirt cluster (Zorvia, Zeus OS), a libvirt host (Machina) or OpenStack." />
+          <img src={card} alt="h2kvm picks up disks from vSphere, ESXi, Azure and local files, repairs them offline with GuestKit, converts to qcow2, then deploys to Kairon through the Veyron API or a Machina libvirt host, with KubeVirt and OpenStack as legacy targets." />
           <p className={styles.caption}>
-            GuestKit repairs the disk and h2kvm lands the VM on one target.
-            KubeVirt is Zorvia and Zeus OS, libvirt hosts are Machina, and
-            OpenStack is Glance and Nova.
+            GuestKit repairs the disk and h2kvm lands the VM on one target:
+            Kairon through Veyron on Kubernetes, or a Machina private cloud.
+            KubeVirt and OpenStack remain as legacy targets.
           </p>
         </div>
+        <Heading as="h2">Where your VMs land</Heading>
+        <div className={styles.grid}>
+          {LANDING.map((shot) => (
+            <ShotCard key={shot.src} shot={shot} />
+          ))}
+        </div>
+        <Heading as="h2">The h2kweb console</Heading>
         <div className={styles.grid}>
           {TOUR.map((shot) => (
             <ShotCard key={shot.src} shot={shot} />

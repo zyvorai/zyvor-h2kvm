@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2026 ZyvorAI Labs Private Limited. -->
 <!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="h2kvm — Any hypervisor to KVM. Convert offline, fix the guest, deploy with confidence. vSphere, ESXi, Azure and files in; KubeVirt, libvirt and OpenStack out.">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="h2kvm — Any hypervisor to KVM. Convert offline, fix the guest, deploy with confidence. vSphere, ESXi, Azure and files in; Kairon and Machina out, with KubeVirt and OpenStack as legacy targets.">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#000000"/>
@@ -54,32 +54,32 @@
   <g>
     <rect x="72" y="486" width="122" height="40" rx="20" fill="#0b2340" stroke="#1d4f8a"/>
     <text x="133.0" y="511" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" font-weight="700" letter-spacing="1" fill="#2997ff">GUESTKIT</text>
-    <rect x="206" y="486" width="142" height="40" rx="20" fill="#0b2340" stroke="#1d4f8a"/>
-    <text x="277.0" y="511" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" font-weight="700" letter-spacing="1" fill="#2997ff">KUBERNETES</text>
-    <rect x="360" y="486" width="108" height="40" rx="20" fill="#0b2340" stroke="#1d4f8a"/>
-    <text x="414.0" y="511" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" font-weight="700" letter-spacing="1" fill="#2997ff">OFFLINE</text>
+    <rect x="206" y="486" width="108" height="40" rx="20" fill="#0b2340" stroke="#1d4f8a"/>
+    <text x="260.0" y="511" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" font-weight="700" letter-spacing="1" fill="#2997ff">KAIRON</text>
+    <rect x="326" y="486" width="116" height="40" rx="20" fill="#0b2340" stroke="#1d4f8a"/>
+    <text x="384.0" y="511" text-anchor="middle" font-family="'Menlo','JetBrains Mono',monospace" font-size="14" font-weight="700" letter-spacing="1" fill="#2997ff">MACHINA</text>
   </g>
 
   <!-- sources -> h2kvm -> targets -->
   <text x="572" y="140" font-family="'Menlo','JetBrains Mono',monospace" font-size="13" font-weight="700" letter-spacing="3" fill="#a1a1a6">SOURCES</text>
-  <text x="984" y="140" font-family="'Menlo','JetBrains Mono',monospace" font-size="13" font-weight="700" letter-spacing="3" fill="#a1a1a6">TARGETS</text>
+  <text x="960" y="140" font-family="'Menlo','JetBrains Mono',monospace" font-size="13" font-weight="700" letter-spacing="3" fill="#a1a1a6">TARGETS</text>
   <g fill="none" stroke="#2997ff" stroke-opacity="0.55" stroke-width="2.5" stroke-linecap="round">
     <path d="M724 195 C 754 195, 750 315, 780 315"/>
     <path d="M724 275 C 754 275, 750 315, 780 315"/>
     <path d="M724 355 C 754 355, 750 315, 780 315"/>
     <path d="M724 435 C 754 435, 750 315, 780 315"/>
-    <path d="M920 315 C 952 315, 952 215, 984 215"/>
-    <path d="M920 315 C 952 315, 952 315, 984 315"/>
-    <path d="M920 315 C 952 315, 952 415, 984 415"/>
+    <path d="M920 315 C 952 315, 928 215, 960 215"/>
+    <path d="M920 315 C 952 315, 928 315, 960 315"/>
+    <path d="M920 315 C 952 315, 928 415, 960 415"/>
   </g>
   <g fill="#2997ff">
     <circle cx="724" cy="195" r="4.5"/>
     <circle cx="724" cy="275" r="4.5"/>
     <circle cx="724" cy="355" r="4.5"/>
     <circle cx="724" cy="435" r="4.5"/>
-    <circle cx="984" cy="215" r="4.5"/>
-    <circle cx="984" cy="315" r="4.5"/>
-    <circle cx="984" cy="415" r="4.5"/>
+    <circle cx="960" cy="215" r="4.5"/>
+    <circle cx="960" cy="315" r="4.5"/>
+    <circle cx="960" cy="415" r="4.5"/>
   </g>
   <g>
     <rect x="572" y="167" width="152" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
@@ -94,15 +94,15 @@
     <rect x="572" y="407" width="152" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
     <text x="590" y="432" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">Files</text>
     <text x="590" y="451" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">VMDK · VHDX · OVA</text>
-    <rect x="984" y="187" width="144" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
-    <text x="1002" y="212" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">KubeVirt</text>
-    <text x="1002" y="231" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">Zorvia · Zeus OS</text>
-    <rect x="984" y="287" width="144" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
-    <text x="1002" y="312" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">libvirt</text>
-    <text x="1002" y="331" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">Machina</text>
-    <rect x="984" y="387" width="144" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
-    <text x="1002" y="412" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">OpenStack</text>
-    <text x="1002" y="431" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">Glance · Nova</text>
+    <rect x="960" y="187" width="168" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="978" y="212" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">Kairon</text>
+    <text x="978" y="231" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">via Veyron · 0 pods</text>
+    <rect x="960" y="287" width="168" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="978" y="312" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">Machina</text>
+    <text x="978" y="331" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">private cloud</text>
+    <rect x="960" y="387" width="168" height="56" rx="15" fill="#1c1c1e" stroke="#3a3a3c" filter="url(#shadow)"/>
+    <text x="978" y="412" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#f5f5f7">Legacy</text>
+    <text x="978" y="431" font-family="'Menlo','JetBrains Mono',monospace" font-size="12" fill="#a1a1a6">KubeVirt · OpenStack</text>
   </g>
   <rect x="780" y="259" width="140" height="112" rx="26" fill="url(#blue)" filter="url(#glow)"/>
   <rect x="780" y="259" width="140" height="112" rx="26" fill="none" stroke="#ffffff" stroke-opacity="0.25"/>
