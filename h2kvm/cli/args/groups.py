@@ -1970,6 +1970,97 @@ def _add_openstack_deployment(p: argparse.ArgumentParser) -> None:
     )
 
 
+def _add_kairon_deployment(p: argparse.ArgumentParser) -> None:
+    """Kairon Machine import through Veyron (no KubeVirt/CDI)."""
+    g = p.add_argument_group("Kairon deployment")
+    g.add_argument(
+        "--deploy-kairon",
+        dest="deploy_kairon",
+        action="store_true",
+        help="After conversion, boot the disk as a Kairon Machine via Veyron POST /api/v1/imports.",
+    )
+    g.add_argument(
+        "--kairon-veyron-url",
+        dest="kairon_veyron_url",
+        default=None,
+        help="Veyron API base URL, e.g. https://veyron.example:30151.",
+    )
+    g.add_argument(
+        "--kairon-api-key",
+        dest="kairon_api_key",
+        default=None,
+        help="Veyron API key with write role (default: $VEYRON_API_KEY).",
+    )
+    g.add_argument(
+        "--kairon-insecure",
+        dest="kairon_insecure",
+        action="store_true",
+        help="Skip TLS verification for a self-signed Veyron certificate.",
+    )
+    g.add_argument("--kairon-namespace", dest="kairon_namespace", default="default")
+    g.add_argument(
+        "--kairon-vm-name",
+        dest="kairon_vm_name",
+        default=None,
+        help="Machine name (default: --vm-name or the image filename stem).",
+    )
+    g.add_argument("--kairon-cpus", dest="kairon_cpus", type=int, default=None)
+    g.add_argument("--kairon-memory", dest="kairon_memory", default=None, help="e.g. 8Gi")
+    g.add_argument(
+        "--kairon-image-url",
+        dest="kairon_image_url",
+        default=None,
+        help="http(s) URL where the converted disk is already published (reachable from Kairon nodes).",
+    )
+    g.add_argument(
+        "--kairon-serve",
+        dest="kairon_serve",
+        default=None,
+        metavar="HOST:PORT",
+        help="Serve the converted disk over HTTP from this host until the VM is Running.",
+    )
+    g.add_argument(
+        "--kairon-advertise-url",
+        dest="kairon_advertise_url",
+        default=None,
+        help="Base URL Kairon nodes use to reach --kairon-serve, e.g. http://10.0.0.5:8099.",
+    )
+    g.add_argument(
+        "--kairon-repair",
+        dest="kairon_repair",
+        action="store_true",
+        help="Also run FluxVM's offline virtio repair (normally unnecessary after h2kvm fixes).",
+    )
+    g.add_argument("--kairon-secure-boot", dest="kairon_secure_boot", action="store_true")
+    g.add_argument("--kairon-tpm", dest="kairon_tpm", action="store_true")
+    g.add_argument(
+        "--kairon-no-start",
+        dest="kairon_no_start",
+        action="store_true",
+        help="Create the Machine stopped (requires --kairon-image-url).",
+    )
+    g.add_argument(
+        "--kairon-source-hypervisor",
+        dest="kairon_source_hypervisor",
+        default=None,
+        help="Recorded on the Machine, e.g. vmware, hyperv, azure.",
+    )
+    g.add_argument(
+        "--kairon-wait-timeout",
+        dest="kairon_wait_timeout",
+        type=int,
+        default=1800,
+        help="Seconds to wait for the Machine to reach Running (default: 1800).",
+    )
+    g.add_argument(
+        "--kairon-continue-on-error",
+        dest="kairon_continue_on_error",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Continue migration if Kairon deploy fails (default: true).",
+    )
+
+
 def _add_ai_flags(p: argparse.ArgumentParser) -> None:
     """AI migration intelligence flags."""
     g = p.add_argument_group("AI Migration Intelligence")

@@ -232,6 +232,8 @@ class MigrationConfig:  # pylint: disable=too-many-instance-attributes
     k8s_continue_on_error: bool = True
     deploy_openstack: bool = False
     openstack_continue_on_error: bool = True
+    deploy_kairon: bool = False
+    kairon_continue_on_error: bool = True
 
     # Daemon mode
     manifest_workflow_mode: bool = False
@@ -283,6 +285,8 @@ class MigrationConfig:  # pylint: disable=too-many-instance-attributes
             k8s_continue_on_error=getattr(args, "k8s_continue_on_error", True),
             deploy_openstack=getattr(args, "deploy_openstack", False),
             openstack_continue_on_error=getattr(args, "openstack_continue_on_error", True),
+            deploy_kairon=getattr(args, "deploy_kairon", False),
+            kairon_continue_on_error=getattr(args, "kairon_continue_on_error", True),
             manifest_workflow_mode=getattr(args, "manifest_workflow_mode", False),
             manifest_workflow_dir=getattr(args, "manifest_workflow_dir", None),
             workflow_mode=getattr(args, "workflow_mode", False),

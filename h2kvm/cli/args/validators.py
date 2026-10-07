@@ -362,6 +362,7 @@ def validate_deploy_exclusive(args: argparse.Namespace, conf: dict[str, Any]) ->
     """Reject incompatible deploy targets (remote upload vs local libvirt lock)."""
     deploy_k8s = _flag_from_args_or_conf(args, conf, "deploy_k8s")
     deploy_openstack = _flag_from_args_or_conf(args, conf, "deploy_openstack")
+    deploy_kairon = _flag_from_args_or_conf(args, conf, "deploy_kairon")
     libvirt_on = (
         _flag_from_args_or_conf(args, conf, "emit_domain_xml")
         or _flag_from_args_or_conf(args, conf, "virsh_define")
@@ -371,6 +372,15 @@ def validate_deploy_exclusive(args: argparse.Namespace, conf: dict[str, Any]) ->
     if deploy_k8s and deploy_openstack:
         raise SystemExit(
             "deploy_k8s and deploy_openstack are mutually exclusive; enable only one remote deploy target."
+        )
+    if deploy_kairon and (deploy_k8s or deploy_openstack):
+        raise SystemExit(
+            "deploy_kairon is mutually exclusive with deploy_k8s and deploy_openstack; enable only one remote deploy target."
+        )
+    if deploy_kairon and libvirt_on:
+        raise SystemExit(
+            "deploy_kairon cannot be combined with emit_domain_xml, virsh_define, or libvirt_test. "
+            "Disable libvirt options or turn off Kairon deploy."
         )
     if deploy_k8s and libvirt_on:
         raise SystemExit(
