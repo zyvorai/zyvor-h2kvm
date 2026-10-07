@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--deploy-kairon` lands the converted disk on Kairon as a `Machine` through Veyron's
+  `POST /api/v1/imports`, with no KubeVirt or CDI. h2kvm can serve the disk itself
+  (`--kairon-serve`) or point at one already published (`--kairon-image-url`). See
+  `docs/deployment/kairon-deployment.md`.
+
 ## [1.4.0] - 2026-09-19
 
 ### Fixed

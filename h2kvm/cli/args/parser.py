@@ -33,6 +33,7 @@ from .groups import (
     _add_kubernetes_deployment,
     _add_libvirt_xml_knobs,
     _add_luks_knobs,
+    _add_kairon_deployment,
     _add_openstack_deployment,
     _add_ovf_ova_knobs,
     _add_ovftool_knobs,
@@ -100,6 +101,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     # OpenStack Glance / Nova
     _add_openstack_deployment(p)
+
+    # Kairon Machines via Veyron
+    _add_kairon_deployment(p)
 
     # AI migration intelligence
     _add_ai_flags(p)

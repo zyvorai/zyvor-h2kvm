@@ -685,6 +685,42 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
                 ),
             ) from e
 
+    def _deploy_to_kairon(self, out_images: list[Path]) -> None:
+        """Boot the converted boot disk as a Kairon Machine through Veyron."""
+        # pylint: disable-next=import-outside-toplevel  # optional deployer, only needed when targeting Kairon
+        from h2kvm.infrastructure.deployers.kairon import deploy_to_kairon
+
+        self.logger.info("")
+        self.logger.info("=" * 80)
+        self.logger.info("Kairon deployment")
+        self.logger.info("=" * 80)
+        images = [img for img in out_images if str(img).endswith((".qcow2", ".raw", ".img"))]
+        if not images:
+            self.logger.warning("No qcow2/raw disk to import into Kairon")
+            return
+        if len(images) > 1:
+            self.logger.warning(
+                "Kairon boots one disk per Machine; importing %s and skipping %d other disk(s)",
+                images[0].name,
+                len(images) - 1,
+            )
+        img = images[0]
+        try:
+            result = deploy_to_kairon(self.logger, self.args, str(img))
+            if not result.get("dry_run"):
+                self.logger.info(
+                    "Kairon Machine %s/%s: %s",
+                    result.get("namespace"),
+                    result.get("vm_name"),
+                    result.get("status"),
+                )
+        except Exception as e:  # pylint: disable=broad-exception-caught  # honour --kairon-continue-on-error
+            err_text = e.user_message(include_context=True) if isinstance(e, H2KvmError) else str(e)
+            self.logger.exception("Kairon deployment failed for '%s': %s", img, err_text)
+            if not self.config.kairon_continue_on_error:
+                raise Fatal(code=1, msg=f"Kairon deployment failed for '{img.name}':\n{err_text}") from e
+        self.logger.info("=" * 80)
+
     def _deploy_to_openstack(self, out_images: list[Path]) -> None:
         """Upload converted disks to OpenStack Glance; optionally boot Nova."""
         try:
@@ -1422,7 +1458,7 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
         self._auto_detect_secure_boot_from_guest()
 
         # Remote deploy (KubeVirt / OpenStack) must not define or boot local libvirt domains.
-        if self.config.deploy_k8s or self.config.deploy_openstack:
+        if self.config.deploy_k8s or self.config.deploy_openstack or self.config.deploy_kairon:
             self.args.emit_domain_xml = False
             self.args.virsh_define = False
             self.config.libvirt_test = False
@@ -1455,6 +1491,9 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
 
         if self.config.deploy_openstack and out_images:
             self._deploy_to_openstack(out_images)
+
+        if self.config.deploy_kairon and out_images:
+            self._deploy_to_kairon(out_images)
 
         U.banner(self.logger, "Done")
 
