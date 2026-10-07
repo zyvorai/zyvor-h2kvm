@@ -38,11 +38,14 @@ Shell Completion is optional. Install argcomplete, then see [docs/getting-starte
 # Local VMDK → qcow2 (GuestKit repair is the default backend)
 h2kvmctl --cmd local --vmdk ubuntu.vmdk --to-output ubuntu.qcow2 --backend guestkit
 
-# vSphere → repair → KubeVirt (there are no subcommands; --cmd picks the mode)
+# vSphere → repair → Kairon through Veyron (there are no subcommands; --cmd picks the mode)
 h2kvmctl --cmd vsphere --vcenter vc.example.com --vc-user admin \
   --vc-password-env VC_PASSWORD --vs-vm web-prod-01 \
   --output-dir ./out --to-output web-prod-01.qcow2 --flatten \
-  --deploy-k8s --k8s-namespace vms
+  --deploy-kairon --kairon-veyron-url https://veyron.example:30151 \
+  --kairon-namespace vms \
+  --kairon-serve 0.0.0.0:8099 --kairon-advertise-url http://10.0.0.5:8099
+# Legacy KubeVirt target: replace the --kairon-* flags with --deploy-k8s --k8s-namespace vms
 
 # Web dashboard
 h2kweb

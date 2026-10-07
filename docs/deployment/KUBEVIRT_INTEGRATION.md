@@ -2,7 +2,8 @@
 
 **Version:** v0.3.1
 **Date:** 2026-01-31
-**Status:** Production Ready
+**Status:** Legacy target. For VMs on Kubernetes, use Kairon through Veyron
+(`--deploy-kairon`, see [kairon-deployment.md](kairon-deployment.md)): no KubeVirt, no CDI, no pod per VM.
 
 ---
 
