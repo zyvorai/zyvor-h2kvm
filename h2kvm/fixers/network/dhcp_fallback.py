@@ -8,10 +8,13 @@ DHCP fallback for guests that arrive with no network configuration at all.
 
 Cloud images (for example Ubuntu's ``*-cloudimg-*.img``, as exported from Nutanix
 or any other platform) ship no netplan/networkd files and rely on cloud-init to
-generate them from a datasource. After a hypervisor exit there is usually no
-datasource, so the guest boots with its NIC unconfigured. This module installs a
-minimal "DHCP on any ethernet device" configuration so the migrated VM is
-reachable on first boot, without touching guests that already have a config.
+generate them from a datasource. After a hypervisor exit there is no datasource,
+so cloud-init does not run its stages at all (observed on Ubuntu 24.04: the boot
+console shows no cloud-init units, ``systemd-networkd`` starts with nothing to
+configure and ``systemd-networkd-wait-online`` fails) and the NIC stays
+unconfigured. This module installs a minimal "DHCP on any ethernet device"
+configuration so the migrated VM is reachable on first boot, without touching
+guests that already have a config.
 """
 
 from __future__ import annotations
