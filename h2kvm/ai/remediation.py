@@ -12,13 +12,15 @@ deduplication and risk filtering.
 
 from __future__ import annotations
 
+from typing import Any
+
 from .models import AIConfig, Diagnosis, Remediation, RemediationPlan, RiskLevel
 
 # ---------------------------------------------------------------------------
 # Fix registry: pattern_id -> list of Remediation templates
 # ---------------------------------------------------------------------------
 
-FIX_REGISTRY: dict[str, list[dict[str, object]]] = {
+FIX_REGISTRY: dict[str, list[dict[str, Any]]] = {
     "fstab_uuid_mismatch": [
         {
             "fix_id": "fstab_stabilize",
@@ -167,7 +169,7 @@ class RemediationEngine:
                     fix_id=fix_id,
                     description=str(tmpl.get("description", "")),
                     command=str(tmpl.get("command", "")),
-                    risk=tmpl.get("risk", RiskLevel.LOW),  # type: ignore[arg-type]
+                    risk=tmpl.get("risk", RiskLevel.LOW),
                     auto_applicable=bool(tmpl.get("auto_applicable", False)),
                     prerequisites=list(tmpl.get("prerequisites", [])),
                 )

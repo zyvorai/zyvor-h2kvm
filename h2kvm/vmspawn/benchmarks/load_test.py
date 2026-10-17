@@ -11,6 +11,7 @@ import json
 import statistics
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from h2kvm.vmspawn.async_manager import AsyncVMManager
 from h2kvm.vmspawn.models import VMConfig
@@ -99,7 +100,7 @@ class LoadTester:
         configs = [
             VMConfig(
                 name=f"loadtest-vm-{i}",
-                image=self.config.image_path,
+                image=Path(self.config.image_path),
                 memory_mb=self.config.memory,
                 cpus=self.config.cpus,
             )

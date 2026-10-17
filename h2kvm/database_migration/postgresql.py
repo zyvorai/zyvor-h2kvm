@@ -333,7 +333,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Backup result dict
         """
-        result = {"success": False, "log_files": [], "total_size_mb": 0.0, "errors": []}
+        result: dict[str, Any] = {"success": False, "log_files": [], "total_size_mb": 0.0, "errors": []}
 
         if not self.db_info.data_directory:
             result["errors"].append("Data directory unknown")

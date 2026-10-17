@@ -219,7 +219,7 @@ def profile_sync_operations():
             with timing.measure("config_creation"):
                 config = VMConfig(
                     name=f"vm-{i}",
-                    image="/path/to/image.qcow2",
+                    image=Path("/path/to/image.qcow2"),
                     memory_mb=2048,
                     cpus=2,
                 )
@@ -243,7 +243,7 @@ def compare_implementations():
 
     config = VMConfig(
         name="compare-vm",
-        image="/path/to/image.qcow2",
+        image=Path("/path/to/image.qcow2"),
     )
 
     # Sync implementation

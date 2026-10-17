@@ -188,7 +188,7 @@ class DockerExtractor:
         compose_file = output_dir / compose_filename
 
         try:
-            compose = {"version": "3.8", "services": {}}
+            compose: dict[str, Any] = {"version": "3.8", "services": {}}
 
             # Add volumes section if needed
             all_volumes = set()

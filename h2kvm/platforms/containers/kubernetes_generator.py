@@ -67,7 +67,7 @@ class KubernetesManifestGenerator:
 
         try:
             # Build deployment manifest
-            deployment = {
+            deployment: dict[str, Any] = {
                 "apiVersion": "apps/v1",
                 "kind": "Deployment",
                 "metadata": {"name": deployment_name, "namespace": namespace},

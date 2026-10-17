@@ -86,7 +86,7 @@ class DatabaseMigrationOrchestrator:
         Returns:
             DatabaseMigrationHandler instance
         """
-        handler_map = {
+        handler_map: dict[DatabaseEngine, type[DatabaseMigrationHandler]] = {
             DatabaseEngine.POSTGRESQL: PostgreSQLHandler,
             DatabaseEngine.MYSQL: MySQLHandler,
             DatabaseEngine.MARIADB: MySQLHandler,  # Use MySQL handler

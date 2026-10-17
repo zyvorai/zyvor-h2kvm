@@ -204,7 +204,7 @@ Performance:
         return 1
 
     # Execute command
-    return args.func(args)
+    return int(args.func(args))
 
 
 if __name__ == "__main__":

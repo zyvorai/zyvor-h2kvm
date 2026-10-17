@@ -420,7 +420,7 @@ class ChangeTracker:
                     [
                         f"# {change.change_type.value}: {change.description}",
                         f"echo 'Rolling back: {change.description}'",
-                        change.rollback_command,
+                        change.rollback_command or "",
                         "",
                     ]
                 )
