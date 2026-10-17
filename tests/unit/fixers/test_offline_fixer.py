@@ -230,6 +230,7 @@ try:
 except ImportError:
     _HAS_OFFLINE_FS_FIX = False
 
+
 def _make_config(**overrides):
     """Helper: create an OfflineFixConfig for OfflineFSFix."""
     defaults = dict(image=Path("/disk.qcow2"))
@@ -323,6 +324,25 @@ class TestOfflineFSFixInit:
 _GK_RESULT = {"applied": True, "dry_run": False, "assessment_score": 0.9, "message": "ok", "notes": []}
 
 
+@pytest.fixture
+def fake_guest():
+    """The pipeline reopens the image after GuestKit's repair (for injectors and the DHCP fallback).
+
+    Replace that step so unit tests never touch NBD or sudo; yields the mocked fallback function.
+    """
+    with (
+        patch.object(OfflineFSFix, "open", return_value=MagicMock()),
+        patch.object(OfflineFSFix, "_activate_storage"),
+        patch.object(OfflineFSFix, "_validate_guest"),
+        patch.object(OfflineFSFix, "_safe_umount_all"),
+        patch(
+            "h2kvm.fixers.offline_fixer.ensure_dhcp_fallback",
+            return_value={"installed": False, "reason": "test"},
+        ) as fallback,
+    ):
+        yield fallback
+
+
 @pytest.mark.skipif(not _HAS_OFFLINE_FS_FIX, reason="OfflineFSFix import failed (missing deps)")
 class TestGuestKitPipelineOptions:
     """GuestKit owns fstab/GRUB/initramfs, so options it cannot honor must be reported."""
@@ -350,7 +370,7 @@ class TestGuestKitPipelineOptions:
             "regen_initramfs": False,
         }
 
-    def test_run_warns_and_reports_ignored_options(self, mock_logger):
+    def test_run_warns_and_reports_ignored_options(self, mock_logger, fake_guest):
         fixer = OfflineFSFix(mock_logger, _make_config(fstab_mode="noop", update_grub=False))
         fixer.write_report = MagicMock()
         with patch("h2kvm.core.guestkit_client.migrate_repair", return_value=_GK_RESULT):
@@ -363,7 +383,7 @@ class TestGuestKitPipelineOptions:
             "no_grub": True,
         }
 
-    def test_run_is_quiet_with_defaults(self, mock_logger):
+    def test_run_is_quiet_with_defaults(self, mock_logger, fake_guest):
         fixer = OfflineFSFix(mock_logger, _make_config())
         fixer.write_report = MagicMock()
         with patch("h2kvm.core.guestkit_client.migrate_repair", return_value=_GK_RESULT):
@@ -371,7 +391,7 @@ class TestGuestKitPipelineOptions:
         assert not any("had no effect" in str(c) for c in mock_logger.warning.call_args_list)
         assert fixer.report["analysis"]["guestkit"]["ignored_options"] == {}
 
-    def test_resize_runs_before_repair(self, mock_logger):
+    def test_resize_runs_before_repair(self, mock_logger, fake_guest):
         fixer = OfflineFSFix(mock_logger, _make_config(resize="+10G"))
         fixer.write_report = MagicMock()
         order = MagicMock()
@@ -384,7 +404,7 @@ class TestGuestKitPipelineOptions:
         order.resize.assert_called_once_with(Path("/disk.qcow2"), "+10G", False)
         assert fixer.report["analysis"]["image_resize"] == {"image_resize": "ok"}
 
-    def test_no_resize_when_unset(self, mock_logger):
+    def test_no_resize_when_unset(self, mock_logger, fake_guest):
         fixer = OfflineFSFix(mock_logger, _make_config())
         fixer.write_report = MagicMock()
         fixer._utilities.resize_image_container = MagicMock()
@@ -392,3 +412,20 @@ class TestGuestKitPipelineOptions:
             fixer.run()
         fixer._utilities.resize_image_container.assert_not_called()
         assert "image_resize" not in fixer.report["analysis"]
+
+    def test_run_installs_dhcp_fallback_after_repair(self, mock_logger, fake_guest):
+        fixer = OfflineFSFix(mock_logger, _make_config())
+        fixer.write_report = MagicMock()
+        fake_guest.return_value = {"installed": True, "path": "/etc/netplan/60-h2kvm-dhcp.yaml"}
+        with patch("h2kvm.core.guestkit_client.migrate_repair", return_value=_GK_RESULT):
+            fixer.run()
+        fake_guest.assert_called_once()
+        assert fixer.report["analysis"]["dhcp_fallback"]["installed"] is True
+
+    def test_dry_run_does_not_reopen_the_image(self, mock_logger, fake_guest):
+        fixer = OfflineFSFix(mock_logger, _make_config(dry_run=True))
+        fixer.write_report = MagicMock()
+        with patch("h2kvm.core.guestkit_client.migrate_repair", return_value=_GK_RESULT):
+            fixer.run()
+        fake_guest.assert_not_called()
+        assert "dhcp_fallback" not in fixer.report["analysis"]
