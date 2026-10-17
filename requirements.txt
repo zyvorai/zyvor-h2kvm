@@ -1,7 +1,7 @@
 # Core dependencies
-click>=8.0.0
-PyYAML>=6.0
-argcomplete>=2.0.0
+click>=8.1.0
+PyYAML>=6.0.2
+argcomplete>=3.6.0
 
 # Optional: VMware/vSphere integration
 # pyvmomi>=7.0.0

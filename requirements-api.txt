@@ -2,16 +2,16 @@
 # Install with: pip install -r requirements-api.txt
 
 # FastAPI framework
-fastapi>=0.143.0
+fastapi>=0.143.3
 
 # ASGI server
 uvicorn[standard]>=0.54.0
 
 # Server-Sent Events support
-sse-starlette>=1.8.2
+sse-starlette>=3.0.0
 
 # Production ASGI server (optional, for deployment)
-gunicorn>=21.2.0
+gunicorn>=23.0.0
 
 # Prometheus metrics (if not already in main requirements)
 prometheus-client>=0.26.0
@@ -20,5 +20,5 @@ prometheus-client>=0.26.0
 # starlette>=0.27.0  # Included with FastAPI
 
 # Testing dependencies (optional)
-httpx>=0.25.0  # For testing FastAPI apps
-pytest-asyncio>=0.21.0  # For async tests
+httpx>=0.28.0  # For testing FastAPI apps
+pytest-asyncio>=1.2.0  # For async tests
