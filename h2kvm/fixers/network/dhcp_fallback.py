@@ -114,3 +114,26 @@ def install_dhcp_fallback(g: Any, logger: logging.Logger, *, dry_run: bool = Fal
 
     logger.info("Installed DHCP fallback for a guest with no network configuration: %s (%s)", path, backend)
     return {"installed": True, "backend": backend, "path": path, "reason": "no network configuration found"}
+
+
+def ensure_dhcp_fallback(g: Any, logger: logging.Logger, *, dry_run: bool = False) -> dict[str, Any]:
+    """
+    Install the DHCP fallback only when the guest has no network configuration.
+
+    This is the entry point for the GuestKit pipeline, which does not run the
+    legacy network fixer: it looks for existing configuration first and leaves
+    configured guests (and Windows guests, which have neither netplan nor
+    systemd-networkd) alone.
+    """
+    # Imported here to keep this module importable without the discovery helpers' dependencies.
+    from .discovery import NetworkDiscovery  # pylint: disable=import-outside-toplevel
+
+    configs = NetworkDiscovery(logger=logger, backup_suffix=".h2kvm_backup").find_network_configs(g)
+    if configs:
+        return {
+            "installed": False,
+            "backend": None,
+            "path": None,
+            "reason": f"guest already has {len(configs)} network configuration file(s)",
+        }
+    return install_dhcp_fallback(g, logger, dry_run=dry_run)
