@@ -164,7 +164,9 @@ class GenericBackupSource(BackupSource):
             BackupVMInfo object
         """
         vms = self.list_vms()
-        return vms[0] if vms else None
+        if not vms:
+            raise ValueError(f"No VM found in generic backup: {self.backup_path}")
+        return vms[0]
 
     def restore_vm(
         self,
@@ -288,7 +290,7 @@ class GenericBackupSource(BackupSource):
                 if progress_callback:
                     progress = RestoreProgress(
                         stage="extraction",
-                        total_bytes=vm_info.backup_size_gb * 1024**3,
+                        total_bytes=int(vm_info.backup_size_gb * 1024**3),
                         processed_bytes=member.size,
                         progress_pct=100.0,  # Simplified
                         speed_mbps=0.0,
@@ -312,7 +314,7 @@ class GenericBackupSource(BackupSource):
                 if progress_callback:
                     progress = RestoreProgress(
                         stage="extraction",
-                        total_bytes=vm_info.backup_size_gb * 1024**3,
+                        total_bytes=int(vm_info.backup_size_gb * 1024**3),
                         processed_bytes=disk["size_gb"] * 1024**3,
                         progress_pct=100.0,
                         speed_mbps=0.0,

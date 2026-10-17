@@ -24,8 +24,8 @@ try:
     from h2kvm.providers.vmware.transports.govc_common import GovcRunner, normalize_ds_path
 except ImportError:
     # fallback for minimal environment
-    GovcRunner = None
-    normalize_ds_path = None
+    GovcRunner = None  # type: ignore[assignment,misc]  # optional-import fallback
+    normalize_ds_path = None  # type: ignore[assignment]  # optional-import fallback
 
 
 # Small generic helpers
@@ -109,7 +109,7 @@ def _merged_cfg(args: Any, conf: dict[str, Any] | None) -> dict[str, Any]:
 
 
 def _as_payload(obj: Any) -> Any:
-    if is_dataclass(obj):
+    if is_dataclass(obj) and not isinstance(obj, type):
         return asdict(obj)
     return obj
 

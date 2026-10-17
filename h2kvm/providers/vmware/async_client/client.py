@@ -31,6 +31,7 @@ if not HTTPX_AVAILABLE:
 from .semaphore import ConcurrencyManager  # pylint: disable=wrong-import-position
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -140,6 +141,12 @@ class AsyncVMwareClient:
         logger.info("Async VMware client disconnected from %s", self.host)
         return False
 
+    def _http(self) -> AsyncClient:
+        """The underlying HTTP client (raises if the connection is not open)."""
+        if self._client is None:
+            raise RuntimeError("Async VMware client is not connected; use 'async with' or connect() first")
+        return self._client
+
     async def _authenticate(self) -> None:
         """
         Authenticate with vCenter and get session cookie.
@@ -152,7 +159,7 @@ class AsyncVMwareClient:
             # vCenter REST API session creation
             url = f"https://{self.host}:{self.port}/rest/com/vmware/cis/session"
 
-            response = await self._client.post(
+            response = await self._http().post(
                 url,
                 auth=(self.username, self.password),
             )
@@ -199,7 +206,7 @@ class AsyncVMwareClient:
                     if folder:
                         params["folders"] = folder
 
-                    response = await self._client.get(url, headers=headers, params=params)
+                    response = await self._http().get(url, headers=headers, params=params)
 
                     if response.status_code == 200:
                         data = response.json()
@@ -245,14 +252,14 @@ class AsyncVMwareClient:
                         vms = await self.list_vms()
                         for vm in vms:
                             if vm.get("name") == vm_name:
-                                vm_id = vm.get("vm")
+                                vm_id = str(vm.get("vm") or vm_id)
                                 break
 
                     # vCenter REST API VM info endpoint
                     url = f"https://{self.host}:{self.port}/rest/vcenter/vm/{vm_id}"
 
                     headers = {"vmware-api-session-id": self._session_cookie}
-                    response = await self._client.get(url, headers=headers)
+                    response = await self._http().get(url, headers=headers)
 
                     if response.status_code == 200:
                         data = response.json()
@@ -282,7 +289,7 @@ class AsyncVMwareClient:
         self,
         vm_name: str,
         output_dir: Path,
-        progress_callback: callable | None = None,
+        progress_callback: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         """
         Export VM asynchronously with progress tracking.
@@ -325,7 +332,7 @@ class AsyncVMwareClient:
         disk: dict[str, Any],
         _output_dir: Path,
         disk_idx: int,
-        progress_callback: callable | None = None,
+        progress_callback: Callable[..., Any] | None = None,
     ) -> dict[str, Any]:
         """
         Export a single disk asynchronously.
@@ -371,8 +378,8 @@ class AsyncVMwareClient:
         self,
         vm_names: list[str],
         output_dir: Path,
-        progress_callback: callable | None = None,
-    ) -> list[dict[str, Any]]:
+        progress_callback: Callable[..., Any] | None = None,
+    ) -> list[dict[str, Any] | BaseException]:
         """
         Export multiple VMs in parallel.
 
@@ -403,7 +410,7 @@ class AsyncVMwareClient:
 
         # Separate successes from failures
         successes = [r for r in results if isinstance(r, dict) and r.get("status") == "success"]
-        failures = [r for r in results if isinstance(r, Exception) or r.get("status") != "success"]
+        failures = [r for r in results if isinstance(r, BaseException) or r.get("status") != "success"]
 
         logger.info("Parallel export complete: %d succeeded, %d failed", len(successes), len(failures))
 

@@ -70,7 +70,9 @@ def retry(  # pylint: disable=too-many-arguments  # generic retry helper: each k
             )
             time.sleep(delay)
 
-    raise last_err  # unreachable, but keeps type checker happy
+    if last_err is None:
+        raise RuntimeError(f"{label}: retries must be at least 1")
+    raise last_err
 
 
 def save_state(path: Path, state: dict[str, Any]) -> None:

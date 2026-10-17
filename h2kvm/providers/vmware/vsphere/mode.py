@@ -29,12 +29,14 @@ if TYPE_CHECKING:
 
     import requests
     from pyVmomi import vim, vmodl
+
+    from h2kvm.providers.vmware.transports.ovftool_client import OvfToolPaths
 else:
     try:
         from pyVmomi import vim, vmodl
     except ImportError:
         # Set imported names to None
-        vim = vmodl = None, None  # type: ignore
+        vim = vmodl = None  # type: ignore
 
 # Import from the correct modules
 try:
@@ -783,7 +785,7 @@ class VsphereMode:
         self.args = args
         self.govc = GovcRunner(logger=logger, args=args)
 
-        self.ovftool_paths = None
+        self.ovftool_paths: OvfToolPaths | None = None
         if getattr(args, "ovftool_path", None):
             try:
                 self.ovftool_paths = find_ovftool(args.ovftool_path)
@@ -802,7 +804,7 @@ class VsphereMode:
                 "Install govc and ensure GOVC_* env / args are configured.",
             )
 
-    def _require_ovftool(self) -> None:
+    def _require_ovftool(self) -> OvfToolPaths:
         if not self.ovftool_paths:
             try:
                 self.ovftool_paths = find_ovftool()
@@ -814,6 +816,7 @@ class VsphereMode:
                 )
             except Exception as e:
                 raise Fatal(2, f"OVF Tool is required but not found: {e}") from e
+        return self.ovftool_paths
 
     # govc helpers (public GovcRunner methods)
     # pylint: disable-next=too-many-locals  # each govc vm.info field is unpacked individually to build the flat inventory row
@@ -879,7 +882,7 @@ class VsphereMode:
 
     # OVF Tool helpers
     def _ovftool_export_vm(self, client: VMwareClient, vm_name: str, out_dir: Path) -> None:
-        self._require_ovftool()
+        ovftool_paths = self._require_ovftool()
 
         source_url = _build_ovftool_source_url(client, vm_name, self.args, _get_dc_name(self.args))
         ova_path = out_dir / f"{vm_name}.ova"
@@ -901,7 +904,7 @@ class VsphereMode:
         t0 = time.monotonic()
 
         export_to_ova(
-            paths=self.ovftool_paths,
+            paths=ovftool_paths,
             source=source_url,
             ova_path=ova_path,
             options=options,
@@ -912,7 +915,7 @@ class VsphereMode:
 
     # pylint: disable-next=too-many-locals  # builds the full OvfDeployOptions surface (target path, network map, ssl/retry/eula options) from args
     def _ovftool_deploy_ova(self, source_ova: Path, target_vm_name: str | None = None) -> None:
-        self._require_ovftool()
+        ovftool_paths = self._require_ovftool()
 
         if not source_ova.exists():
             raise Fatal(2, f"Source OVA/OVF not found: {source_ova}")
@@ -966,7 +969,7 @@ class VsphereMode:
         t0 = time.monotonic()
 
         deploy_ovf_or_ova(
-            paths=self.ovftool_paths,
+            paths=ovftool_paths,
             source_ovf_or_ova=source_ova,
             target_vi=target_url,
             options=options,
@@ -1035,7 +1038,7 @@ class VsphereMode:
             vc_host,
             vc_user,
             vc_pass,
-            port=getattr(self.args, "vc_port", None),
+            port=int(getattr(self.args, "vc_port", None) or 443),
             insecure=bool(getattr(self.args, "vc_insecure", False)),
         )
 
@@ -1322,8 +1325,8 @@ class VsphereMode:
             print(f"Downloaded {len(downloaded)}/{len(files)} files into {out_dir}")
             if errors:
                 print("Some downloads failed:")
-                for e in errors[:20]:
-                    print(f" - {e}")
+                for err in errors[:20]:
+                    print(f" - {err}")
                 if len(errors) > 20:
                     print(f" ... and {len(errors) - 20} more")
         return 0

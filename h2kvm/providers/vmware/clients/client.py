@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from h2kvm.core.exceptions import VMwareError
 from h2kvm.core.retry_decorator import api_retry
 from h2kvm.core.structured_log import log_event
 from h2kvm.providers.vmware.utils.compat import vim
@@ -44,16 +45,9 @@ except ImportError:  # pragma: no cover
 
 # HTTP/HTTPS download client
 try:
-    from h2kvm.providers.vmware.transports.http_client import HTTPDownloadClient, VMwareError
+    from h2kvm.providers.vmware.transports.http_client import HTTPDownloadClient
 except ImportError:  # pragma: no cover
     HTTPDownloadClient = None  # type: ignore
-    try:
-        from ....core.exceptions import VMwareError
-    except ImportError:  # pragma: no cover
-
-        class VMwareError(RuntimeError):
-            """Fallback VMware error type when neither http_client nor core.exceptions is importable."""
-
 
 # ✅ shared credential resolver (supports vs_password_env + vc_password_env)
 try:
@@ -401,7 +395,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         self.connect()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         try:
             self.disconnect()
         finally:
@@ -409,7 +403,6 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 self.logger.error(
                     "Exception in context: %s: %s", getattr(exc_type, "__name__", exc_type), exc_val
                 )
-        return False
 
     # Connection
 
@@ -929,6 +922,69 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
             msg=f"No disk matching label '{s}'. Available disks: {available_str}\n"
             "Specify a disk by label (e.g., 'Hard disk 1') or index (e.g., 0, 1)."
         )
+
+    # Inventory / snapshot / CBT helpers (pyVmomi)
+
+    def list_vm_names(self) -> list[str]:
+        """List the names of all VMs visible to this vCenter/ESXi connection."""
+        self._require_pyvmomi()
+        content = self._content()
+        view = content.viewManager.CreateContainerView(content.rootFolder, [vim.VirtualMachine], True)
+        try:
+            return sorted(str(vm.name) for vm in view.view)
+        finally:
+            view.Destroy()
+
+    def create_snapshot(
+        self,
+        vm_obj: Any,
+        name: str,
+        *,
+        quiesce: bool = True,
+        memory: bool = False,
+        description: str = "Created by h2kvm",
+    ) -> Any:
+        """Create a VM snapshot and return the snapshot managed object reference."""
+        task = vm_obj.CreateSnapshot_Task(name=name, description=description, memory=memory, quiesce=quiesce)
+        self.wait_for_task(task)
+        return task.info.result
+
+    @staticmethod
+    def snapshot_moref(snapshot: Any) -> str:
+        """Return the managed-object id (moref) of a snapshot reference."""
+        return str(getattr(snapshot, "_moId", snapshot))
+
+    def enable_cbt(self, vm_obj: Any) -> None:
+        """Enable Changed Block Tracking on a VM (takes effect after the next snapshot/stun)."""
+        self._require_pyvmomi()
+        spec = vim.vm.ConfigSpec()
+        spec.changeTrackingEnabled = True
+        self.wait_for_task(vm_obj.ReconfigVM_Task(spec))
+
+    def query_changed_disk_areas(
+        self,
+        vm_obj: Any,
+        *,
+        snapshot: Any,
+        device_key: int,
+        start_offset: int = 0,
+        change_id: str = "*",
+    ) -> Any:
+        """Query CBT changed areas of one disk since ``change_id`` (``"*"`` = all allocated areas)."""
+        return vm_obj.QueryChangedDiskAreas(
+            snapshot=snapshot,
+            deviceKey=device_key,
+            startOffset=start_offset,
+            changeId=change_id,
+        )
+
+    @staticmethod
+    def _vm_disk_backing_filename(disk: Any) -> str:
+        """Return the ``[datastore] path/file.vmdk`` backing file name of a VirtualDisk."""
+        name = getattr(getattr(disk, "backing", None), "fileName", None)
+        if not name:
+            raise VMwareError(msg="Selected disk has no backing file name")
+        return str(name)
 
     # Unified entrypoint (policy) - refactored into smaller handlers
 

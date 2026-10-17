@@ -27,9 +27,10 @@ try:
     HYPERCTL_AVAILABLE = True
 except ImportError:
     HYPERCTL_AVAILABLE = False
-    HyperCtlRunner = None
-    create_hyperctl_runner = None
-    export_vm_hyperctl = None
+    # optional-import fallback: callers must check HYPERCTL_AVAILABLE before using these names
+    HyperCtlRunner = None  # type: ignore[assignment,misc]
+    create_hyperctl_runner = None  # type: ignore[assignment]
+    export_vm_hyperctl = None  # type: ignore[assignment]
 
 __all__ = [
     "HYPERCTL_AVAILABLE",

@@ -450,7 +450,7 @@ class VsphereCommands:
     def download_only_vm(self) -> Any:
         """Download a filtered set of files from a VM's datastore folder, without exporting/converting it."""
         vm_name = _require(self.args, "vm_name")
-        out_dir = getattr(self.args, "output_dir", None) or getattr(self.args, "output_dir", "./out")
+        out_dir = getattr(self.args, "output_dir", None) or "./out"
         out_dir_path = Path(out_dir).expanduser()
 
         include_globs = tuple(getattr(self.args, "vs_include_glob", None) or []) or ("*",)
