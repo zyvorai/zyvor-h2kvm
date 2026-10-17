@@ -13,6 +13,7 @@ Uses watchdog when available, falls back to polling for RHEL 10 compatibility.
 from __future__ import annotations
 
 import logging
+import os
 import time
 from pathlib import Path
 from threading import Event, Lock, Thread
@@ -103,7 +104,7 @@ if WATCHDOG_AVAILABLE:
             if not isinstance(event, FileCreatedEvent):
                 return
 
-            file_path = Path(event.src_path)
+            file_path = Path(os.fsdecode(event.src_path))
 
             if self.handler._is_valid_manifest(file_path):
                 self.handler._process_manifest(file_path)
@@ -146,7 +147,7 @@ if WATCHDOG_AVAILABLE:
 else:
     # Polling fallback for RHEL 10
 
-    class ManifestWatcher:
+    class ManifestWatcher:  # type: ignore[no-redef]  # alternative definition: watchdog available vs polling fallback
         """Polling-based manifest watcher (RHEL 10 compatible)."""
 
         def __init__(

@@ -104,6 +104,8 @@ class DaemonControl:
         while self.running:
             try:
                 try:
+                    if self.socket is None:
+                        break
                     conn, _ = self.socket.accept()
                 except TimeoutError:
                     continue

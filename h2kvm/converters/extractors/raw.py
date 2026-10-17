@@ -463,8 +463,7 @@ class RAW:  # pylint: disable=too-few-public-methods
                 preserve_timestamps=preserve_timestamps,
             )
 
-        U.die(logger, f"Unsupported RAW source type (expected .raw/.img or tarball): {src}", 1)
-        raise AssertionError("unreachable: U.die() always raises")
+        return U.die(logger, f"Unsupported RAW source type (expected .raw/.img or tarball): {src}", 1)
 
     @staticmethod
     def _extract_raw_tar(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements

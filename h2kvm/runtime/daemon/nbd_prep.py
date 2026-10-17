@@ -27,7 +27,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional, TextIO
 
 from kubernetes import client, config, watch
 
@@ -80,7 +80,7 @@ def retry_on_failure(func, max_retries=MAX_RETRIES, delay=RETRY_DELAY, logger=lo
     Raises:
         Last exception if all retries fail
     """
-    last_exception = None
+    last_exception: Exception | None = None
 
     for attempt in range(max_retries):
         try:
@@ -93,6 +93,8 @@ def retry_on_failure(func, max_retries=MAX_RETRIES, delay=RETRY_DELAY, logger=lo
             else:
                 logger.exception(f"All {max_retries} attempts failed: {e}")
 
+    if last_exception is None:
+        raise RuntimeError("retry_operation: max_retries must be at least 1")
     raise last_exception
 
 
@@ -101,10 +103,16 @@ class NBDPrepDaemon:
 
     def __init__(self, node_name: str):
         self.node_name = node_name
-        self.api = None
-        self.active_jobs = {}  # job_ref -> {device, mount_path}
-        self.activated_vgs = []  # Track VGs we activated for safe cleanup
-        self.nbd_lock_fds = {}  # File descriptors for NBD locks, keyed by device path
+        self.api: client.CoreV1Api | None = None
+        self.active_jobs: dict[str, dict[str, Any]] = {}  # job_ref -> {device, mount_path}
+        self.activated_vgs: list[str] = []  # Track VGs we activated for safe cleanup
+        self.nbd_lock_fds: dict[str, TextIO] = {}  # File descriptors for NBD locks, keyed by device path
+
+    def _core_api(self) -> client.CoreV1Api:
+        """Kubernetes CoreV1 client (available once run() has configured it)."""
+        if self.api is None:
+            raise RuntimeError("Kubernetes API client is not initialised; call run() first")
+        return self.api
 
     def run(self):
         """Main daemon loop."""
@@ -143,7 +151,9 @@ class NBDPrepDaemon:
         while True:
             try:
                 for event in w.stream(
-                    self.api.list_node, field_selector=f"metadata.name={self.node_name}", timeout_seconds=30
+                    self._core_api().list_node,
+                    field_selector=f"metadata.name={self.node_name}",
+                    timeout_seconds=30,
                 ):
                     if event["type"] in ["ADDED", "MODIFIED"]:
                         node = event["object"]
@@ -272,7 +282,7 @@ class NBDPrepDaemon:
                         }
                     }
                 }
-                self.api.patch_node(self.node_name, body)
+                self._core_api().patch_node(self.node_name, body)
                 logger.info(f"Updated node annotations with error for {job_ref}")
             except Exception as patch_error:
                 logger.exception(f"Failed to update node with error: {patch_error}")
@@ -819,7 +829,7 @@ class NBDPrepDaemon:
             }
         }
 
-        self.api.patch_node(self.node_name, body)
+        self._core_api().patch_node(self.node_name, body)
         logger.info(f"Updated node annotations for {job_ref}")
 
     def clear_node_annotations(self, job_ref: str):
@@ -836,7 +846,7 @@ class NBDPrepDaemon:
             }
         }
 
-        self.api.patch_node(self.node_name, body)
+        self._core_api().patch_node(self.node_name, body)
         logger.info(f"Cleared node annotations for {job_ref}")
 
 

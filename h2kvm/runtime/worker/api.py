@@ -42,18 +42,18 @@ from typing import Any, Optional
 
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
 from .events import EventStore, EventStream
-from .metrics import WorkerMetrics
 from .scheduler import JobQueue, WorkerRegistry
 from .schemas import (
     JobResult,
     JobSpec,
     JobState,
+    OperationType,
     ProgressEvent,
     WorkerCapabilities,
 )
@@ -398,13 +398,20 @@ async def get_job_status(job_id: str) -> JobStatusResponse:
 
     # Get job spec (would be stored separately in production)
     # For now, create minimal spec
-    from .schemas import ExecutionPolicy, ImageSpec
+    from .schemas import ArtifactConfig, AuditInfo, ExecutionPolicy, ImageSpec
+
+    try:
+        operation = OperationType(sm.job_id.split("-")[0])
+    except ValueError:
+        operation = OperationType.CONVERT
 
     job_spec = JobSpec(
         job_id=job_id,
-        operation=sm.job_id.split("-")[0] if "-" in sm.job_id else "convert",
+        operation=operation,
         image=ImageSpec(path="/tmp/placeholder", format="qcow2"),
         execution_policy=ExecutionPolicy(),
+        artifacts=ArtifactConfig(output_path="/tmp/placeholder"),
+        audit=AuditInfo(requested_by="unknown"),
     )
 
     # Get latest event if available
@@ -452,11 +459,8 @@ async def list_jobs(
     Returns:
         List of jobs with summary information
     """
-    all_jobs = job_registry.list_jobs()
-
-    # Filter by state if requested
-    if state:
-        all_jobs = [job_id for job_id in all_jobs if job_registry.get(job_id).current_state == state]
+    # list_jobs() already filters by state when asked to
+    all_jobs = job_registry.list_jobs(state_filter=state)
 
     # Apply limit
     all_jobs = all_jobs[:limit]
@@ -465,6 +469,8 @@ async def list_jobs(
     jobs = []
     for job_id in all_jobs:
         sm = job_registry.get(job_id)
+        if sm is None:  # removed between listing and lookup
+            continue
         jobs.append(
             {
                 "job_id": job_id,
@@ -583,7 +589,7 @@ async def stream_job_events(job_id: str, request: Request):
 
     async def event_generator():
         """Generate SSE events from EventStream."""
-        stream = EventStream(event_store, job_id)
+        stream = EventStream(job_id, event_store)
 
         try:
             for event in stream:
@@ -698,22 +704,18 @@ async def list_workers() -> WorkerListResponse:
     workers = worker_registry.list_workers()
 
     worker_details = []
-    for worker_id in workers:
-        caps = worker_registry.get_capabilities(worker_id)
-        if caps:
-            worker_details.append(
-                {
-                    "worker_id": worker_id,
-                    "capabilities": caps.capabilities,
-                    "system_info": caps.system_info.model_dump() if caps.system_info else None,
-                }
-            )
-
-    active = len([w for w in workers if worker_registry.heartbeat(w)])
+    for caps in workers:
+        worker_details.append(
+            {
+                "worker_id": caps.worker_id,
+                "capabilities": caps.capabilities,
+                "system_info": caps.os_info,
+            }
+        )
 
     return WorkerListResponse(
-        total=len(workers),
-        active=active,
+        total=len(worker_registry.list_workers(only_alive=False)),
+        active=len(workers),
         workers=worker_details,
     )
 
@@ -831,7 +833,11 @@ async def health_check() -> HealthResponse:
         Service health status and basic statistics
     """
     all_jobs = job_registry.list_jobs()
-    active_jobs = len([j for j in all_jobs if not job_registry.get(j).is_terminal()])
+    active_jobs = 0
+    for job_id in all_jobs:
+        sm = job_registry.get(job_id)
+        if sm is not None and not sm.is_terminal():
+            active_jobs += 1
 
     return HealthResponse(
         status="healthy",
@@ -855,17 +861,11 @@ async def metrics():
         curl http://localhost:8000/metrics
         ```
     """
-    # Would integrate with WorkerMetrics.get_registry()
-    # For now, return basic metrics
-    from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+    # WorkerMetrics register their collectors in prometheus_client's default registry
+    from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, generate_latest
 
     try:
-        metrics = WorkerMetrics()
-        registry = metrics.get_registry()
-        return JSONResponse(
-            content=generate_latest(registry).decode("utf-8"),
-            media_type=CONTENT_TYPE_LATEST,
-        )
+        return Response(content=generate_latest(REGISTRY), media_type=CONTENT_TYPE_LATEST)
     except Exception as e:
         logger.exception(f"Error generating metrics: {e}")
         return JSONResponse(content={"error": str(e)}, status_code=500)

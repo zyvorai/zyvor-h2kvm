@@ -12,6 +12,7 @@ artifact generation.
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import logging
 import subprocess
@@ -23,7 +24,10 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable
 
+from ...core.guest_inspector import ComprehensiveGuestInspector
 from ...core.guestfs_factory import create_guestfs
+from ...fixers.filesystem.fstab import FstabMode
+from ...fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
 from .capabilities import CapabilityDetector, CapabilityLevel, get_detector
 from .schemas import (
     ErrorInfo,
@@ -338,9 +342,10 @@ class WorkerEngine:
 
             valid, error_msg = self._validate_job(job_spec)
             if not valid:
-                state_machine.transition(JobState.FAILED, error_msg)
+                reason = error_msg or "Job validation failed"
+                state_machine.transition(JobState.FAILED, reason)
                 return self._create_error_result(
-                    job_spec, "validation", "VALIDATION_FAILED", error_msg, start_time
+                    job_spec, "validation", "VALIDATION_FAILED", reason, start_time
                 )
 
             state_machine.transition(JobState.VALIDATED, "Job validated")
@@ -456,13 +461,10 @@ class WorkerEngine:
             )
         )
 
-        # Import here to avoid circular dependencies
-        from ..inspector import DiskInspector
-
-        inspector = DiskInspector()
+        inspector = ComprehensiveGuestInspector(self.logger)
 
         start_time = time.time()
-        inspection_result = inspector.inspect(job_spec.image.path)
+        inspection_result = dataclasses.asdict(inspector.inspect(job_spec.image.path))
         inspect_time = int(time.time() - start_time)
 
         # Save inspection report
@@ -500,8 +502,9 @@ class WorkerEngine:
         )
 
         # Get conversion parameters
-        output_format = job_spec.parameters.get("output_format", "qcow2")
-        compress = job_spec.parameters.get("compress", True)
+        params = job_spec.parameters or {}
+        output_format = params.get("output_format", "qcow2")
+        compress = params.get("compress", True)
 
         # Import conversion utilities
         import subprocess
@@ -612,8 +615,9 @@ class WorkerEngine:
         )
 
         # Get conversion parameters
-        output_format = job_spec.parameters.get("output_format", "qcow2")
-        compress = job_spec.parameters.get("compress", True)
+        params = job_spec.parameters or {}
+        output_format = params.get("output_format", "qcow2")
+        compress = params.get("compress", True)
 
         input_path = job_spec.image.path
         output_path = Path(job_spec.artifacts.output_path)
@@ -857,8 +861,6 @@ class WorkerEngine:
 
         # Integrate with OfflineFSFix
         try:
-            from ..fixers.offline_fixer import OfflineFSFix
-
             self._emit_event(
                 ProgressEvent(
                     job_id=job_spec.job_id,
@@ -869,30 +871,31 @@ class WorkerEngine:
             )
 
             # Create OfflineFSFix instance
-            offline_fixer = OfflineFSFix(
-                logger=self.logger,
+            params = job_spec.parameters or {}
+            fix_config = OfflineFixConfig(
                 image=fixed_image_path,
-                dry_run=job_spec.parameters.get("dry_run", False),
-                no_backup=job_spec.parameters.get("no_backup", False),
-                print_fstab=job_spec.parameters.get("print_fstab", False),
-                update_grub=job_spec.parameters.get("update_grub", True),
-                regen_initramfs=job_spec.parameters.get("regen_initramfs", True),
-                fstab_mode=job_spec.parameters.get("fstab_mode", "uuid"),
+                dry_run=params.get("dry_run", False),
+                no_backup=params.get("no_backup", False),
+                print_fstab=params.get("print_fstab", False),
+                update_grub=params.get("update_grub", True),
+                regen_initramfs=params.get("regen_initramfs", True),
+                fstab_mode=params.get("fstab_mode", FstabMode.STABILIZE_ALL),
                 report_path=Path(job_spec.artifacts.output_path) / f"{job_spec.job_id}_offline_fixes.json",
-                remove_vmware_tools=job_spec.parameters.get("remove_vmware_tools", True),
-                enable_rdp=job_spec.parameters.get("enable_rdp"),
-                inject_cloud_init=job_spec.parameters.get("inject_cloud_init"),
-                firstboot_scripts=job_spec.parameters.get("firstboot_scripts"),
-                network_config_inject=job_spec.parameters.get("network_config_inject"),
-                user_config_inject=job_spec.parameters.get("user_config_inject"),
-                service_config_inject=job_spec.parameters.get("service_config_inject"),
-                hostname_config_inject=job_spec.parameters.get("hostname_config_inject"),
+                remove_vmware_tools=params.get("remove_vmware_tools", True),
+                enable_rdp=params.get("enable_rdp"),
+                inject_cloud_init=params.get("inject_cloud_init"),
+                firstboot_scripts=params.get("firstboot_scripts"),
+                network_config_inject=params.get("network_config_inject"),
+                user_config_inject=params.get("user_config_inject"),
+                service_config_inject=params.get("service_config_inject"),
+                hostname_config_inject=params.get("hostname_config_inject"),
                 recovery_manager=None,
-                resize=job_spec.parameters.get("resize"),
-                virtio_drivers_dir=job_spec.parameters.get("virtio_drivers_dir"),
-                luks_enable=job_spec.parameters.get("luks_enable", False),
-                luks_passphrase=job_spec.parameters.get("luks_passphrase"),
+                resize=params.get("resize"),
+                virtio_drivers_dir=params.get("virtio_drivers_dir"),
+                luks_enable=params.get("luks_enable", False),
+                luks_passphrase=params.get("luks_passphrase"),
             )
+            offline_fixer = OfflineFSFix(self.logger, fix_config)
 
             self._emit_event(
                 ProgressEvent(

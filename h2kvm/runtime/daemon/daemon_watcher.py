@@ -47,6 +47,8 @@ from .stats import DaemonStatistics
 if TYPE_CHECKING:
     import logging
 
+    from watchdog.observers.api import BaseObserver
+
 
 class VMFileHandler(FileSystemEventHandler):
     """
@@ -176,14 +178,14 @@ class VMFileHandler(FileSystemEventHandler):
         """Handle file creation events."""
         if event.is_directory:
             return
-        path = Path(event.src_path)
+        path = Path(os.fsdecode(event.src_path))
         self._queue_file(path)
 
     def on_moved(self, event: FileSystemEvent) -> None:
         """Handle file move events (e.g., mv from temp location)."""
         if event.is_directory:
             return
-        path = Path(event.dest_path)
+        path = Path(os.fsdecode(event.dest_path))
         self._queue_file(path)
 
     def mark_completed(self, path: Path, success: bool) -> None:
@@ -293,7 +295,7 @@ class DaemonWatcher:
         self.stop_event = Event()
         self.pause_event = Event()  # For pause/resume
         self.drain_mode = False
-        self.observer: Observer | None = None
+        self.observer: BaseObserver | None = None
         self.handler: VMFileHandler | None = None
         self.executor: ThreadPoolExecutor | None = None
 
@@ -503,7 +505,7 @@ class DaemonWatcher:
                     archive_dir = self.watch_dir / ".processed" / date_dir
                     U.ensure_dir(archive_dir)
                     file_path.rename(archive_dir / file_path.name)
-                self.stats.job_completed(file_path.name, duration, 0)
+                self.stats.job_completed(file_path.name, True)
                 self.notifier.notify_success(file_path.name, duration, None)
                 return
 
@@ -680,6 +682,8 @@ class DaemonWatcher:
                 try:
                     error_path.rename(retry_path)
                     # Queue for processing with retry count
+                    if self.executor is None:
+                        raise RuntimeError("worker pool is not running")
                     self.executor.submit(self._process_file, retry_path, retry_count)
                 except Exception as e:
                     self.logger.exception(f"Failed to queue retry for {filename}: {e}")

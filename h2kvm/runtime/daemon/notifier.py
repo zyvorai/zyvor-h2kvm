@@ -69,7 +69,7 @@ class DaemonNotifier:
             if self.email_enabled:
                 self.logger.info(f"  Email: {self.email_from} → {self.email_to}")
 
-    def notify_success(self, filename: str, duration_seconds: float, output_path: Path) -> None:
+    def notify_success(self, filename: str, duration_seconds: float, output_path: Path | None) -> None:
         """Notify successful conversion."""
         if not self.enabled or not self.on_success:
             return
@@ -78,7 +78,7 @@ class DaemonNotifier:
             "event": "conversion_success",
             "filename": filename,
             "duration_seconds": duration_seconds,
-            "output_path": str(output_path),
+            "output_path": str(output_path) if output_path is not None else None,
             "timestamp": datetime.now().isoformat(),
         }
 
@@ -146,6 +146,9 @@ class DaemonNotifier:
         if not REQUESTS_AVAILABLE:
             self.logger.warning("requests library not available, skipping webhook")
             return
+        webhook_url = self.webhook_url
+        if not webhook_url:
+            return
 
         try:
             if self.webhook_type == "slack":
@@ -156,7 +159,7 @@ class DaemonNotifier:
                 payload = self._format_generic(title, message, details, level)
 
             response = requests.post(
-                self.webhook_url, json=payload, timeout=10, headers={"Content-Type": "application/json"}
+                webhook_url, json=payload, timeout=10, headers={"Content-Type": "application/json"}
             )
             response.raise_for_status()
             self.logger.debug(f"Webhook sent: {title}")
@@ -229,7 +232,8 @@ class DaemonNotifier:
 
     def _send_email(self, title: str, message: str, details: dict, level: str) -> None:
         """Send email notification."""
-        if not all([self.email_smtp_host, self.email_from, self.email_to]):
+        smtp_host = self.email_smtp_host
+        if not smtp_host or not self.email_from or not self.email_to:
             self.logger.warning("Email not configured properly, skipping")
             return
 
@@ -250,7 +254,7 @@ class DaemonNotifier:
             msg.set_content(body)
 
             # Send email
-            with smtplib.SMTP(self.email_smtp_host, self.email_smtp_port) as server:
+            with smtplib.SMTP(smtp_host, self.email_smtp_port) as server:
                 server.starttls()
                 if self.email_username and self.email_password:
                     server.login(self.email_username, self.email_password)

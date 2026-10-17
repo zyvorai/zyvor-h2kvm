@@ -355,7 +355,6 @@ class OVF:
             from h2kvm.converters.qemu.converter import Convert
         except ImportError as e:
             U.die(logger, f"QCOW2 conversion requested but Convert could not be imported: {e}", 1)
-            raise  # unreachable
 
         U.banner(logger, "Convert extracted disks to QCOW2")
         U.ensure_dir(outdir)

@@ -693,13 +693,12 @@ class AMI:  # pylint: disable=too-few-public-methods  # namespace-style extracto
             from h2kvm.converters.qemu.converter import (  # pylint: disable=import-outside-toplevel
                 Convert,
             )
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught  # any failure here is fatal and reported via U.die
             U.die(
                 logger,
                 f"QCOW2 conversion requested but Convert could not be imported: {e}",
                 AMI.EX_CONVERT_FAILED,
             )
-            raise
 
         U.banner(logger, "Convert extracted disk(s) to QCOW2")
         U.ensure_dir(outdir)

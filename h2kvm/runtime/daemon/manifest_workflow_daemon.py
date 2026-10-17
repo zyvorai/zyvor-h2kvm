@@ -22,6 +22,7 @@ Supports:
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import signal
 import time
@@ -43,6 +44,8 @@ from .stats import DaemonStatistics
 if TYPE_CHECKING:
     import argparse
     import logging
+
+    from watchdog.observers.api import BaseObserver
 
 
 class ManifestFileHandler(FileSystemEventHandler):
@@ -94,14 +97,14 @@ class ManifestFileHandler(FileSystemEventHandler):
         """Handle file creation events."""
         if event.is_directory:
             return
-        path = Path(event.src_path)
+        path = Path(os.fsdecode(event.src_path))
         self._queue_file(path)
 
     def on_moved(self, event: FileSystemEvent) -> None:
         """Handle file move events."""
         if event.is_directory:
             return
-        path = Path(event.dest_path)
+        path = Path(os.fsdecode(event.dest_path))
         self._queue_file(path)
 
 
@@ -136,7 +139,7 @@ class ManifestWorkflowDaemon:
         # Core components
         self.queue: Queue = Queue()
         self.stop_event = Event()
-        self.observer: Observer | None = None
+        self.observer: BaseObserver | None = None
         self.handler: ManifestFileHandler | None = None
         self.executor: ThreadPoolExecutor | None = None
 
