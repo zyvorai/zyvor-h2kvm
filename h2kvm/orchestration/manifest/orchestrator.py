@@ -30,6 +30,7 @@ from h2kvm.fixers.offline_fixer import OfflineFixConfig, OfflineFSFix
 from h2kvm.infrastructure.deployers.openstack import deploy_to_openstack
 from h2kvm.infrastructure.hooks import HookRunner, create_hook_context
 
+from .domain import emit_domain_xml
 from .loader import ManifestLoader
 from .reporter import ManifestReporter
 
@@ -64,6 +65,7 @@ class ManifestOrchestrator:
         self.current_stage = "none"
         self.output_dir: Path | None = None
         self.converted_disks: dict[str, Path] = {}  # disk_id -> output_path
+        self.boot_mode: str | None = None  # bios | uefi, as detected by the fix stage's guest inspection
 
     def run(self) -> dict[str, Any]:
         # pylint: disable=too-many-branches,too-many-statements
@@ -390,6 +392,8 @@ class ManifestOrchestrator:
 
         # Run fixes
         fixer.run()
+        analysis = (fixer.report or {}).get("analysis") or {}
+        self.boot_mode = analysis.get("boot_mode") or None
 
         # Note about data disks
         all_disks = self.loader.get_disks()
@@ -408,6 +412,8 @@ class ManifestOrchestrator:
             "initramfs_regenerated": fix_config.get("regen_initramfs", True),
             "vmware_tools_removed": fix_config.get("remove_vmware_tools", False),
             "enable_rdp": bool(enable_rdp),
+            "boot_mode": self.boot_mode,
+            "dhcp_fallback": analysis.get("dhcp_fallback"),
         }
 
     def _stage_convert(self) -> dict[str, Any]:
@@ -527,6 +533,16 @@ class ManifestOrchestrator:
             "validation_results": validation_results,
         }
 
+    def _emit_domain_xml(self) -> Path | None:
+        """Write a libvirt domain definition for the converted boot disk; returns its path, or None."""
+        return emit_domain_xml(
+            self.loader,
+            self.logger,
+            output_dir=self.output_dir,
+            converted_disks=self.converted_disks,
+            boot_mode=self.boot_mode,
+        )
+
     def _stage_libvirt_integration(self) -> dict[str, Any]:
         """Stage 6: Libvirt integration - define domain and import disks to pools."""
         # pylint: disable=import-outside-toplevel,too-many-locals
@@ -549,6 +565,12 @@ class ManifestOrchestrator:
         if self.output_dir is None:
             return {"enabled": False, "reason": "output directory not set"}
         domain_xml_path = self.output_dir / "domain.xml"
+        if not domain_xml_path.exists():
+            # Manifest mode does not emit a domain definition during conversion, so write one from the
+            # manifest's VM details and the firmware the fix stage detected.
+            emitted = self._emit_domain_xml()
+            if emitted is not None:
+                domain_xml_path = emitted
         if not domain_xml_path.exists():
             self.logger.warning("⚠️  Domain XML not found: %s", domain_xml_path)
             return {"enabled": False, "reason": "domain XML not found"}
