@@ -30,13 +30,13 @@ from .unlocker import (
 )
 
 
-def setup_logging(verbose: bool = False):
+def setup_logging(verbose: bool = False) -> None:
     """Configure logging."""
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(level=level, format="%(levelname)s: %(message)s")
 
 
-def cmd_unlock(args):
+def cmd_unlock(args: argparse.Namespace) -> None:
     """Unlock LUKS devices."""
     config = load_config(args.config)
 
@@ -53,7 +53,8 @@ def cmd_unlock(args):
         sys.exit(1)
 
 
-def cmd_list(args):  # pylint: disable=unused-argument  # dispatch-table callback signature (handlers.get(args.command)(args)) must match its siblings
+# pylint: disable-next=unused-argument  # dispatch-table callback: handlers.get(args.command)(args) needs a uniform signature
+def cmd_list(args: argparse.Namespace) -> None:
     """List LUKS devices."""
     devices = LUKSDevice.list()
 
@@ -69,7 +70,7 @@ def cmd_list(args):  # pylint: disable=unused-argument  # dispatch-table callbac
             print(f"    UUID: {uuid}")
 
 
-def cmd_status(args):
+def cmd_status(args: argparse.Namespace) -> None:
     """Show unlock status."""
     devices = LUKSDevice.list()
 
@@ -94,7 +95,7 @@ def cmd_status(args):
             print(f"    Mapper: /dev/mapper/{mapper}")
 
 
-def cmd_seal(args):
+def cmd_seal(args: argparse.Namespace) -> None:
     """Seal key to TPM2."""
     sealer = TPMSealer()
 
@@ -145,7 +146,7 @@ def load_config(config_path: Optional[str] = None) -> dict:
     return config
 
 
-def main():
+def main() -> None:
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(description="H2KVM LUKS Auto-Unlock Tool")
 

@@ -32,6 +32,7 @@ import os
 import shutil
 import subprocess
 import uuid
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Optional
 
@@ -80,7 +81,9 @@ class InitramfsError(PipelineError):
 # ============================================================
 
 
-def run(cmd, check=True, capture_output=False):
+def run(
+    cmd: Sequence[str], check: bool = True, capture_output: bool = False
+) -> subprocess.CompletedProcess[str]:
     """
     Execute shell command with logging.
 
@@ -188,10 +191,10 @@ class NBDAttach:
             except subprocess.CalledProcessError as e:
                 LOG.warning("Failed to detach %s: %s", self.device, e)
 
-    def __enter__(self):
+    def __enter__(self) -> "NBDAttach":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
         self.detach()
 
 
@@ -254,7 +257,7 @@ class RootDetector:
         try:
             result = run(["blkid", "-s", "UUID", "-o", "value", partition], capture_output=True)
 
-            part_uuid = result.stdout.strip()
+            part_uuid = str(result.stdout).strip()
             LOG.info("Partition %s UUID: %s", partition, part_uuid)
             return part_uuid
 
@@ -607,7 +610,7 @@ class H2KVMVMwareToLUKSPipeline:
         )
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.converter = DiskConverter()
         self.detector = RootDetector()
         self.encryptor = LUKSEncryptor()
