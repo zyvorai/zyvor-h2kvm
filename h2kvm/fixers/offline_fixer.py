@@ -379,7 +379,7 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         g = create_guestfs(
             python_return_dict=True,
             backend=backend,
-            conversion_dir=self.conversion_dir,
+            conversion_dir=str(self.conversion_dir) if self.conversion_dir is not None else None,
             allowed_dirs=self.allowed_dirs,
             container_isolation=self.container_isolation,
         )
@@ -662,8 +662,6 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 return
             if mode.startswith("opts:"):
                 opts = mode.split(":", 1)[1]
-                if self.dry_run and "ro" not in opts:
-                    opts = f"ro, {opts}"
                 g.mount_options(opts, dev, "/")
                 return
 
@@ -1496,14 +1494,13 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 mount_failures.append({"device": dev, "error": f"best_root_mount_failed:{e}"})
 
         # Phase 3: If no root found, try btrfs subvolumes
+        best_btrfs: tuple[int, str | None, str | None] = (-(10**9), None, None)
         if not best[1]:
             self.logger.warning(
                 "No candidate devices passed _looks_like_root check. Trying btrfs subvolumes..."
             )
             best_btrfs, btrfs_failures = self._find_best_btrfs_subvolume(g, candidates)
             mount_failures.extend(btrfs_failures)
-        else:
-            best_btrfs: tuple[int, str | None, str | None] = (-(10**9), None, None)
 
         # Phase 4: Mount best btrfs subvolume if found
         if best_btrfs[1] and best_btrfs[2]:
@@ -1623,32 +1620,41 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 reasons.append("LUKS")
             self.logger.info("Detected %s on disk", "+".join(reasons))
 
-    def _activate_storage(self, g: Any) -> dict[str, str]:
+    def _mount_root_ok(self, g: Any) -> bool:
+        """Mount the guest root filesystem; returns True once mounted (failures raise)."""
+        self.detect_and_mount_root(g)
+        return True
+
+    def _activate_storage(self, g: Any) -> dict[str, str] | None:
         """Phase 1: Activate storage stack (LUKS, LVM, UUIDs) and mount root."""
         # Detect LVM/LUKS for later appliance-based initramfs rebuild
         self._detect_and_record_lvm_luks(g)
 
         # Storage activation always goes through guestfs/VMCraft
         # (the disk is already NBD-attached, so appliance VM can't access it)
-        luks_audit = self._run_stage("luks_unlock", lambda: self._unlock_luks_devices(g), default={})
+        luks_audit: dict[str, Any] = self._run_stage(
+            "luks_unlock", lambda: self._unlock_luks_devices(g), default={}
+        )
         self.report["analysis"]["luks"] = luks_audit
         self.logger.info(f"LUKS audit: {U.json_dump(luks_audit)}")
 
-        stack_audit = self._run_stage(
+        stack_audit: dict[str, Any] = self._run_stage(
             "storage_stack", lambda: self._pre_mount_activate_storage_stack(g), default={}
         )
         self.report.setdefault("analysis", {})["storage_stack"] = stack_audit
 
         self._run_stage("lvm_activate", lambda: self._activate_lvm(g), default=None)
 
-        uuid_audit = self._run_stage("regenerate_uuids", lambda: self._regenerate_uuids(g), default={})
+        uuid_audit: dict[str, Any] = self._run_stage(
+            "regenerate_uuids", lambda: self._regenerate_uuids(g), default={}
+        )
         self.report.setdefault("analysis", {})["uuid_regeneration"] = uuid_audit
         uuid_map: dict[str, str] = uuid_audit.get("uuid_map", {}) if uuid_audit else {}
 
         mount_ok = self._run_stage(
-            "mount_root", lambda: self.detect_and_mount_root(g), critical=False, default="failed"
+            "mount_root", lambda: self._mount_root_ok(g), critical=False, default=False
         )
-        if mount_ok == "failed":
+        if not mount_ok:
             self.logger.info("")
             self.logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
             self.logger.info("⚠️  Root filesystem could not be mounted for offline fixes.")
@@ -1687,11 +1693,11 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         if (fs_audit or {}).get("enabled"):
             remount_ok = self._run_stage(
                 "remount_root_after_fs_repair",
-                lambda: self.detect_and_mount_root(g),
+                lambda: self._mount_root_ok(g),
                 critical=False,
-                default="failed",
+                default=False,
             )
-            if remount_ok == "failed":
+            if not remount_ok:
                 self.logger.warning(
                     "⚠️  Could not remount root after filesystem repair — continuing without offline fixes"
                 )

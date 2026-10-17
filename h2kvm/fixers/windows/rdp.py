@@ -321,7 +321,7 @@ def enable_rdp_if_disabled(
     if log is None:
         log = logging.getLogger(__name__)
 
-    result = {
+    result: dict[str, Any] = {
         "modified": False,
         "previous_state": None,
         "current_state": None,

@@ -142,7 +142,7 @@ class FstabFixer:
         # Statistics
         self.stats = {"total_entries": 0, "converted": 0, "removed": 0, "warnings": 0, "errors": 0}
 
-    def fix(self) -> dict[str, any]:
+    def fix(self) -> dict[str, Any]:
         """
         Execute fstab fixes.
 
@@ -487,7 +487,7 @@ class FstabFixer:
 
 
 # Convenience function for direct usage
-def fix_fstab(root_mount: str = "/mnt", mode: str = "uuid", dry_run: bool = False) -> dict[str, any]:
+def fix_fstab(root_mount: str = "/mnt", mode: str = "uuid", dry_run: bool = False) -> dict[str, Any]:
     """
     Fix /etc/fstab in mounted root filesystem.
 

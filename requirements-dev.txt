@@ -25,3 +25,5 @@ myst-parser>=4.0.0
 # Type stubs
 types-PyYAML>=6.0.12.20260815
 types-requests>=2.33.0.20261006
+types-psutil>=7.0.0
+types-defusedxml>=0.7.0

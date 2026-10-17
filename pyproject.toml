@@ -176,6 +176,8 @@ test = [
     "moto[ec2]>=5.2.4",
     "types-PyYAML>=6.0.12.20260906",
     "types-requests>=2.33.0.20261006",
+    "types-psutil>=7.0.0",
+    "types-defusedxml>=0.7.0",
     "pytest-benchmark>=5.1.0",
 ]
 

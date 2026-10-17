@@ -404,8 +404,6 @@ class OfflineMountEngine:
             return
         if mode.startswith("opts:"):
             opts = mode.split(":", 1)[1]
-            if self.dry_run and "ro" not in opts:
-                opts = f"ro,{opts}"
             g.mount_options(opts, dev, "/")
             return
 
@@ -593,8 +591,8 @@ class OfflineMountEngine:
                 self.logger.debug(f"Host-direct LV scan failed: {e}")
 
             # Also add any /dev/mapper/vg* devices
-            for mp in Path("/dev/mapper").glob("vg*"):
-                mp = str(mp)
+            for mp_path in Path("/dev/mapper").glob("vg*"):
+                mp = str(mp_path)
                 if mp not in candidates:
                     candidates.append(mp)
                     self.logger.info(f"Added mapper candidate: {mp}")
@@ -633,9 +631,9 @@ class OfflineMountEngine:
             else:
                 standard.append(d)
 
-        result = priority + standard
-        self.logger.info(f"📋 Candidate priority order: {result}")
-        return result
+        ordered = priority + standard
+        self.logger.info(f"📋 Candidate priority order: {ordered}")
+        return ordered
 
     # tries every candidate device, then every btrfs subvolume on top; the two
     # scan passes are safer kept inline than split into helpers

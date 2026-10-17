@@ -209,7 +209,12 @@ class DatabaseMigrationOrchestrator:
         """
         self.logger.info("Resuming databases after snapshot...")
 
-        results = {"success": True, "databases": [], "total_duration_seconds": 0.0, "errors": []}
+        results: dict[str, Any] = {
+            "success": True,
+            "databases": [],
+            "total_duration_seconds": 0.0,
+            "errors": [],
+        }
 
         for db_info in databases:
             handler = self.get_handler(db_info)
@@ -254,7 +259,7 @@ class DatabaseMigrationOrchestrator:
         """
         self.logger.info("Validating databases after migration...")
 
-        results = {"all_valid": True, "validations": [], "errors": [], "warnings": []}
+        results: dict[str, Any] = {"all_valid": True, "validations": [], "errors": [], "warnings": []}
 
         for db_info in databases:
             handler = self.get_handler(db_info)

@@ -41,7 +41,7 @@ def create_cloud_init_config(
         ...     runcmd=["echo 'VM ready' > /tmp/ready"],
         ... )
     """
-    config = {}
+    config: dict[str, Any] = {}
 
     if hostname:
         config["hostname"] = hostname

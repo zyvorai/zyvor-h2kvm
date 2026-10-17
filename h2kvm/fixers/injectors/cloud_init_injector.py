@@ -38,7 +38,7 @@ try:
 
     YAML_AVAILABLE = True
 except ImportError:
-    yaml = None
+    yaml = None  # type: ignore[assignment]  # optional-dependency fallback; guarded by YAML_AVAILABLE
     YAML_AVAILABLE = False
 
 

@@ -120,7 +120,7 @@ class OfflineUtilities:
         return info
 
     def resize_image_container(
-        self, image: Path, resize: str, dry_run: bool = False
+        self, image: Path, resize: str | None, dry_run: bool = False
     ) -> dict[str, Any] | None:
         """
         Resize QEMU image container.
@@ -168,8 +168,8 @@ class OfflineUtilities:
             with subprocess.Popen(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.DEVNULL, universal_newlines=True
             ) as proc:
-                blinking_progress("Resizing image", proc)
-                proc.wait()
+                with blinking_progress(self.logger, "Resizing image"):
+                    proc.wait()
 
                 if proc.returncode != 0:
                     raise subprocess.CalledProcessError(proc.returncode, cmd)

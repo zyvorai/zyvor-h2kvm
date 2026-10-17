@@ -128,7 +128,7 @@ class InitramfsFixer:
             "rebuild_failures": 0,
         }
 
-    def fix(self) -> dict[str, any]:
+    def fix(self) -> dict[str, Any]:
         """
         Execute initramfs fixes.
 
@@ -631,7 +631,7 @@ class InitramfsFixer:
 # Convenience function for direct usage
 def fix_initramfs(
     root_mount: str = "/mnt", add_lvm: bool = True, force_rebuild: bool = False, dry_run: bool = False
-) -> dict[str, any]:
+) -> dict[str, Any]:
     """
     Fix initramfs in mounted root filesystem.
 

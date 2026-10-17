@@ -288,6 +288,7 @@ class FstabStabilizer:
             return conversion
 
         # Handle Btrfs subvolume specifications
+        new_spec: str | None
         if entry.spec.startswith("btrfsvol:") or entry.fs_type == "btrfs":
             new_spec = convert_btrfs_subvol_spec(
                 entry.spec, identifiers, prefer_partuuid=self.prefer_partuuid

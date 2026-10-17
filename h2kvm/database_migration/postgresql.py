@@ -159,7 +159,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Resume result dict
         """
-        result = {"success": True, "duration_seconds": 0.0, "errors": []}
+        result: dict[str, Any] = {"success": True, "duration_seconds": 0.0, "errors": []}
 
         self.logger.info(
             f"Resuming PostgreSQL instance: {self.db_info.instance_name} "
@@ -184,7 +184,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Validation result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "valid": True,
             "checks": {
                 "starts": False,

@@ -55,7 +55,7 @@ def _json_safe(  # pylint: disable=too-many-return-statements,too-many-branches
         b = bytes(obj)
         prefix = b[:32].hex()
         return {"_type": "bytes", "len": len(b), "prefix_hex": prefix}
-    if is_dataclass(obj):
+    if is_dataclass(obj) and not isinstance(obj, type):
         try:
             return _json_safe(asdict(obj))
         except Exception:  # pylint: disable=broad-exception-caught

@@ -155,7 +155,7 @@ class MongoDBHandler(DatabaseMigrationHandler):
         Returns:
             Resume result dict
         """
-        result = {"success": False, "duration_seconds": 0.0, "errors": []}
+        result: dict[str, Any] = {"success": False, "duration_seconds": 0.0, "errors": []}
 
         self.logger.info(f"Resuming MongoDB instance: {self.db_info.instance_name}")
 
@@ -201,7 +201,7 @@ class MongoDBHandler(DatabaseMigrationHandler):
         Returns:
             Validation result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "valid": True,
             "checks": {
                 "starts": False,

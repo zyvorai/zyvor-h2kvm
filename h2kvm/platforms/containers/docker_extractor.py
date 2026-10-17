@@ -194,7 +194,7 @@ class DockerExtractor:
             all_volumes = set()
 
             for container in containers:
-                service_config = {
+                service_config: dict[str, Any] = {
                     "image": f"{container.image}:{container.image_tag}",
                     "container_name": container.name,
                 }

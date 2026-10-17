@@ -1037,7 +1037,7 @@ class SystemdBootIntegration:
         Returns:
             Complete results dictionary
         """
-        results = {}
+        results: dict[str, Any] = {}
 
         # Prepare boot environment
         results["boot_env"] = self.prepare_vm_boot_environment(boot_env)

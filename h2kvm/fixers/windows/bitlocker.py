@@ -188,7 +188,7 @@ def _read_bitlocker_service_info(  # pylint: disable=too-many-locals,too-many-re
             return None  # BitLocker service not installed
 
         # Read service configuration
-        service_info = {"service_exists": True}
+        service_info: dict[str, Any] = {"service_exists": True}
 
         # Read Start type
         start_val = h.node_get_value(bdesvc_node, "Start")
@@ -284,7 +284,7 @@ def _check_bitlocker_metadata(g: guestfs.GuestFS) -> dict[str, Any]:
     BitLocker uses -FVE-FS- filesystem signatures that persist even after decryption.
     Check partition labels and filesystem types for BitLocker indicators.
     """
-    result = {"found": False, "volumes": []}
+    result: dict[str, Any] = {"found": False, "volumes": []}
 
     try:  # pylint: disable=too-many-nested-blocks  # exhaustive best-effort device/partition/label probing
         # Get all block devices
@@ -339,7 +339,7 @@ def _check_bitlocker_files(g: guestfs.GuestFS, root: str) -> dict[str, Any]:
         - BitLocker startup keys
         - FVEAPI.dll (BitLocker API)
     """
-    result = {"found": False, "files": []}
+    result: dict[str, Any] = {"found": False, "files": []}
 
     try:
         # Check for BitLocker DLL (indicates BitLocker was installed)

@@ -321,7 +321,10 @@ class KubernetesManifestGenerator:
         Returns:
             Kubernetes container spec dict
         """
-        k8s_container = {"name": container.name, "image": f"{container.image}:{container.image_tag}"}
+        k8s_container: dict[str, Any] = {
+            "name": container.name,
+            "image": f"{container.image}:{container.image_tag}",
+        }
 
         # Command
         if container.command:

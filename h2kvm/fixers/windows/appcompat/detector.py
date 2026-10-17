@@ -122,7 +122,7 @@ HARDWARE_DEPENDENT_VENDORS = {
 }
 
 # Known license manager services
-LICENSE_SERVICES = {
+LICENSE_SERVICES: dict[str, dict[str, Any]] = {
     "lmgrd": {
         "name": "FlexLM License Manager",
         "risk": RiskLevel.HIGH,
@@ -146,7 +146,7 @@ LICENSE_SERVICES = {
 }
 
 # Known dongle drivers
-DONGLE_DRIVERS = {
+DONGLE_DRIVERS: dict[str, dict[str, Any]] = {
     "akshasp": {
         "name": "Aladdin HASP",
         "risk": RiskLevel.CRITICAL,

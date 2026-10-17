@@ -38,7 +38,7 @@ if TYPE_CHECKING:  # pylint: disable=duplicate-code
     except ImportError:
         from typing import Protocol
 
-        class guestfs:  # type: ignore  pylint: disable=invalid-name,missing-class-docstring,too-few-public-methods
+        class guestfs:  # type: ignore[no-redef]  # pylint: disable=invalid-name,missing-class-docstring,too-few-public-methods
             # reason: TYPE_CHECKING-only stand-in module/class mirroring the `guestfs`
             # module's name so `guestfs.GuestFS` type hints resolve when the real
             # (dynamically-typed, C-extension) guestfs package isn't installed.

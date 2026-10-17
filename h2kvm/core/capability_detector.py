@@ -19,7 +19,7 @@ import tempfile
 import time
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from h2kvm.core.structured_log import log_event
 
@@ -71,7 +71,7 @@ class CapabilityDetector:
     def __init__(self, logger: Optional[logging.Logger] = None):
         self.logger = logger or logging.getLogger(__name__)
         self.detected_level: Optional[CapabilityLevel] = None
-        self.detection_details: dict[str, any] = {}
+        self.detection_details: dict[str, Any] = {}
 
     def detect(self) -> CapabilityLevel:
         """
@@ -348,7 +348,7 @@ class CapabilityDetector:
                 os.unlink(path)
             return None
 
-    def get_capability_report(self) -> dict[str, any]:
+    def get_capability_report(self) -> dict[str, Any]:
         """
         Get detailed capability report
 

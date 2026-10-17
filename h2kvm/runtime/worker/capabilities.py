@@ -22,6 +22,7 @@ import tempfile
 import time
 from enum import Enum
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -373,12 +374,12 @@ class CapabilityDetector:
         self.logger.info(f"Detected capabilities: {self._capabilities}")
         return self._capabilities
 
-    def get_system_info(self) -> dict[str, any]:
+    def get_system_info(self) -> dict[str, Any]:
         """Get system information for worker registration."""
 
         import psutil
 
-        info = {
+        info: dict[str, Any] = {
             "hostname": platform.node(),
             "os": platform.system(),
             "os_release": platform.release(),
@@ -663,7 +664,7 @@ class CapabilityDetector:
                 os.unlink(path)
             return None
 
-    def get_capability_level_report(self, level: CapabilityLevel) -> dict[str, any]:
+    def get_capability_level_report(self, level: CapabilityLevel) -> dict[str, Any]:
         """
         Get detailed capability report for a given level.
 
@@ -765,7 +766,7 @@ class CapabilityDetector:
         }
         return recommendations.get(level, [])
 
-    def get_detection_diagnostics(self) -> dict[str, any]:
+    def get_detection_diagnostics(self) -> dict[str, Any]:
         """
         Get detailed diagnostics about capability detection.
 

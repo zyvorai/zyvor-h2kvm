@@ -48,7 +48,7 @@ def stage_firewall_export_script(  # pylint: disable=unused-argument
                 "error": str
             }
     """
-    result = {
+    result: dict[str, Any] = {
         "staged": False,
         "script_path": None,
         "error": None,
