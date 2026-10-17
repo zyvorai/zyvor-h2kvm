@@ -15,17 +15,25 @@ const SHOTS: Shot[] = [
   {src: '/04-migrate.png', alt: 'h2kweb migrate'},
 ];
 
-export default function ScreenshotStrip(): ReactNode {
+export default function ScreenshotStrip({bare = false}: {bare?: boolean}): ReactNode {
   return (
     <section className={styles.strip}>
       <div className="container">
-        <Heading as="h2" className="text--center">
-          A real product, not a mockup
-        </Heading>
-        <p className="text--center">
-          Captured against a live lab deployment.{' '}
-          <Link to="/gallery">See the full tour →</Link>
-        </p>
+        {bare ? (
+          <p className="text--center">
+            <Link to="/gallery">See the full tour →</Link>
+          </p>
+        ) : (
+          <>
+            <Heading as="h2" className="text--center">
+              A real product, not a mockup
+            </Heading>
+            <p className="text--center">
+              Captured against a live lab deployment.{' '}
+              <Link to="/gallery">See the full tour →</Link>
+            </p>
+          </>
+        )}
         <div className={styles.grid}>
           {SHOTS.map((shot) => (
             <ShotImage key={shot.src} shot={shot} />
