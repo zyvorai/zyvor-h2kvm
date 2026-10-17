@@ -77,7 +77,7 @@ class PoolManager:
         """
         if not LIBVIRT_AVAILABLE:
             raise InfrastructureError(
-                "libvirt Python bindings not available. Install with: pip install libvirt-python"
+                msg="libvirt Python bindings not available. Install with: pip install libvirt-python"
             )
 
         self.logger = logger or logging.getLogger(__name__)
@@ -97,12 +97,12 @@ class PoolManager:
         try:
             self.conn = libvirt.open(self.uri)
             if self.conn is None:
-                raise InfrastructureError(f"Failed to connect to libvirt at {self.uri}")
+                raise InfrastructureError(msg=f"Failed to connect to libvirt at {self.uri}")
 
             self.logger.info("Connected to libvirt: %s", self.uri)
 
         except libvirt.libvirtError as e:
-            raise InfrastructureError(f"Libvirt connection failed: {e}") from e
+            raise InfrastructureError(msg=f"Libvirt connection failed: {e}") from e
 
     def disconnect(self) -> None:
         """Close libvirt connection and cleanup resources."""
@@ -162,11 +162,11 @@ class PoolManager:
         try:
             pool = self.conn.storagePoolLookupByName(name)
             if pool is None:
-                raise InfrastructureError(f"Pool '{name}' not found")
+                raise InfrastructureError(msg=f"Pool '{name}' not found")
             return pool
 
         except libvirt.libvirtError as e:
-            raise InfrastructureError(f"Failed to get pool '{name}': {e}") from e
+            raise InfrastructureError(msg=f"Failed to get pool '{name}': {e}") from e
 
     def create_pool(
         self,
@@ -202,11 +202,11 @@ class PoolManager:
                 path.mkdir(parents=True, exist_ok=True)
                 self.logger.info("Created pool directory: %s", path)
             except Exception as e:
-                raise InfrastructureError(f"Failed to create pool directory {path}: {e}") from e
+                raise InfrastructureError(msg=f"Failed to create pool directory {path}: {e}") from e
 
         # Check if pool already exists
         if self.pool_exists(name):
-            raise InfrastructureError(f"Pool '{name}' already exists")
+            raise InfrastructureError(msg=f"Pool '{name}' already exists")
 
         # Build pool XML
         pool_xml = f"""<pool type='{pool_type}'>
@@ -220,7 +220,7 @@ class PoolManager:
         try:
             pool = self.conn.storagePoolDefineXML(pool_xml, 0)
             if pool is None:
-                raise InfrastructureError(f"Failed to define pool '{name}'")
+                raise InfrastructureError(msg=f"Failed to define pool '{name}'")
 
             pool.create(0)
             self.logger.info("Created storage pool: %s", name)
@@ -232,7 +232,7 @@ class PoolManager:
             return pool
 
         except libvirt.libvirtError as e:
-            raise InfrastructureError(f"Failed to create pool '{name}': {e}") from e
+            raise InfrastructureError(msg=f"Failed to create pool '{name}': {e}") from e
 
     def ensure_pool(
         self,
@@ -297,10 +297,10 @@ class PoolManager:
         # Validate source disk
         disk_path = Path(disk_path).resolve()
         if not disk_path.exists():
-            raise InfrastructureError(f"Disk not found: {disk_path}")
+            raise InfrastructureError(msg=f"Disk not found: {disk_path}")
 
         if not disk_path.is_file():
-            raise InfrastructureError(f"Disk is not a file: {disk_path}")
+            raise InfrastructureError(msg=f"Disk is not a file: {disk_path}")
 
         # Determine volume name
         if volume_name is None:
@@ -311,7 +311,7 @@ class PoolManager:
         root = ET.fromstring(pool_xml)
         target = root.find("target/path")
         if target is None or not target.text:
-            raise InfrastructureError(f"Failed to get path for pool '{pool_name}'")
+            raise InfrastructureError(msg=f"Failed to get path for pool '{pool_name}'")
 
         pool_path = Path(target.text)
         dest_path = pool_path / f"{volume_name}{disk_path.suffix}"
@@ -323,7 +323,7 @@ class PoolManager:
                 dest_path.unlink()
             else:
                 raise InfrastructureError(
-                    f"Volume '{volume_name}' already exists in pool '{pool_name}' "
+                    msg=f"Volume '{volume_name}' already exists in pool '{pool_name}' "
                     f"(use overwrite=True to replace)"
                 )
 
@@ -343,7 +343,7 @@ class PoolManager:
             return str(dest_path)
 
         except Exception as e:
-            raise InfrastructureError(f"Failed to import disk to pool '{pool_name}': {e}") from e
+            raise InfrastructureError(msg=f"Failed to import disk to pool '{pool_name}': {e}") from e
 
     def list_volumes(self, pool_or_name: Any | str) -> list[str]:
         """
@@ -369,7 +369,7 @@ class PoolManager:
             return pool.listVolumes()
 
         except libvirt.libvirtError as e:
-            raise InfrastructureError(f"Failed to list volumes: {e}") from e
+            raise InfrastructureError(msg=f"Failed to list volumes: {e}") from e
 
     def delete_pool(
         self,
@@ -411,7 +411,7 @@ class PoolManager:
             self.logger.info("Deleted pool: %s", pool_name)
 
         except libvirt.libvirtError as e:
-            raise InfrastructureError(f"Failed to delete pool '{pool_name}': {e}") from e
+            raise InfrastructureError(msg=f"Failed to delete pool '{pool_name}': {e}") from e
 
 
 __all__ = [

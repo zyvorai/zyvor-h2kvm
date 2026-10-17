@@ -14,6 +14,7 @@ import logging
 import re
 import shutil
 from pathlib import Path
+from typing import Literal
 
 _logger = logging.getLogger(__name__)
 
@@ -107,9 +108,9 @@ def has_spice() -> bool:
     return False
 
 
-def default_graphics() -> str:
+def default_graphics() -> Literal["spice", "vnc"]:
     """Return 'spice' if supported by the QEMU/libvirt stack, otherwise 'vnc'."""
-    result = "spice" if has_spice() else "vnc"
+    result: Literal["spice", "vnc"] = "spice" if has_spice() else "vnc"
     _logger.debug("default_graphics: chose %s", result)
     return result
 
