@@ -25,7 +25,7 @@ from .utils import U
 if TYPE_CHECKING:
     import argparse
     import logging
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Callable, Iterable, Sequence
 
 
 class ExitCode(IntEnum):
@@ -606,7 +606,7 @@ class SanityChecker:
 
     # orchestration
 
-    def _run_checks(self, checks: Sequence[tuple[str, callable]]) -> None:
+    def _run_checks(self, checks: Sequence[tuple[str, Callable[[], None]]]) -> None:
         for i, (name, fn) in enumerate(checks, 1):
             self.logger.info("Sanity check %d/%d: %s...", i, len(checks), name)
             fn()
@@ -650,7 +650,7 @@ class SanityChecker:
 
     def check_all(self) -> SanityReport:
         """Run all sanity checks in order, log a summary, and return the report."""
-        checks: list[tuple[str, callable]] = [
+        checks: list[tuple[str, Callable[[], None]]] = [
             ("args", self.check_args),
             ("tools", self.check_tools),
             ("disk space", self.check_disk_space),

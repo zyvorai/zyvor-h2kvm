@@ -168,6 +168,7 @@ class DropEvent(Exception):
 
 
 Processor = Callable[[Any, str, dict[str, Any]], dict[str, Any]]
+Renderer = Callable[[Any, str, dict[str, Any]], str]
 
 
 class PrintLogger:  # pylint: disable=too-few-public-methods
@@ -866,7 +867,7 @@ def configure_structured_logging(
     global _configured, _main_writer, _audit_writer  # pylint: disable=global-statement
     # Deliberate module-level singleton configuration entry point.
 
-    renderer: Processor
+    renderer: Renderer
     if json_output:
         renderer = _JSONRenderer(
             sort_keys=False,
@@ -876,7 +877,7 @@ def configure_structured_logging(
         renderer = _ConsoleRenderer()
 
     # Build the processor pipeline
-    processors: list[Processor] = [
+    processors: list[Processor | Renderer] = [
         _add_log_level,
         _level_filter,
         add_envelope,

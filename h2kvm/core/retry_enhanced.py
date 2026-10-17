@@ -120,6 +120,7 @@ def retry_vmware_api(
         def get_vm_info(vm_name):
             return vmware_client.get_vm_by_name(vm_name)
     """
+    exceptions: tuple[type[BaseException], ...]
     if PYVMOMI_AVAILABLE:
         exceptions = (vim.fault.NotAuthenticated, ConnectionError, OSError)
     else:

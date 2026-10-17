@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import contextlib
 import os
+import sys
 import time
 
 try:
@@ -241,7 +242,7 @@ if PROMETHEUS_AVAILABLE:
     build_info.info(
         {
             "version": "0.1.0",
-            "python_version": f"{os.sys.version_info.major}.{os.sys.version_info.minor}.{os.sys.version_info.micro}",
+            "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
             "commit": os.getenv("GIT_COMMIT", "unknown"),
         }
     )
@@ -325,7 +326,7 @@ def get_metrics() -> bytes:
     Returns:
         Metrics in text format (bytes)
     """
-    if not PROMETHEUS_AVAILABLE:
+    if not PROMETHEUS_AVAILABLE or registry is None:
         return b"# Prometheus client not available\n"
 
     return generate_latest(registry)

@@ -156,7 +156,7 @@ class RegistryReader:
         except Exception:  # pylint: disable=broad-exception-caught  # hivex raises various undocumented exception types; treat any failure as "no data"
             return None
 
-    def decode_string(self, val_data: tuple[int, bytes]) -> str | None:
+    def decode_string(self, val_data: tuple[int, bytes] | None) -> str | None:
         """Decode a registry string value (REG_SZ) from raw data."""
         if not val_data or len(val_data) <= 1:
             return None

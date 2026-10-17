@@ -162,6 +162,7 @@ class CommandRunner:
             CommandError: If check=True and command fails
         """
         # Prepare command
+        cmd_exec: str | list[str]
         if isinstance(command, list):
             cmd_str = " ".join(command)
             cmd_exec = command

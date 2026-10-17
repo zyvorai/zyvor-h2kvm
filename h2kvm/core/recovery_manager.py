@@ -28,11 +28,14 @@ from .utils import U
 if TYPE_CHECKING:
     import logging
     from collections.abc import Sequence
+    from types import ModuleType
+    from typing import TextIO
 
+fcntl: ModuleType | None
 try:
     import fcntl  # POSIX only
 except ImportError:  # pragma: no cover
-    fcntl = None  # type: ignore
+    fcntl = None
 
 
 # Helpers
@@ -276,7 +279,7 @@ class Checkpoint:  # pylint: disable=too-many-instance-attributes
             resumable=bool(d.get("resumable", True)),
             safe_to_resume=bool(d.get("safe_to_resume", True)),
             sha256=(None if d.get("sha256") in (None, "") else str(d.get("sha256"))),
-            bytes_len=(None if d.get("bytes_len") in (None, "") else int(d.get("bytes_len"))),
+            bytes_len=(None if d.get("bytes_len") in (None, "") else int(d["bytes_len"])),
         )
 
     @staticmethod
@@ -373,7 +376,7 @@ class RecoveryManager:  # pylint: disable=too-many-instance-attributes
             for sd in stage_defs:
                 self.stage_defs[_safe_stage(sd.name)] = sd
 
-        self._lock_fp = None  # file handle for flock
+        self._lock_fp: TextIO | None = None  # file handle for flock
 
         # Write run manifest early (so you can find run metadata even if you crash).
         self._manifest = RunManifest(

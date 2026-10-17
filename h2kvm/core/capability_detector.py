@@ -140,17 +140,17 @@ class CapabilityDetector:
                 return True
 
             # Try to load NBD module with partition support
-            result = subprocess.run(
+            load_result = subprocess.run(
                 ["modprobe", "nbd", "max_part=16"], capture_output=True, timeout=5, check=False
             )
 
-            if result.returncode == 0:
+            if load_result.returncode == 0:
                 self.logger.info("✅ NBD module loaded successfully")
                 self.detection_details["nbd_module"] = True
                 self.detection_details["nbd_module_preloaded"] = False
                 return True
-            self.logger.debug("modprobe failed: %s", result.stderr.decode())
-            self.detection_details["nbd_module_error"] = result.stderr.decode()
+            self.logger.debug("modprobe failed: %s", load_result.stderr.decode())
+            self.detection_details["nbd_module_error"] = load_result.stderr.decode()
             return False
 
         except subprocess.TimeoutExpired:
@@ -407,7 +407,7 @@ class CapabilityDetector:
                 "virtio_driver_injection",
             ],
         }
-        return ops.get(self.detected_level, [])
+        return ops.get(self.detected_level, []) if self.detected_level is not None else []
 
     def _get_limitations(self) -> list[str]:
         """List limitations at detected level"""
@@ -428,7 +428,7 @@ class CapabilityDetector:
             ],
             CapabilityLevel.FULL_OFFLINE_FIXES: [],
         }
-        return limitations.get(self.detected_level, [])
+        return limitations.get(self.detected_level, []) if self.detected_level is not None else []
 
     def _get_recommendations(self) -> list[str]:
         """Get recommendations based on detected level"""
@@ -446,7 +446,7 @@ class CapabilityDetector:
             ],
             CapabilityLevel.FULL_OFFLINE_FIXES: [],
         }
-        return recommendations.get(self.detected_level, [])
+        return recommendations.get(self.detected_level, []) if self.detected_level is not None else []
 
 
 def main():

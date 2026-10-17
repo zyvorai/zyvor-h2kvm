@@ -25,3 +25,11 @@ def test_emoji_formatter_utc_seconds():
 def test_json_formatter_iso_utc():
     out = json.loads(JsonFormatter(utc=True).format(_record()))
     assert any(str(v).startswith("1970-01-02T00:00:00.123") for v in out.values())
+
+
+def test_context_adapter_merges_bound_and_call_ctx():
+    from h2kvm.core.logger import ContextLoggerAdapter
+
+    adapter = ContextLoggerAdapter(logging.getLogger("ctx-test"), {"vm": "a"}).bind(stage="x")
+    _msg, kwargs = adapter.process("m", {"extra": {"ctx": {"disk": 2}}})
+    assert kwargs["extra"]["ctx"] == {"vm": "a", "stage": "x", "disk": 2}
