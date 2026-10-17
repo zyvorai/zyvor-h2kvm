@@ -53,7 +53,7 @@ class _Paths:
         self.xml_path = xml_path
 
 
-def _emit(orch: ManifestOrchestrator):
+def _emit(orch: ManifestOrchestrator, has_esp: bool = False):
     captured = {}
 
     def fake_emit(config):
@@ -64,6 +64,7 @@ def _emit(orch: ManifestOrchestrator):
         patch("h2kvm.libvirt.linux_domain.emit_linux_domain", fake_emit),
         patch("h2kvm.libvirt.domain_emitter.auto_detect_ovmf", return_value="/ovmf/OVMF_CODE.fd"),
         patch("h2kvm.libvirt.libvirt_utils.default_graphics", return_value="vnc"),
+        patch("h2kvm.orchestration.manifest.domain._has_efi_system_partition", return_value=has_esp),
     ):
         result = orch._emit_domain_xml()  # private stage helper under test
     return result, captured.get("config")
@@ -118,3 +119,15 @@ def test_a_one_gib_one_cpu_vm_keeps_its_size(tmp_path):
     orch = _orchestrator(tmp_path, mem_gb=1, cpu=1)
     _, config = _emit(orch)
     assert (config.memory_mib, config.vcpus) == (1024, 1)
+
+
+def test_a_gpt_image_with_an_esp_boots_via_uefi_even_when_nothing_else_says_so(tmp_path):
+    orch = _orchestrator(tmp_path)  # manifest hint bios, boot mode not detected
+    _, config = _emit(orch, has_esp=True)
+    assert config.firmware == "uefi"
+
+
+def test_an_image_without_an_esp_stays_bios(tmp_path):
+    orch = _orchestrator(tmp_path)
+    _, config = _emit(orch, has_esp=False)
+    assert config.firmware == "bios"

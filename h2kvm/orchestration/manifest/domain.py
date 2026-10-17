@@ -15,8 +15,40 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+try:  # libguestfs, optional; the inspect stage uses it too
+    import guestfs
+except ImportError:
+    guestfs = None
+
 if TYPE_CHECKING:
     from .loader import ManifestLoader
+
+
+_EFI_SYSTEM_PARTITION_GUID = "C12A7328-F81F-11D2-BA4B-00A0C93EC93B"
+
+
+def _has_efi_system_partition(image: Path, logger: logging.Logger) -> bool:
+    """True when the image's GPT has an EFI System Partition. Best effort: any failure means unknown (False)."""
+    # pylint: disable=broad-exception-caught
+    if guestfs is None:
+        return False
+    try:
+        handle = guestfs.GuestFS(python_return_dict=True)
+        try:
+            handle.add_drive_opts(str(image), readonly=1)
+            handle.launch()
+            device = handle.list_devices()[0]
+            if handle.part_get_parttype(device) != "gpt":
+                return False
+            return any(
+                handle.part_get_gpt_type(device, part["part_num"]).upper() == _EFI_SYSTEM_PARTITION_GUID
+                for part in handle.part_list(device)
+            )
+        finally:
+            handle.close()
+    except Exception as exc:
+        logger.debug("Could not look for an EFI System Partition in %s: %s", image, exc)
+        return False
 
 
 def _safe_domain_name(raw: str) -> str:
@@ -76,7 +108,9 @@ def emit_domain_xml(
         logger.warning("⚠️  Boot disk %s has not been converted; no domain XML written", boot_disk.id)
         return None
 
-    uefi = boot_mode == "uefi" or loader.get_firmware() == "uefi"
+    # The fix stage detection and the manifest hint win; otherwise a GPT image with an ESP boots via UEFI
+    # (Transiva writes bios into manifests because Prism does not report the firmware).
+    uefi = boot_mode == "uefi" or loader.get_firmware() == "uefi" or _has_efi_system_partition(image, logger)
     name = _safe_domain_name(str(loader.get_source_metadata().get("vm_name") or boot_disk.id))
     logger.info("🧾 Writing domain XML: name=%s firmware=%s", name, "uefi" if uefi else "bios")
     config = _domain_config(loader, name=name, image=image, output_dir=output_dir, uefi=uefi)
