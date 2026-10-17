@@ -29,8 +29,6 @@ if TYPE_CHECKING:
 
     import requests
     from pyVmomi import vim, vmodl
-
-    from h2kvm.providers.vmware.transports.ovftool_client import OvfToolPaths
 else:
     try:
         from pyVmomi import vim, vmodl
@@ -57,6 +55,7 @@ try:
         OvfToolAuthError,
         OvfToolError,
         OvfToolNotFound,
+        OvfToolPaths,
         OvfToolSslError,
         deploy_ovf_or_ova,
         export_to_ova,
@@ -71,6 +70,7 @@ except ImportError:  # pragma: no cover
     OvfToolAuthError = None  # type: ignore
     OvfToolError = None  # type: ignore
     OvfToolNotFound = None  # type: ignore
+    OvfToolPaths = None  # type: ignore
     OvfToolSslError = None  # type: ignore
     deploy_ovf_or_ova = None  # type: ignore
     export_to_ova = None  # type: ignore

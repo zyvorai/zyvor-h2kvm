@@ -19,7 +19,7 @@ import shutil
 import subprocess
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from h2kvm.converters.qemu.converter import Convert, run_qemu_img_convert
 from h2kvm.core.exceptions import DiskConversionError, InfrastructureError
@@ -211,6 +211,22 @@ def pick_preferred_kubeconfig(paths: list[str]) -> str | None:
     return existing[0]
 
 
+def _as_dict(obj: object) -> dict[str, Any]:
+    """Custom-object API results are plain dicts, but the client types them as ``object``."""
+    return obj if isinstance(obj, dict) else {}
+
+
+def _node_addresses(node: Any) -> list[Any]:
+    """Addresses of a V1Node (empty when the node has no status yet)."""
+    return list(node.status.addresses or []) if node.status else []
+
+
+def _first_node_port(svc: Any) -> int | None:
+    """NodePort of the first port of a V1Service (None when not allocated)."""
+    ports = svc.spec.ports if svc.spec else None
+    return ports[0].node_port if ports else None
+
+
 def sanitize_k8s_dns_subdomain(name: str, *, max_len: int = 253) -> str:
     """
     Normalize a string for Kubernetes metadata.name and OCI image path segments:
@@ -268,8 +284,10 @@ class KubernetesDeployer:
 
         # K8s deployment options
         self.namespace = getattr(args, "k8s_namespace", "default")
-        self.vm_name = getattr(args, "k8s_vm_name", None)
-        self.pvc_name = getattr(args, "k8s_pvc_name", None)
+        # "" = not set yet; deploy() derives defaults from the image name
+        self.vm_name: str = str(getattr(args, "k8s_vm_name", None) or "")
+        self.pvc_name: str = str(getattr(args, "k8s_pvc_name", None) or "")
+        self._container_disk_image: str | None = None
         self.storage_class = getattr(args, "k8s_storage_class", "local-path")
         self.pvc_size = getattr(args, "k8s_pvc_size", "10Gi")
         self.cpu_cores = getattr(args, "k8s_cpu", "2")
@@ -1078,7 +1096,7 @@ class KubernetesDeployer:
                     access_modes=["ReadWriteOnce"],
                     volume_mode="Filesystem",
                     storage_class_name=self.storage_class,
-                    resources=client.V1ResourceRequirements(requests={"storage": self.pvc_size}),
+                    resources=client.V1VolumeResourceRequirements(requests={"storage": self.pvc_size}),
                 ),
             )
 
@@ -1169,14 +1187,17 @@ class KubernetesDeployer:
             "upload_pod_phase": None,
         }
         try:
-            dv = self.custom_api.get_namespaced_custom_object(
-                group="cdi.kubevirt.io",
-                version="v1beta1",
-                namespace=self.namespace,
-                plural="datavolumes",
-                name=self.pvc_name,
+            dv = _as_dict(
+                self.custom_api.get_namespaced_custom_object(
+                    group="cdi.kubevirt.io",
+                    version="v1beta1",
+                    namespace=self.namespace,
+                    plural="datavolumes",
+                    name=self.pvc_name,
+                )
             )
-            dv_status = dv.get("status") if isinstance(dv.get("status"), dict) else {}
+            raw_status = dv.get("status")
+            dv_status: dict[str, Any] = raw_status if isinstance(raw_status, dict) else {}
             status["dv_phase"] = dv_status.get("phase")
             status["dv_message"] = dv_status.get("message") or dv_status.get("conditions")
         except ApiException as e:
@@ -1291,10 +1312,12 @@ class KubernetesDeployer:
     def _has_cdi(self) -> bool:
         """Check if CDI (Containerized Data Importer) is available."""
         try:
-            result = self.custom_api.list_cluster_custom_object(
-                group="cdi.kubevirt.io",
-                version="v1beta1",
-                plural="cdis",
+            result = _as_dict(
+                self.custom_api.list_cluster_custom_object(
+                    group="cdi.kubevirt.io",
+                    version="v1beta1",
+                    plural="cdis",
+                )
             )
             items = result.get("items", [])
             if items:
@@ -1309,7 +1332,9 @@ class KubernetesDeployer:
         """Get CDI upload proxy URL."""
         try:
             svc = self.core_api.read_namespaced_service("cdi-uploadproxy", "cdi")
-            ip = svc.spec.cluster_ip
+            ip = svc.spec.cluster_ip if svc.spec else None
+            if not ip:
+                return None
             return f"https://{ip}:443"
         except Exception as e:
             self.logger.debug(f"CDI upload proxy URL not available: {e}")
@@ -1966,7 +1991,7 @@ class KubernetesDeployer:
                 pod_status = self.core_api.read_namespaced_pod_status(
                     name=uploader_name, namespace=self.namespace
                 )
-                if pod_status.status.phase == "Running":
+                if pod_status.status is not None and pod_status.status.phase == "Running":
                     self.logger.info("✅ Uploader pod is ready")
                     break
             except ApiException as e:
@@ -2155,12 +2180,14 @@ class KubernetesDeployer:
         start_time = time.time()
         while time.time() - start_time < timeout:
             try:
-                vmi = self.custom_api.get_namespaced_custom_object(
-                    group="kubevirt.io",
-                    version="v1",
-                    namespace=self.namespace,
-                    plural="virtualmachineinstances",
-                    name=self.vm_name,
+                vmi = _as_dict(
+                    self.custom_api.get_namespaced_custom_object(
+                        group="kubevirt.io",
+                        version="v1",
+                        namespace=self.namespace,
+                        plural="virtualmachineinstances",
+                        name=self.vm_name,
+                    )
                 )
 
                 phase = vmi.get("status", {}).get("phase", "")
@@ -2307,12 +2334,14 @@ class KubernetesDeployer:
     def _get_vmi_guest_ip(self) -> str | None:
         """Return the primary guest IP from the VMI status, if the instance exists."""
         try:
-            vmi = self.custom_api.get_namespaced_custom_object(
-                group="kubevirt.io",
-                version="v1",
-                namespace=self.namespace,
-                plural="virtualmachineinstances",
-                name=self.vm_name,
+            vmi = _as_dict(
+                self.custom_api.get_namespaced_custom_object(
+                    group="kubevirt.io",
+                    version="v1",
+                    namespace=self.namespace,
+                    plural="virtualmachineinstances",
+                    name=self.vm_name,
+                )
             )
         except ApiException:
             return None
@@ -2354,7 +2383,7 @@ class KubernetesDeployer:
         try:
             nodes = self.core_api.list_node()
             for node in nodes.items:
-                for addr in node.status.addresses or []:
+                for addr in _node_addresses(node):
                     if addr.type in ("ExternalIP", "InternalIP"):
                         node_ips.append(addr.address)
                         break
@@ -2366,14 +2395,15 @@ class KubernetesDeployer:
         try:
             svcs = self.core_api.list_namespaced_service(namespace=self.namespace)
             for svc in svcs.items:
-                name = svc.metadata.name or ""
-                labels = svc.metadata.labels or {}
+                name = (svc.metadata.name if svc.metadata else None) or ""
+                labels = (svc.metadata.labels if svc.metadata else None) or {}
                 name_match = self.vm_name in name
                 label_match = labels.get("v9s.io/vm-name") == self.vm_name
                 rdp_match = "rdp" in name.lower() or labels.get("v9s.io/rdp-expose") == "true"
                 if not (name_match or label_match) or not rdp_match:
                     continue
-                for port in svc.spec.ports or []:
+                svc_spec = svc.spec
+                for port in (svc_spec.ports if svc_spec else None) or []:
                     if port.port != WINDOWS_RDP_PORT:
                         continue
                     rdp_svc_logged = True
@@ -2386,10 +2416,10 @@ class KubernetesDeployer:
                                 port.node_port,
                                 name,
                             )
-                    elif svc.spec.cluster_ip:
+                    elif svc_spec and svc_spec.cluster_ip:
                         self.logger.info(
                             "  ClusterIP RDP: %s:%d (service %s) — use NodePort or port-forward",
-                            svc.spec.cluster_ip,
+                            svc_spec.cluster_ip,
                             port.port,
                             name,
                         )
@@ -2417,7 +2447,7 @@ class KubernetesDeployer:
 
         # Pod: runs websockify + noVNC, proxying to the KubeVirt VNC via virtctl
         # Uses the KubeVirt subresource API to connect VNC directly
-        novnc_pod = {
+        novnc_pod: dict[str, Any] = {  # dict bodies are accepted by the kubernetes client
             "apiVersion": "v1",
             "kind": "Pod",
             "metadata": {
@@ -2485,7 +2515,7 @@ class KubernetesDeployer:
         if node_port > 0:
             port_spec["nodePort"] = node_port
 
-        novnc_svc = {
+        novnc_svc: dict[str, Any] = {
             "apiVersion": "v1",
             "kind": "Service",
             "metadata": {
@@ -2508,7 +2538,7 @@ class KubernetesDeployer:
             try:
                 self.core_api.create_namespaced_pod(
                     namespace=self.namespace,
-                    body=novnc_pod,
+                    body=cast("client.V1Pod", novnc_pod),  # the client also accepts plain dict bodies
                 )
                 self.logger.info(f"✅ Created noVNC pod: {novnc_name}")
             except ApiException as e:
@@ -2522,9 +2552,9 @@ class KubernetesDeployer:
             try:
                 svc = self.core_api.create_namespaced_service(
                     namespace=self.namespace,
-                    body=novnc_svc,
+                    body=cast("client.V1Service", novnc_svc),
                 )
-                allocated_port = svc.spec.ports[0].node_port
+                allocated_port = _first_node_port(svc) or node_port
                 self.logger.info(f"✅ Created noVNC service: {novnc_name} (NodePort: {allocated_port})")
             except ApiException as e:
                 if e.status == 409:
@@ -2533,7 +2563,7 @@ class KubernetesDeployer:
                         name=novnc_name,
                         namespace=self.namespace,
                     )
-                    allocated_port = existing.spec.ports[0].node_port
+                    allocated_port = _first_node_port(existing) or node_port
                     self.logger.info(
                         f"noVNC service already exists: {novnc_name} (NodePort: {allocated_port})"
                     )
@@ -2545,7 +2575,7 @@ class KubernetesDeployer:
             try:
                 nodes = self.core_api.list_node()
                 for node in nodes.items:
-                    for addr in node.status.addresses or []:
+                    for addr in _node_addresses(node):
                         if addr.type in ("ExternalIP", "InternalIP"):
                             node_ip = addr.address
                             break

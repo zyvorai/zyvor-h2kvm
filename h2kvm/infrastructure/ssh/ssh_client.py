@@ -89,7 +89,7 @@ class SSHClient:
             opts += ["-o", f"UserKnownHostsFile={known_hosts}"]
 
         if self.cfg.identity:
-            opts += ["-i", self.cfg.identity]
+            opts += ["-i", str(self.cfg.identity)]
 
         if self.cfg.ssh_opts:
             opts += list(self.cfg.ssh_opts)

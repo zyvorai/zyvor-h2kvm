@@ -190,7 +190,7 @@ class HookRunner:
 
         # Execute hook with retries
         last_result = None
-        last_error = None
+        last_error: Exception | None = None
 
         for attempt in range(max_retries + 1):
             if attempt > 0:

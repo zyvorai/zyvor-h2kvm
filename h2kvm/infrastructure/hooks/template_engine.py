@@ -118,7 +118,7 @@ class TemplateEngine:
         Returns:
             List with all string values substituted
         """
-        result = []
+        result: list[Any] = []
 
         for item in template_list:
             if isinstance(item, str):
