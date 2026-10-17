@@ -71,7 +71,7 @@ def normalize_ds_path(datastore: str, ds_path: str) -> tuple[str, str]:
     s = (ds_path or "").strip()
     if not s:
         raise VMwareError(
-            "Datastore path is empty. Provide the path in one of these formats:\n"
+            msg="Datastore path is empty. Provide the path in one of these formats:\n"
             '  - "[datastore1] vm-folder/disk.vmdk" (full datastore path)\n'
             '  - "vm-folder/disk.vmdk" (relative to datastore root)\n'
             "You can find datastore paths in vSphere: Datastore Browser or VM Settings."
@@ -471,14 +471,14 @@ class GovcRunner:
 
         if _looks_like_govc_usage(out) or _looks_like_govc_usage(err):
             raise VMwareError(
-                "govc printed usage/help output instead of command output "
+                msg="govc printed usage/help output instead of command output "
                 "(likely argument parsing issue). "
                 f"cmd={' '.join(full)}"
             )
 
         if p.returncode != 0:
             detail = err or out[:1200]
-            raise VMwareError(f"govc failed ({p.returncode}): {detail}")
+            raise VMwareError(msg=f"govc failed ({p.returncode}): {detail}")
 
         return out
 
@@ -494,7 +494,7 @@ class GovcRunner:
             _log(self.logger, "debug", "govc.json: parsed shape=%s", _summarize_json_shape(data))
             return data
         except Exception as e:  # pylint: disable=broad-exception-caught  # any parse failure must surface as a clear VMwareError, not a bare JSON exception
-            raise VMwareError(f"govc returned non-JSON output: {e}: {out[:2000]}") from e
+            raise VMwareError(msg=f"govc returned non-JSON output: {e}: {out[:2000]}") from e
 
     def run(self, cmd: Sequence[str], *, json_output: bool = False) -> Any:
         """
@@ -595,12 +595,12 @@ class GovcRunner:
         Delegates the workflow to govc_export.py (single source of truth).
         """
         if export_vm_govc is None or GovcExportSpec is None:
-            raise VMwareError("govc_export.py not available to perform export")
+            raise VMwareError(msg="govc_export.py not available to perform export")
 
         if not vm or not str(vm).strip():
-            raise VMwareError("govc export.ovf: empty vm")
+            raise VMwareError(msg="govc export.ovf: empty vm")
         if not out_dir or not str(out_dir).strip():
-            raise VMwareError("govc export.ovf: empty out_dir")
+            raise VMwareError(msg="govc export.ovf: empty out_dir")
 
         if snapshot or disk_mode or extra_args:
             _log(
@@ -635,7 +635,7 @@ class GovcRunner:
             )
         except Exception as e:
             # 🔥 Critical: preserve govc stderr/cmd/rc instead of collapsing to "error"
-            raise VMwareError(_format_export_exception(e)) from e
+            raise VMwareError(msg=_format_export_exception(e)) from e
 
         return f"exported ovf: vm={vm} out_dir={out_dir}"
 
@@ -665,12 +665,12 @@ class GovcRunner:
         Delegates the workflow to govc_export.py (single source of truth).
         """
         if export_vm_govc is None or GovcExportSpec is None:
-            raise VMwareError("govc_export.py not available to perform export")
+            raise VMwareError(msg="govc_export.py not available to perform export")
 
         if not vm or not str(vm).strip():
-            raise VMwareError("govc export.ova: empty vm")
+            raise VMwareError(msg="govc export.ova: empty vm")
         if not out_file or not str(out_file).strip():
-            raise VMwareError("govc export.ova: empty out_file")
+            raise VMwareError(msg="govc export.ova: empty out_file")
 
         if snapshot or disk_mode or extra_args:
             _log(
@@ -710,7 +710,7 @@ class GovcRunner:
             )
         except Exception as e:
             # 🔥 Critical: preserve govc stderr/cmd/rc instead of collapsing to "error"
-            raise VMwareError(_format_export_exception(e)) from e
+            raise VMwareError(msg=_format_export_exception(e)) from e
 
         return f"exported ova: vm={vm} out_file={out_file}"
 

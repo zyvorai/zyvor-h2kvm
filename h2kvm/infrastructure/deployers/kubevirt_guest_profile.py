@@ -191,9 +191,10 @@ def resolve_guest_profile(args: Any, *, vm_name: str = "") -> GuestProfile:
         or parsed.get("PRETTY_NAME")
     )
 
-    variant = _explicit_os_variant(args)
-    if variant and not _looks_windows_variant(variant):
-        os_variant = variant
+    explicit_variant = _explicit_os_variant(args)
+    os_variant: str | None
+    if explicit_variant and not _looks_windows_variant(explicit_variant):
+        os_variant = explicit_variant
     else:
         os_variant = kubevirt_os_variant(
             distro_id=distro,

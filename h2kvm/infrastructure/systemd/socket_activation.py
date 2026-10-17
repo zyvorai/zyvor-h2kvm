@@ -100,9 +100,9 @@ class RepairSocketServer:
         self.socket_path = Path(socket_path)
         self.handler = handler or self._default_handler
         self.logger = logging.getLogger(__name__)
-        self.server_socket = None
+        self.server_socket: socket.socket | None = None
         self.running = False
-        self.server_thread = None
+        self.server_thread: threading.Thread | None = None
         self.active_requests: dict[str, dict] = {}
 
     def start(self):
@@ -159,6 +159,8 @@ class RepairSocketServer:
 
         while self.running:
             try:
+                if self.server_socket is None:
+                    break
                 client_socket, _ = self.server_socket.accept()
                 # Handle each connection in a separate thread
                 client_thread = threading.Thread(

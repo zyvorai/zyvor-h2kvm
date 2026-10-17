@@ -16,7 +16,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 try:
     import inotify.adapters
@@ -71,18 +71,19 @@ class VMPathMonitor:
         self.file_extensions = file_extensions or [".vmdk", ".qcow2", ".vdi", ".vhd", ".vhdx"]
 
         self.monitoring = False
-        self.monitor_thread = None
+        self.monitor_thread: threading.Thread | None = None
         self.event_history: list[PathEvent] = []
         self.max_history = 1000
 
         # Debouncing
         self.debounce_seconds = 5.0
-        self.last_event_time: dict[Path, datetime] = {}
+        self.last_event_time: dict[str, datetime] = {}
         self.processed_events: set[str] = set()
 
+        # inotify.adapters.Inotify (untyped optional third-party dependency)
+        self.inotify: Any = None
         if not INOTIFY_AVAILABLE:
             self.logger.error("inotify not available, path monitoring disabled")
-            self.inotify = None
         else:
             self._setup_inotify()
 

@@ -156,15 +156,15 @@ def _run_govc_simple(
                 "  - Set GOVC_INSECURE=1 to skip certificate verification\n"
                 "  - Import the vCenter CA certificate into the system trust store"
             )
-        raise GovcExportError(error_msg) from e
+        raise GovcExportError(msg=error_msg) from e
     except FileNotFoundError as e:
         raise GovcExportError(
-            "govc binary not found. Install it from https://github.com/vmware/govmomi/releases "
+            msg="govc binary not found. Install it from https://github.com/vmware/govmomi/releases "
             "and ensure it is in your PATH."
         ) from e
     except Exception as e:
         raise GovcExportError(
-            f"Failed to run govc: {e}\n"
+            msg=f"Failed to run govc: {e}\n"
             "Ensure govc is installed and in PATH: https://github.com/vmware/govmomi/releases"
         ) from e
 
@@ -285,7 +285,7 @@ def _run_govc_with_logging(  # pylint: disable=too-many-arguments,too-many-local
     try:
         if proc.stdout is None:
             raise GovcExportError(
-                "govc export process stdout is None - subprocess may have failed to start. "
+                msg="govc export process stdout is None - subprocess may have failed to start. "
                 "Ensure govc is installed and in PATH: https://github.com/vmware/govmomi/releases"
             )
         # Read char-by-char to split on \n or \r so govc progress is streamed live.
@@ -331,7 +331,7 @@ def _run_govc_with_logging(  # pylint: disable=too-many-arguments,too-many-local
                     "\n\nVM or resource not found. Verify the VM name is correct "
                     "(names are case-sensitive) and the VM exists in the configured datacenter."
                 )
-            raise GovcExportError(msg)
+            raise GovcExportError(msg=msg)
 
         return subprocess.CompletedProcess(cmd, rc, stdout=stdout, stderr="")
 
@@ -344,7 +344,7 @@ def _run_govc_with_logging(  # pylint: disable=too-many-arguments,too-many-local
         msg = f"Failed to run govc: {e}"
         if tail:
             msg += f"\nLast output:\n{tail}"
-        raise GovcExportError(msg) from e
+        raise GovcExportError(msg=msg) from e
     finally:
         stop_monitor.set()
         if monitor_thread:
@@ -368,17 +368,17 @@ def _run_govc_with_tty_passthrough(
         subprocess.run(cmd, env=full_env, check=True)
     except subprocess.CalledProcessError as e:
         raise GovcExportError(
-            f"govc failed with exit code {e.returncode}. "
+            msg=f"govc failed with exit code {e.returncode}. "
             "Check vSphere connectivity and credentials (GOVC_URL, GOVC_USERNAME, GOVC_PASSWORD)."
         ) from e
     except FileNotFoundError as e:
         raise GovcExportError(
-            "govc binary not found. Install it from https://github.com/vmware/govmomi/releases "
+            msg="govc binary not found. Install it from https://github.com/vmware/govmomi/releases "
             "and ensure it is in your PATH."
         ) from e
     except Exception as e:
         raise GovcExportError(
-            f"Failed to run govc: {e}\n"
+            msg=f"Failed to run govc: {e}\n"
             "Ensure govc is installed and in PATH: https://github.com/vmware/govmomi/releases"
         ) from e
 
@@ -577,7 +577,7 @@ def _create_ova_from_ovf(ovf_dir: Path, ova_file: Path, logger: Any) -> None:
 
     files = [p for p in ovf_dir.rglob("*") if p.is_file()]
     if not files:
-        raise GovcExportError(f"No files found under OVF directory: {ovf_dir}")
+        raise GovcExportError(msg=f"No files found under OVF directory: {ovf_dir}")
 
     try:
         with tarfile.open(ova_file, "w") as tar:
@@ -587,7 +587,7 @@ def _create_ova_from_ovf(ovf_dir: Path, ova_file: Path, logger: Any) -> None:
                 logger.info("Packaging OVA file %d/%d: %s", i, len(files), fp.name)
 
         if not ova_file.exists():
-            raise GovcExportError("OVA file was not created after tar creation")
+            raise GovcExportError(msg="OVA file was not created after tar creation")
 
         size_bytes = ova_file.stat().st_size
         size_mb = size_bytes / (1024 * 1024)
@@ -598,7 +598,7 @@ def _create_ova_from_ovf(ovf_dir: Path, ova_file: Path, logger: Any) -> None:
             _ok_line(logger, f"OVA created: {ova_file} ({size_mb:.2f} MB)")
 
     except Exception as e:
-        raise GovcExportError(f"Failed to create OVA: {e}") from e
+        raise GovcExportError(msg=f"Failed to create OVA: {e}") from e
 
 
 def _find_exported_ovf_dir(parent: Path, vm_name: str) -> Path | None:
@@ -744,7 +744,7 @@ def export_vm_govc(logger: Any, spec: GovcExportSpec) -> None:
     8. Success panel
     """
     if spec.mode not in ("ovf", "ova"):
-        raise GovcExportError(f"Invalid export mode: {spec.mode}. Must be 'ovf' or 'ova'")
+        raise GovcExportError(msg=f"Invalid export mode: {spec.mode}. Must be 'ovf' or 'ova'")
 
     if spec.mode == "ova" and not spec.ova_filename:
         spec.ova_filename = f"{spec.vm}.ova"
@@ -797,7 +797,7 @@ def export_vm_govc(logger: Any, spec: GovcExportSpec) -> None:
             )
         except Exception as e:
             m, s = _fmt_elapsed(start_time)
-            raise GovcExportError(f"OVF export failed after {m}m {s}s: {e}") from e
+            raise GovcExportError(msg=f"OVF export failed after {m}m {s}s: {e}") from e
 
         ovf_dir = _find_exported_ovf_dir(spec.outdir, spec.vm)
         m, s = _fmt_elapsed(start_time)
@@ -835,7 +835,7 @@ def export_vm_govc(logger: Any, spec: GovcExportSpec) -> None:
 
                 ovf_dir = _find_exported_ovf_dir(tmp_path, spec.vm)
                 if not ovf_dir:
-                    raise GovcExportError(f"Could not find OVF directory in temp location: {tmp_path}")
+                    raise GovcExportError(msg=f"Could not find OVF directory in temp location: {tmp_path}")
 
                 ova_file = spec.outdir / (spec.ova_filename or f"{spec.vm}.ova")
 
@@ -850,4 +850,4 @@ def export_vm_govc(logger: Any, spec: GovcExportSpec) -> None:
 
             except Exception as e:
                 m, s = _fmt_elapsed(start_time)
-                raise GovcExportError(f"OVA export failed after {m}m {s}s: {e}") from e
+                raise GovcExportError(msg=f"OVA export failed after {m}m {s}s: {e}") from e

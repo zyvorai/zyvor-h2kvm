@@ -64,7 +64,7 @@ class FirstbootConfig:
     create_conversion_metadata: bool = True  # Create conversion metadata
 
     # Advanced (Tier 3)
-    custom_commands: list[str] = None  # Custom commands to execute
+    custom_commands: list[str] | None = None  # Custom commands to execute
     enable_telemetry: bool = False  # Telemetry integration (optional)
 
 

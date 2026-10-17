@@ -160,7 +160,7 @@ def _parse_vm_datastore_dir(vmx_path: str) -> tuple[str, str]:
     """Parse VM datastore directory from VMX path."""
     s = (vmx_path or "").strip()
     if not s.startswith("[") or "]" not in s:
-        raise VMwareError(f"Unexpected vmPathName format: {vmx_path}")
+        raise VMwareError(msg=f"Unexpected vmPathName format: {vmx_path}")
     ds = s[1 : s.index("]")]
     rest = s[s.index("]") + 1 :].strip()
     folder = "" if "/" not in rest else rest.rsplit("/", 1)[0].lstrip("/")
@@ -171,7 +171,7 @@ def _parse_datastore_dir_override(s: str, *, default_ds: str | None = None) -> t
     """Parse datastore directory override."""
     t = (s or "").strip()
     if not t:
-        raise VMwareError("Empty vs_datastore_dir override")
+        raise VMwareError(msg="Empty vs_datastore_dir override")
 
     if t.startswith("[") and "]" in t:
         ds = t[1 : t.index("]")]
@@ -181,7 +181,7 @@ def _parse_datastore_dir_override(s: str, *, default_ds: str | None = None) -> t
         return ds, folder.strip("/")
 
     if not default_ds:
-        raise VMwareError("vs_datastore_dir provided without datastore and default datastore is unknown")
+        raise VMwareError(msg="vs_datastore_dir provided without datastore and default datastore is unknown")
 
     folder = t.strip().lstrip("/").rstrip("/")
     if "/" in folder and "." in folder.split("/")[-1]:
@@ -200,16 +200,16 @@ def _safe_rel_ds_path(ds_path: str) -> str:
     raw = str(ds_path or "").replace("\\", "/").strip()
     raw = raw.lstrip("/")  # datastore-relative
     if not raw:
-        raise VMwareError("empty ds_path")
+        raise VMwareError(msg="empty ds_path")
 
     parts = [p for p in raw.split("/") if p not in ("", ".")]
     if any(p == ".." for p in parts):
-        raise VMwareError(f"refusing ds_path with '..' segments: {ds_path!r}")
+        raise VMwareError(msg=f"refusing ds_path with '..' segments: {ds_path!r}")
 
     # Reconstruct stable posix-ish relative path
     clean = "/".join(parts)
     if clean.startswith(("/", "..")):
-        raise VMwareError(f"refusing unsafe ds_path: {ds_path!r}")
+        raise VMwareError(msg=f"refusing unsafe ds_path: {ds_path!r}")
     return clean
 
 
@@ -276,7 +276,7 @@ def _download_one_folder_file(
 ) -> None:
     """Download a single file via HTTPS /folder endpoint using HTTPDownloadClient."""
     if HTTPDownloadClient is None:
-        raise VMwareError("HTTPDownloadClient not available. Install: pip install requests")
+        raise VMwareError(msg="HTTPDownloadClient not available. Install: pip install requests")
 
     # Create download client
     timeout_tuple = _get_http_timeout(args)
@@ -376,7 +376,7 @@ def _get_session_cookie(client: VMwareClient) -> str:
         pass
 
     raise VMwareError(
-        "Cannot get session cookie: VMwareClient is not properly connected or returned empty cookie"
+        msg="Cannot get session cookie: VMwareClient is not properly connected or returned empty cookie"
     )
 
 

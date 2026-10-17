@@ -81,10 +81,10 @@ class ScriptHook(BaseHook):
 
         # Security: Validate script path exists and is not a symlink escape
         if not script_path.exists():
-            raise HookExecutionError(f"Script not found: {script_path}")
+            raise HookExecutionError(msg=f"Script not found: {script_path}")
 
         if not script_path.is_file():
-            raise HookExecutionError(f"Script path is not a file: {script_path}")
+            raise HookExecutionError(msg=f"Script path is not a file: {script_path}")
 
         # Check executable permission
         if not script_path.stat().st_mode & 0o111:
@@ -113,7 +113,7 @@ class ScriptHook(BaseHook):
         if working_dir:
             working_dir = Path(self._substitute_variables(str(working_dir)))
             if not working_dir.exists():
-                raise HookExecutionError(f"Working directory not found: {working_dir}")
+                raise HookExecutionError(msg=f"Working directory not found: {working_dir}")
             cwd = str(working_dir)
         else:
             cwd = None
@@ -160,11 +160,11 @@ class ScriptHook(BaseHook):
 
         except subprocess.TimeoutExpired:
             duration = time.time() - start_time
-            raise HookExecutionError(f"Script hook timed out after {self.timeout}s") from None
+            raise HookExecutionError(msg=f"Script hook timed out after {self.timeout}s") from None
 
         except Exception as e:
             duration = time.time() - start_time
-            raise HookExecutionError(f"Script hook execution failed: {e}") from e
+            raise HookExecutionError(msg=f"Script hook execution failed: {e}") from e
 
 
 class PythonHook(BaseHook):
@@ -198,15 +198,17 @@ class PythonHook(BaseHook):
             try:
                 module = importlib.import_module(module_name)
             except ImportError as e:
-                raise HookExecutionError(f"Failed to import module '{module_name}': {e}") from e
+                raise HookExecutionError(msg=f"Failed to import module '{module_name}': {e}") from e
 
             # Get function
             if not hasattr(module, function_name):
-                raise HookExecutionError(f"Function '{function_name}' not found in module '{module_name}'")
+                raise HookExecutionError(
+                    msg=f"Function '{function_name}' not found in module '{module_name}'"
+                )
 
             func = getattr(module, function_name)
             if not callable(func):
-                raise HookExecutionError(f"'{function_name}' is not a callable function")
+                raise HookExecutionError(msg=f"'{function_name}' is not a callable function")
 
             # Prepare arguments with variable substitution
             args = self.config.get("args", {})
@@ -232,7 +234,7 @@ class PythonHook(BaseHook):
                 try:
                     result = future.result(timeout=self.timeout)
                 except FuturesTimeoutError as err:
-                    raise HookExecutionError(f"Python hook timed out after {self.timeout}s") from err
+                    raise HookExecutionError(msg=f"Python hook timed out after {self.timeout}s") from err
 
             duration = time.time() - start_time
 
@@ -263,7 +265,7 @@ class PythonHook(BaseHook):
             duration = time.time() - start_time
             self.logger.exception(f"Python hook exception: {e}")
             Log.trace(self.logger, "Python hook exception", exc_info=True)
-            raise HookExecutionError(f"Python hook execution failed: {e}") from e
+            raise HookExecutionError(msg=f"Python hook execution failed: {e}") from e
 
 
 class HttpHook(BaseHook):
@@ -291,7 +293,7 @@ class HttpHook(BaseHook):
             import requests
         except ImportError:
             raise HookExecutionError(
-                "requests library not installed. Install with: pip install requests"
+                msg="requests library not installed. Install with: pip install requests"
             ) from None
 
         url = self._substitute_variables(self.config["url"])
@@ -356,11 +358,11 @@ class HttpHook(BaseHook):
 
         except requests.Timeout:
             duration = time.time() - start_time
-            raise HookExecutionError(f"HTTP hook timed out after {self.timeout}s") from None
+            raise HookExecutionError(msg=f"HTTP hook timed out after {self.timeout}s") from None
 
         except Exception as e:
             duration = time.time() - start_time
-            raise HookExecutionError(f"HTTP hook execution failed: {e}") from e
+            raise HookExecutionError(msg=f"HTTP hook execution failed: {e}") from e
 
 
 def create_hook(

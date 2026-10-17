@@ -74,7 +74,7 @@ class VsphereCommands:
     def _vm_or_raise(self, vm_name: str) -> Any:
         vm = self.client.get_vm_by_name(vm_name)
         if vm is None:
-            raise VMwareError(f"VM not found: {vm_name!r}")
+            raise VMwareError(msg=f"VM not found: {vm_name!r}")
         return vm
 
     def _govc(self) -> GovmomiCLI | None:
@@ -139,7 +139,7 @@ class VsphereCommands:
     def _resolve_snapshot_ref(self, vm: Any, snapshot_name: str) -> Any:
         node = _find_snapshot_tree_by_name(vm, snapshot_name)
         if node is None:
-            raise VMwareError(f"Snapshot not found by name: {snapshot_name!r}")
+            raise VMwareError(msg=f"Snapshot not found by name: {snapshot_name!r}")
         return _snapshot_ref_from_tree(node)
 
     # ---- actions ----
@@ -221,7 +221,7 @@ class VsphereCommands:
 
         govc = self._govc()
         if not govc:
-            raise VMwareError("datastore_ls requires govc (install govc or disable this action)")
+            raise VMwareError(msg="datastore_ls requires govc (install govc or disable this action)")
 
         files = govc.datastore_ls_json(datastore=datastore, ds_dir=ds_dir)
         names = govc._extract_names_from_ls_json(files)  # pylint: disable=protected-access  # same-package internal helper on GovmomiCLI
@@ -242,7 +242,9 @@ class VsphereCommands:
 
         govc = self._govc()
         if not govc:
-            raise VMwareError("download_datastore_dir requires govc (install govc or disable this action)")
+            raise VMwareError(
+                msg="download_datastore_dir requires govc (install govc or disable this action)"
+            )
 
         res = govc.download_datastore_dir(
             datastore=datastore,
@@ -304,7 +306,7 @@ class VsphereCommands:
             d = self.client.select_disk(vm, disk_sel)
             device_key = int(getattr(d, "key", 0) or 0)
             if not device_key:
-                raise VMwareError("Could not resolve device_key from selected disk")
+                raise VMwareError(msg="Could not resolve device_key from selected disk")
 
         r = self.client.query_changed_disk_areas(
             vm,
@@ -398,7 +400,7 @@ class VsphereCommands:
         d = self.client.select_disk(vm, disk_sel)
         device_key = int(getattr(d, "key", 0) or 0)
         if not device_key:
-            raise VMwareError("Could not resolve device_key for selected disk")
+            raise VMwareError(msg="Could not resolve device_key for selected disk")
 
         # base pull so you at least have a consistent local artifact
         self.download_vm_disk_with(vm_name=vm_name, disk_sel=disk_sel, local_path=local_path)
@@ -506,10 +508,10 @@ _ACTIONS: dict[str, str] = {
 def _get_action_or_raise(args: Any) -> str:
     action = getattr(args, "vs_action", None)
     if not action:
-        raise VMwareError("Missing vs_action (argparse should have required=True)")
+        raise VMwareError(msg="Missing vs_action (argparse should have required=True)")
     action = str(action)
     if action not in _ACTIONS:
-        raise VMwareError(f"vsphere: unknown action: {action}")
+        raise VMwareError(msg=f"vsphere: unknown action: {action}")
     return action
 
 
@@ -538,7 +540,7 @@ def run_vsphere_command(args: Any, conf: dict[str, Any] | None, logger: Any) -> 
             meth_name = _ACTIONS[action]
             meth = getattr(cmd, meth_name, None)
             if not callable(meth):
-                raise VMwareError(f"vsphere: action not callable: {action} -> {meth_name}")
+                raise VMwareError(msg=f"vsphere: action not callable: {action} -> {meth_name}")
             meth()
 
         return int(VsphereExitCode.OK)

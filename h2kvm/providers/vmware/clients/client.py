@@ -365,7 +365,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         if self._http_client is None:
             if HTTPDownloadClient is None:
                 raise VMwareError(
-                    "HTTP download client not available. Ensure http_download_client.py is importable."
+                    msg="HTTP download client not available. Ensure http_download_client.py is importable."
                 )
             self._http_client = HTTPDownloadClient(
                 logger=self.logger,
@@ -392,7 +392,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
                     version or "unknown",
                 )
             except Exception as e:
-                raise VMwareError(f"OVF Tool not found: {e}") from e
+                raise VMwareError(msg=f"OVF Tool not found: {e}") from e
         return self._ovftool_paths
 
     # Context managers
@@ -415,7 +415,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
     def _require_pyvmomi(self) -> None:
         if not PYVMOMI_AVAILABLE:
-            raise VMwareError("pyvmomi not installed. Install: pip install pyvmomi")
+            raise VMwareError(msg="pyvmomi not installed. Install: pip install pyvmomi")
 
     def _ssl_context(self) -> ssl.SSLContext:
         """
@@ -625,7 +625,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
         # All retries exhausted - raise final error
         raise VMwareError(
-            f"Failed to connect to vSphere ({self.host}:{self.port}) "
+            msg=f"Failed to connect to vSphere ({self.host}:{self.port}) "
             f"after {max_attempts} attempts: {last_error}"
         ) from last_error
 
@@ -646,11 +646,11 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
     def _content(self) -> Any:
         if not self.si:
-            raise VMwareError("Not connected")
+            raise VMwareError(msg="Not connected")
         try:
             return self.si.RetrieveContent()
         except Exception as e:
-            raise VMwareError(f"Failed to retrieve content: {e}") from e
+            raise VMwareError(msg=f"Failed to retrieve content: {e}") from e
 
     # Datacenters / Hosts - Delegate to vmware_datastore
 
@@ -902,7 +902,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         disks = self.vm_disks(vm_obj)
         if not disks:
             raise VMwareError(
-                "No virtual disks found on VM. The VM may have no hard disks attached, "
+                msg="No virtual disks found on VM. The VM may have no hard disks attached, "
                 "or the disk configuration is not accessible. Check the VM's hardware "
                 "settings in vSphere to verify it has virtual disks."
             )
@@ -912,7 +912,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         if s.isdigit():
             idx = int(s)
             if idx < 0 or idx >= len(disks):
-                raise VMwareError(f"Disk index out of range: {idx} (found {len(disks)})")
+                raise VMwareError(msg=f"Disk index out of range: {idx} (found {len(disks)})")
             return disks[idx]
         sl = s.lower()
         for d in disks:
@@ -926,7 +926,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 available.append(label)
         available_str = ", ".join(available) if available else "none detected"
         raise VMwareError(
-            f"No disk matching label '{s}'. Available disks: {available_str}\n"
+            msg=f"No disk matching label '{s}'. Available disks: {available_str}\n"
             "Specify a disk by label (e.g., 'Hard disk 1') or index (e.g., 0, 1)."
         )
 
