@@ -13,6 +13,13 @@ type Asset = {
 
 const ASSETS: Asset[] = [
   {
+    title: 'Exit Nutanix',
+    blurb:
+      'Transiva exports a VM out of Nutanix; h2kvm repairs, converts and lands it on KVM or KubeVirt. Diagrams and a measured run.',
+    meta: '7 of 7 stages, 145 s',
+    links: [{label: 'Read the page', href: '/nutanix-exit'}],
+  },
+  {
     title: 'Install',
     blurb: 'h2kvm 1.4.0 on PyPI. GuestKit is the guestkit extra.',
     meta: 'pip install "h2kvm==1.4.0"',

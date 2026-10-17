@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="t2 d2"><title id="t2">Order of calls in a Nutanix exit</title><desc id="d2">The script runs hyperexport, which negotiates the Prism v4 version, lists the VM, reads the disk from the NFS container and converts it to qcow2 with a manifest. The script then runs h2kvm and boots the result.</desc>
+<style>
+svg{--c-fg:#1d1d1f;--c-mut:#6e6e73;--c-line:#c7c7cc;--c-card:#fff;--c-bg2:#f5f5f7;--c-bgp:#fff;--c-blue:#0071e3;--c-blue2:#2997ff;--c-or:#ff6a2a;--c-ok:#1d8a3a;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+@media (prefers-color-scheme:dark){svg{--c-fg:#f5f5f7;--c-mut:#a1a1a6;--c-line:#3a3a3c;--c-card:#111114;--c-bg2:#0b0b0f;--c-bgp:#000;--c-blue:#0a84ff;--c-blue2:#64b5ff;--c-ok:#30d158}}
+.fg{fill:var(--zx-fg,var(--c-fg))}.mut{fill:var(--zx-mut,var(--c-mut))}.ok{fill:var(--zx-ok,var(--c-ok))}.or{fill:var(--c-or)}
+.card{fill:var(--zx-card,var(--c-card));stroke:var(--zx-line,var(--c-line));stroke-width:1.5}
+.hl{fill:var(--zx-card,var(--c-card));stroke:var(--zx-blue,var(--c-blue));stroke-width:2}
+.chip{fill:var(--zx-bg2,var(--c-bg2));stroke:none}.pill{fill:var(--zx-bgp,var(--c-bgp))}
+.dash{stroke-dasharray:7 6}
+.ln{stroke:var(--zx-mut,var(--c-mut));stroke-width:1.6;fill:none}
+.lnb{stroke:var(--zx-blue,var(--c-blue));stroke-width:2.4;fill:none}
+.lnd{stroke:var(--zx-mut,var(--c-mut));stroke-width:1.6;fill:none;stroke-dasharray:6 6}
+.life{stroke:var(--zx-line,var(--c-line));stroke-width:1.5;stroke-dasharray:3 5}
+.ah{fill:var(--zx-mut,var(--c-mut))}.ahb{fill:var(--zx-blue,var(--c-blue))}
+.t{font-size:16px}.tb{font-size:20px;font-weight:700}.ts{font-size:14px}.tm{font-family:Menlo,Consolas,monospace;font-size:14px}.th{font-size:12px;font-weight:700;letter-spacing:.06em}
+</style>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" class="ah"/></marker>
+<marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" class="ahb"/></marker></defs>
+<rect x="15" y="14" width="150" height="40" rx="12" class="card"/>
+<text x="90" y="40" class="fg t" text-anchor="middle">Script</text>
+<line x1="90" y1="54" x2="90" y2="624" class="life"/>
+<rect x="215" y="14" width="150" height="40" rx="12" class="hl"/>
+<text x="290" y="40" class="fg t" text-anchor="middle">hyperexport</text>
+<line x1="290" y1="54" x2="290" y2="624" class="life"/>
+<rect x="415" y="14" width="150" height="40" rx="12" class="card"/>
+<text x="490" y="40" class="fg t" text-anchor="middle">Prism v4</text>
+<line x1="490" y1="54" x2="490" y2="624" class="life"/>
+<rect x="615" y="14" width="150" height="40" rx="12" class="card"/>
+<text x="690" y="40" class="fg t" text-anchor="middle">NFS container</text>
+<line x1="690" y1="54" x2="690" y2="624" class="life"/>
+<rect x="815" y="14" width="150" height="40" rx="12" class="hl"/>
+<text x="890" y="40" class="fg t" text-anchor="middle">h2kvm</text>
+<line x1="890" y1="54" x2="890" y2="624" class="life"/>
+<rect x="1015" y="14" width="150" height="40" rx="12" class="card"/>
+<text x="1090" y="40" class="fg t" text-anchor="middle">KVM / KubeVirt</text>
+<line x1="1090" y1="54" x2="1090" y2="624" class="life"/>
+<path d="M96 100 L286 100" class="lnb" marker-end="url(#ab)"/>
+<rect x="43.400000000000006" y="74" width="293.2" height="22" rx="7" class="pill"/>
+<text x="190.0" y="89" class="fg tm" text-anchor="middle">run, -provider nutanix -vm &lt;name></text>
+<path d="M296 150 L486 150" class="ln" marker-end="url(#a)"/>
+<rect x="226.6" y="124" width="326.8" height="22" rx="7" class="pill"/>
+<text x="390.0" y="139" class="fg ts" text-anchor="middle">OPTIONS /unversioned/info (negotiate v4.3)</text>
+<path d="M296 200 L486 200" class="ln" marker-end="url(#a)"/>
+<rect x="230.29999999999998" y="174" width="319.40000000000003" height="22" rx="7" class="pill"/>
+<text x="390.0" y="189" class="fg ts" text-anchor="middle">GET vms, then GET vm: disks and container</text>
+<path d="M296 250 L686 250" class="ln" marker-end="url(#a)"/>
+<rect x="371.0" y="224" width="238.0" height="22" rx="7" class="pill"/>
+<text x="490.0" y="239" class="fg ts" text-anchor="middle">read .acropolis/vmdisk/&lt;disk>/</text>
+<rect x="155.0" y="282" width="270" height="30" rx="9" class="chip"/>
+<text x="290" y="302" class="fg ts" text-anchor="middle">qemu-img convert, write manifest</text>
+<path d="M96 360 L886 360" class="lnb" marker-end="url(#ab)"/>
+<rect x="280.4" y="334" width="419.20000000000005" height="22" rx="7" class="pill"/>
+<text x="490.0" y="349" class="fg tm" text-anchor="middle">run, --cmd local --vmdk &lt;disk> --emit-domain-xml</text>
+<rect x="760.0" y="392" width="260" height="30" rx="9" class="chip"/>
+<text x="890" y="412" class="fg ts" text-anchor="middle">inspect, repair, convert, checksum</text>
+<rect x="755.0" y="432" width="270" height="30" rx="9" class="chip"/>
+<text x="890" y="452" class="fg ts" text-anchor="middle">repair skipped on the test image</text>
+<circle cx="769.0" cy="447" r="4" class="or"/>
+<path d="M896 510 L1086 510" class="lnb" marker-end="url(#ab)"/>
+<rect x="896.9" y="484" width="186.20000000000002" height="22" rx="7" class="pill"/>
+<text x="990.0" y="499" class="fg ts" text-anchor="middle">boot the converted disk</text>
+<path d="M1084 560 L96 560" class="ln" marker-end="url(#a)"/>
+<rect x="480" y="534" width="240" height="22" rx="7" class="pill"/>
+<text x="600" y="549" class="fg ts" text-anchor="middle">guest answers ping: 0% loss</text>
+<text x="20" y="624" class="mut ts" text-anchor="start">Real run: 7 of 7 stages, 145 s. The Prism endpoint was a simulator.</text>
+</svg>
