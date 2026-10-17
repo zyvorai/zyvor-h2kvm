@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import contextlib
-import datetime as _dt
+import datetime as dt
 import fnmatch
 import gc
 import hashlib
@@ -247,7 +247,7 @@ class U:
     @staticmethod
     def now_ts() -> str:
         """Return the current local timestamp formatted as YYYYMMDD-HHMMSS."""
-        return _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+        return dt.datetime.now().strftime("%Y%m%d-%H%M%S")
 
     @staticmethod
     def json_dump(obj: Any) -> str:

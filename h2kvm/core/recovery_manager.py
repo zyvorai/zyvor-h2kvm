@@ -11,7 +11,7 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
+import datetime as dt
 import hashlib
 import json
 import os
@@ -1115,5 +1115,5 @@ class RecoveryManager:  # pylint: disable=too-many-instance-attributes
         """
         if days is None or days <= 0:
             return None
-        cutoff_dt = datetime.datetime.now() - datetime.timedelta(days=days)
+        cutoff_dt = dt.datetime.now() - dt.timedelta(days=days)
         return cutoff_dt.strftime("%Y%m%d-%H%M%S")

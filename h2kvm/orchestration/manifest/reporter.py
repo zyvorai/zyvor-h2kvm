@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import json
 import logging
 from pathlib import Path
@@ -20,7 +20,7 @@ class ManifestReporter:
         self.logger = logger or logging.getLogger(__name__)
         self.report: dict[str, Any] = {
             "version": "1.0",
-            "timestamp": datetime.datetime.now().isoformat(),
+            "timestamp": dt.datetime.now().isoformat(),
             "pipeline": {
                 "success": False,
                 "duration_seconds": 0.0,
@@ -50,7 +50,7 @@ class ManifestReporter:
             {
                 "stage": stage,
                 "message": message,
-                "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": dt.datetime.now().isoformat(),
             }
         )
 
@@ -60,7 +60,7 @@ class ManifestReporter:
             {
                 "stage": stage,
                 "message": message,
-                "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": dt.datetime.now().isoformat(),
             }
         )
 

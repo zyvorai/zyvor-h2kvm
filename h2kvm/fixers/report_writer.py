@@ -11,7 +11,7 @@ h2kvm report writer.
 from __future__ import annotations
 
 import contextlib
-import datetime as _dt
+import datetime as dt
 import json
 import os
 import sys
@@ -46,9 +46,9 @@ def _json_safe(  # pylint: disable=too-many-return-statements,too-many-branches
         return obj
     if isinstance(obj, Path):
         return str(obj)
-    if isinstance(obj, _dt.datetime):
+    if isinstance(obj, dt.datetime):
         return obj.isoformat()
-    if isinstance(obj, _dt.date):
+    if isinstance(obj, dt.date):
         return obj.isoformat()
     if isinstance(obj, (bytes, bytearray)):
         # Avoid huge blobs; represent as length + short prefix.
@@ -745,7 +745,7 @@ def write_report(self) -> None:  # pylint: disable=too-many-locals,too-many-stat
     # End timestamp
     try:
         self.report.setdefault("timestamps", {})
-        self.report["timestamps"]["end"] = _dt.datetime.now().isoformat()
+        self.report["timestamps"]["end"] = dt.datetime.now().isoformat()
     except Exception:  # pylint: disable=broad-exception-caught
         # self.report is caller/state-supplied and not guaranteed to be a plain
         # dict (e.g. a subclass overriding __setitem__); timestamping is

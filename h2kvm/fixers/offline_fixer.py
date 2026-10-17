@@ -34,7 +34,7 @@ Architecture:
 from __future__ import annotations
 
 import contextlib
-import datetime as _dt
+import datetime as dt
 import os
 import subprocess
 import tempfile
@@ -278,7 +278,7 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
             "dry_run": self.dry_run,
             "changes": {},
             "analysis": {},
-            "timestamps": {"start": _dt.datetime.now().isoformat()},
+            "timestamps": {"start": dt.datetime.now().isoformat()},
         }
 
         # Timings/metrics stash
@@ -1931,7 +1931,7 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 with contextlib.suppress(Exception):
                     g.close()
 
-        self.report["timestamps"]["end"] = _dt.datetime.now().isoformat()
+        self.report["timestamps"]["end"] = dt.datetime.now().isoformat()
         self.write_report()
 
     # ── Main entry point ─────────────────────────────────────────────

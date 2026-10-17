@@ -460,6 +460,6 @@ Additional scripts have been created in the output directory:
 ---
 Generated: {timestamp}
 """
-        import datetime
+        import datetime as dt
 
-        return guide.replace("{timestamp}", datetime.datetime.now().isoformat())
+        return guide.replace("{timestamp}", dt.datetime.now().isoformat())

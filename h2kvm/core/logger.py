@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import contextlib
-import datetime as _dt
+import datetime as dt
 import json
 import logging
 import multiprocessing as _mp
@@ -198,12 +198,12 @@ class EmojiFormatter(logging.Formatter):
         self._style = style
 
     def _now(self, created: float) -> str:
-        dt = (
-            _dt.datetime.fromtimestamp(created, tz=_dt.timezone.utc)
+        stamp = (
+            dt.datetime.fromtimestamp(created, tz=dt.timezone.utc)
             if self._style.utc
-            else _dt.datetime.fromtimestamp(created)
+            else dt.datetime.fromtimestamp(created)
         )
-        return dt.strftime("%H:%M:%S.%f")[:-3] if self._style.show_ms else dt.strftime("%H:%M:%S")
+        return stamp.strftime("%H:%M:%S.%f")[:-3] if self._style.show_ms else stamp.strftime("%H:%M:%S")
 
     def _emoji(self, levelname: str) -> str:
         if not self._style.unicode:
@@ -302,12 +302,12 @@ class JsonFormatter(logging.Formatter):
         self._include_src = bool(include_src)
 
     def _iso(self, created: float) -> str:
-        dt = (
-            _dt.datetime.fromtimestamp(created, tz=_dt.timezone.utc)
+        stamp = (
+            dt.datetime.fromtimestamp(created, tz=dt.timezone.utc)
             if self._utc
-            else _dt.datetime.fromtimestamp(created)
+            else dt.datetime.fromtimestamp(created)
         )
-        return dt.isoformat(timespec="milliseconds")
+        return stamp.isoformat(timespec="milliseconds")
 
     def format(self, record: logging.LogRecord) -> str:
         try:
