@@ -53,7 +53,8 @@ class _Paths:
         self.xml_path = xml_path
 
 
-def _emit(orch: ManifestOrchestrator, has_esp: bool = False):
+def _emit(orch: ManifestOrchestrator, has_esp: bool = False, taken: dict[str, str] | None = None):
+    taken = taken or {}
     captured = {}
 
     def fake_emit(config):
@@ -65,6 +66,7 @@ def _emit(orch: ManifestOrchestrator, has_esp: bool = False):
         patch("h2kvm.libvirt.domain_emitter.auto_detect_ovmf", return_value="/ovmf/OVMF_CODE.fd"),
         patch("h2kvm.libvirt.libvirt_utils.default_graphics", return_value="vnc"),
         patch("h2kvm.orchestration.manifest.domain._has_efi_system_partition", return_value=has_esp),
+        patch("h2kvm.libvirt.linux_domain.unique_domain_name", side_effect=lambda n: taken.get(n, n)),
     ):
         result = orch._emit_domain_xml()  # private stage helper under test
     return result, captured.get("config")
@@ -131,3 +133,9 @@ def test_an_image_without_an_esp_stays_bios(tmp_path):
     orch = _orchestrator(tmp_path)
     _, config = _emit(orch, has_esp=False)
     assert config.firmware == "bios"
+
+
+def test_an_existing_domain_with_the_same_name_is_not_reused(tmp_path):
+    orch = _orchestrator(tmp_path)
+    _, config = _emit(orch, taken={"chimera-vm-01": "chimera-vm-01-20261017-120000"})
+    assert config.name == "chimera-vm-01-20261017-120000"
