@@ -94,7 +94,7 @@ def emit_domain_xml(
     """Write a libvirt domain definition for the converted boot disk; returns its path, or None."""
     # pylint: disable=import-outside-toplevel
     # Deliberately lazy: the libvirt helpers are an optional dependency.
-    from h2kvm.libvirt.linux_domain import emit_linux_domain
+    from h2kvm.libvirt.linux_domain import emit_linux_domain, unique_domain_name
 
     if output_dir is None:
         return None
@@ -111,7 +111,10 @@ def emit_domain_xml(
     # The fix stage detection and the manifest hint win; otherwise a GPT image with an ESP boots via UEFI
     # (Transiva writes bios into manifests because Prism does not report the firmware).
     uefi = boot_mode == "uefi" or loader.get_firmware() == "uefi" or _has_efi_system_partition(image, logger)
-    name = _safe_domain_name(str(loader.get_source_metadata().get("vm_name") or boot_disk.id))
+    # A second migration of the same VM must not overwrite the disk of one that is already running.
+    name = unique_domain_name(
+        _safe_domain_name(str(loader.get_source_metadata().get("vm_name") or boot_disk.id))
+    )
     logger.info("🧾 Writing domain XML: name=%s firmware=%s", name, "uefi" if uefi else "bios")
     config = _domain_config(loader, name=name, image=image, output_dir=output_dir, uefi=uefi)
     return emit_linux_domain(config).xml_path

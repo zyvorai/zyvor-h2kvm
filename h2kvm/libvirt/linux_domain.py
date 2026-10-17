@@ -750,6 +750,11 @@ def _find_unique_domain_name(base_name: str) -> str:
     return f"{base_name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
 
+def unique_domain_name(base_name: str) -> str:
+    """Public wrapper: ``base_name``, or ``base_name`` plus a timestamp when a libvirt domain already has it."""
+    return _find_unique_domain_name(base_name)
+
+
 def define_linux_domain(*, xml_path: Path) -> None:
     """
     Define a libvirt domain from XML and start it.
