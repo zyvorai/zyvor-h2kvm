@@ -151,7 +151,7 @@ export default function NutanixExit(): ReactNode {
             stats={[
               {value: run.passed, suffix: ` / ${run.total}`, label: 'stages passed', note: 'unattended'},
               {value: run.seconds, suffix: ' s', label: 'end to end', note: 'download to running guests'},
-              {value: run.pingLoss, suffix: '%', label: 'packet loss', note: 'to the booted guest'},
+              {value: run.landed, suffix: ' / 2', label: 'targets booted', note: 'KVM (UEFI) and KubeVirt'},
             ]}
           />
           <Timings />
@@ -174,7 +174,8 @@ export default function NutanixExit(): ReactNode {
               <List
                 items={[
                   'Export, convert and boot, unattended, in one script',
-                  'Boot on libvirt/KVM and on KubeVirt, guest answers ping',
+                  'Ubuntu 24.04 boots on libvirt/KVM (UEFI) and on KubeVirt, guest answers ping',
+                  'A guest with no network config comes up through the DHCP fallback',
                   'Prism endpoint was Chimera, a simulator, not a real cluster',
                 ]}
               />
@@ -185,7 +186,8 @@ export default function NutanixExit(): ReactNode {
                 limits
                 items={[
                   'A real Nutanix cluster',
-                  'Windows, UEFI-specific repair and multi-disk VMs beyond the test image',
+                  'Windows, multi-disk and large VMs',
+                  'Boot repair on a guest that needs it (the Ubuntu image needed only the network fallback)',
                   'Kairon and Machina landings',
                   'Checks inside the guest beyond ping',
                 ]}

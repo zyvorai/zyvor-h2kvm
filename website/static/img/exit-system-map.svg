@@ -51,7 +51,7 @@ svg{--c-fg:#1d1d1f;--c-mut:#6e6e73;--c-line:#c7c7cc;--c-card:#fff;--c-bg2:#f5f5f
 <rect x="770" y="292" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="312" class="fg ts" text-anchor="middle">GuestKit repair</text>
 <rect x="770" y="332" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="352" class="fg ts" text-anchor="middle">convert + checksum</text>
 <rect x="770" y="372" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="392" class="fg ts" text-anchor="middle">domain XML</text>
-<rect x="770" y="412" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="432" class="fg ts" text-anchor="middle">Windows, UEFI: not run</text>
+<rect x="770" y="412" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="432" class="fg ts" text-anchor="middle">Windows: not run</text>
 <path d="M700 335 L750 335" class="lnb" marker-end="url(#ab)"/>
 <text x="1030" y="36" class="mut th" text-anchor="start">LAND</text>
 <rect x="1030" y="60" width="230" height="100" rx="16" class="card"/>
