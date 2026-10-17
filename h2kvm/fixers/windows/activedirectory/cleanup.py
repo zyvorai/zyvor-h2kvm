@@ -13,9 +13,9 @@ from enum import Enum
 from typing import Any, Optional
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +75,7 @@ def stage_cleanup_script(  # pylint: disable=too-many-arguments,too-many-positio
     """
     logger.info("Staging AD cleanup script for %s", old_computer_name)
 
-    results = {
+    results: dict[str, Any] = {
         "success": False,
         "script_path": None,
         "method": method.value,
@@ -349,6 +349,5 @@ def get_cleanup_command(method: CleanupMethod) -> str:
     if method == CleanupMethod.MANUAL:
         return "notepad C:\\h2kvm\\activedirectory\\ad-cleanup.ps1"
     return (
-        "PowerShell.exe -ExecutionPolicy Bypass -NoProfile "
-        "-File C:\\h2kvm\\activedirectory\\ad-cleanup.ps1"
+        "PowerShell.exe -ExecutionPolicy Bypass -NoProfile -File C:\\h2kvm\\activedirectory\\ad-cleanup.ps1"
     )

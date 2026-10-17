@@ -22,11 +22,11 @@ import tempfile
 from typing import Any
 
 try:
-    import hivex as _hivex_mod  # type: ignore
+    import hivex as _hivex_mod
 
     HIVEX_AVAILABLE = True
 except ImportError:
-    _hivex_mod = None  # type: ignore
+    _hivex_mod = None
     HIVEX_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
@@ -300,6 +300,8 @@ def verify_rdp_enabled(
                 os.unlink(tmp_path)
 
     return result
+
+
 # pylint: enable=too-many-locals,too-many-branches,too-many-statements
 
 
@@ -319,7 +321,7 @@ def enable_rdp_if_disabled(
     if log is None:
         log = logging.getLogger(__name__)
 
-    result = {
+    result: dict[str, Any] = {
         "modified": False,
         "previous_state": None,
         "current_state": None,
@@ -420,6 +422,8 @@ def enable_rdp_if_disabled(
                 os.unlink(tmp_path)
 
     return result
+
+
 # pylint: enable=too-many-locals,too-many-branches,too-many-statements
 
 

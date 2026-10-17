@@ -51,7 +51,7 @@ def detect_bitlocker(g: guestfs.GuestFS, root: str) -> dict[str, Any]:
     Raises:
         WindowsFixerError: If BitLocker is detected (blocks migration)
     """
-    result = {
+    result: dict[str, Any] = {
         "bitlocker_detected": False,
         "encrypted_volumes": [],
         "protection_status": {},
@@ -188,7 +188,7 @@ def _read_bitlocker_service_info(  # pylint: disable=too-many-locals,too-many-re
             return None  # BitLocker service not installed
 
         # Read service configuration
-        service_info = {"service_exists": True}
+        service_info: dict[str, Any] = {"service_exists": True}
 
         # Read Start type
         start_val = h.node_get_value(bdesvc_node, "Start")
@@ -235,7 +235,7 @@ def _check_bitlocker_registry(g: guestfs.GuestFS, root: str) -> dict[str, Any]:
         HKLM\\SYSTEM\\CurrentControlSet\\Services\\BDESVC (BitLocker Drive Encryption Service)
         HKLM\\SOFTWARE\\Policies\\Microsoft\\FVE (Full Volume Encryption policies)
     """
-    result = {"found": False, "volumes": [], "status": {}}
+    result: dict[str, Any] = {"found": False, "volumes": [], "status": {}}
 
     try:
         # Check for BitLocker service (BDESVC)
@@ -284,7 +284,7 @@ def _check_bitlocker_metadata(g: guestfs.GuestFS) -> dict[str, Any]:
     BitLocker uses -FVE-FS- filesystem signatures that persist even after decryption.
     Check partition labels and filesystem types for BitLocker indicators.
     """
-    result = {"found": False, "volumes": []}
+    result: dict[str, Any] = {"found": False, "volumes": []}
 
     try:  # pylint: disable=too-many-nested-blocks  # exhaustive best-effort device/partition/label probing
         # Get all block devices
@@ -339,7 +339,7 @@ def _check_bitlocker_files(g: guestfs.GuestFS, root: str) -> dict[str, Any]:
         - BitLocker startup keys
         - FVEAPI.dll (BitLocker API)
     """
-    result = {"found": False, "files": []}
+    result: dict[str, Any] = {"found": False, "files": []}
 
     try:
         # Check for BitLocker DLL (indicates BitLocker was installed)

@@ -127,7 +127,7 @@ def get_virtio_download_url(windows_version: str | None = None) -> str:
         "6.1": "virtio-win.iso",  # Windows 7, Server 2008 R2
     }
 
-    filename = version_mapping.get(windows_version, "virtio-win.iso")
+    filename = version_mapping.get(windows_version or "", "virtio-win.iso")
     return base_url + filename
 
 

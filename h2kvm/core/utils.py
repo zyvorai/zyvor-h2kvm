@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import contextlib
-import datetime as _dt
+import datetime as dt
 import fnmatch
 import gc
 import hashlib
@@ -23,7 +23,7 @@ import threading
 import time
 from pathlib import Path
 from shutil import which as _which
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NoReturn
 
 from .constants import SIZE_1_MIB
 from .exceptions import Fatal
@@ -31,7 +31,7 @@ from .exceptions import Fatal
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Iterable
 
-    import guestfs  # type: ignore
+    import guestfs
 
 
 def effective_cpu_count() -> int:
@@ -80,7 +80,7 @@ class U:
     """Grab-bag of static utility helpers (process running, sizing, paths) used across h2kvm."""
 
     @staticmethod
-    def die(logger: logging.Logger | None, msg: str, code: int = 1) -> None:
+    def die(logger: logging.Logger | None, msg: str, code: int = 1) -> NoReturn:
         """Log an error (if a logger is given) and raise a Fatal with the given exit code."""
         if logger:
             logger.error(msg)
@@ -247,7 +247,7 @@ class U:
     @staticmethod
     def now_ts() -> str:
         """Return the current local timestamp formatted as YYYYMMDD-HHMMSS."""
-        return _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+        return dt.datetime.now().strftime("%Y%m%d-%H%M%S")
 
     @staticmethod
     def json_dump(obj: Any) -> str:

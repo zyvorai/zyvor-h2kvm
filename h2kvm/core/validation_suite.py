@@ -57,7 +57,7 @@ class ExitCodes:  # pylint: disable=too-few-public-methods  # constants namespac
     INVALID = 4
 
     @staticmethod
-    def from_payload(payload: dict[str, Any]) -> int:
+    def from_payload(payload: Any) -> int:
         """Classify a run_all() result payload into one of the structured exit codes above."""
         if not isinstance(payload, dict):
             return ExitCodes.INTERNAL
@@ -192,7 +192,7 @@ def _redact_in_obj(obj: Any, redact_tokens: set[str]) -> Any:
                     out[k] = _redact_in_obj(v, redact_tokens)
             return out
         if _is_sequence(obj):
-            return obj.__class__(_redact_in_obj(v, redact_tokens) for v in obj)  # type: ignore[misc]
+            return obj.__class__(_redact_in_obj(v, redact_tokens) for v in obj)
         return obj
     except Exception:  # pylint: disable=broad-exception-caught  # best-effort redaction over arbitrary check-result objects, must not crash the suite
         return obj
@@ -592,7 +592,8 @@ class ValidationSuite:
             raise RuntimeError(msg)
 
         try:
-            ctx = mp.get_context(self.mp_start_method)
+            # Any: typeshed types get_context(str) as BaseContext, which lacks Process
+            ctx: Any = mp.get_context(self.mp_start_method)
         except Exception:  # pylint: disable=broad-exception-caught  # unsupported start method on this platform, fall back to spawn
             ctx = mp.get_context("spawn")
 
@@ -743,7 +744,8 @@ class ValidationSuite:
             )
 
         try:
-            ctx = mp.get_context(self.mp_start_method)
+            # Any: typeshed types get_context(str) as BaseContext, which lacks Process
+            ctx: Any = mp.get_context(self.mp_start_method)
         except Exception:  # pylint: disable=broad-exception-caught  # unsupported start method on this platform, fall back to spawn
             ctx = mp.get_context("spawn")
 
@@ -827,12 +829,12 @@ class ValidationSuite:
             # poll running procs
             done_names: list[str] = []
             for name, st in list(running.items()):
-                spec: CheckSpec = st["spec"]
+                spec = st["spec"]
                 p: mp.Process = st["proc"]
                 conn = st["conn"]
                 child_conn = st["child_conn"]
                 t0: float = st["t0"]
-                attempt: int = st["attempt"]
+                attempt = st["attempt"]
 
                 timeout = spec.timeout_s if use_hard_timeout else None
                 elapsed = time.monotonic() - t0
@@ -1016,9 +1018,10 @@ class ValidationSuite:
         use_procs = self.default_use_processes if use_processes is None else bool(use_processes)
         strict_process_checks = bool(context.get("strict_process_checks", False))
 
-        allow_context_keys = context.get("process_context_keys")
-        if allow_context_keys is not None and not isinstance(allow_context_keys, (list, tuple)):
-            allow_context_keys = None
+        raw_keys = context.get("process_context_keys")
+        allow_context_keys: list[str] | None = (
+            list(raw_keys) if isinstance(raw_keys, (list, tuple)) else None
+        )
 
         missing_required = list(context.get("missing_required_tools", []) or [])
         fail_fast_missing = bool(context.get("fail_fast_on_missing_required_tools", True))
@@ -1398,10 +1401,10 @@ class ValidationSuite:
                         par_results[spec.name] = rr
 
                 for name, r in par_results.items():
-                    spec = next((s for s in candidates if s.name == name), None)
-                    if spec is None:
+                    matched = next((s for s in candidates if s.name == name), None)
+                    if matched is None:
                         continue
-                    r = self._postprocess_result(spec, context, r)
+                    r = self._postprocess_result(matched, context, r)
                     results_json[name] = self._result_to_json(r, show_tracebacks=show_tracebacks)
                     if r.passed:
                         passed_count += 1

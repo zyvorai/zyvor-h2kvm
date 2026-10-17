@@ -38,7 +38,7 @@ if TYPE_CHECKING:  # pylint: disable=duplicate-code
     except ImportError:
         from typing import Protocol
 
-        class guestfs:  # type: ignore  pylint: disable=invalid-name,missing-class-docstring,too-few-public-methods
+        class guestfs:  # type: ignore[no-redef]  # pylint: disable=invalid-name,missing-class-docstring,too-few-public-methods
             # reason: TYPE_CHECKING-only stand-in module/class mirroring the `guestfs`
             # module's name so `guestfs.GuestFS` type hints resolve when the real
             # (dynamically-typed, C-extension) guestfs package isn't installed.
@@ -438,6 +438,4 @@ def get_recommended_fs_check_freq(  # pylint: disable=too-many-return-statements
 # Logging helper
 def log_fstab_conversion(original_spec: str, new_spec: str, mountpoint: str, fs_type: str) -> None:
     """Log fstab conversion for audit trail."""
-    logger.info(
-        "fstab stabilization: %s (%s): %s -> %s", mountpoint, fs_type, original_spec, new_spec
-    )
+    logger.info("fstab stabilization: %s (%s): %s -> %s", mountpoint, fs_type, original_spec, new_spec)

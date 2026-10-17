@@ -43,6 +43,7 @@ if TYPE_CHECKING:
         class guestfs:  # type: ignore
             class GuestFS(Protocol): ...
 
+
 logger = logging.getLogger(__name__)
 
 

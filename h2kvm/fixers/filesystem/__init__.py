@@ -14,6 +14,7 @@ This package provides filesystem-related fixes:
 
 import logging
 import re
+from typing import Any
 
 from .universal_rewriter import (
     DevInfo,
@@ -61,7 +62,7 @@ def stabilize_guest_fstab(  # pylint: disable=too-many-locals,too-many-branches,
     """
     logger = logging.getLogger(__name__)
 
-    result = {
+    result: dict[str, Any] = {
         "success": False,
         "inventory_size": 0,
         "fstab_stats": {},
@@ -72,7 +73,7 @@ def stabilize_guest_fstab(  # pylint: disable=too-many-locals,too-many-branches,
 
     try:  # pylint: disable=too-many-nested-blocks  # linear best-effort orchestration, splitting would hurt clarity
         # 1. Build device inventory
-        devices = []
+        devices: list[Any] = []
 
         # Get partitions
         try:

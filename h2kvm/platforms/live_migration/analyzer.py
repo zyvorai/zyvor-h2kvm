@@ -269,7 +269,7 @@ class LiveMigrationAnalyzer:
         Returns:
             Batch analysis results with summary statistics
         """
-        results = {
+        results: dict[str, Any] = {
             "total_vms": len(vms),
             "live_feasible": 0,
             "live_recommended": 0,

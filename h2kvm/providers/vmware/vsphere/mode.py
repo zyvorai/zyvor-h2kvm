@@ -34,7 +34,7 @@ else:
         from pyVmomi import vim, vmodl
     except ImportError:
         # Set imported names to None
-        vim = vmodl = None, None  # type: ignore
+        vim = vmodl = None  # type: ignore
 
 # Import from the correct modules
 try:
@@ -55,6 +55,7 @@ try:
         OvfToolAuthError,
         OvfToolError,
         OvfToolNotFound,
+        OvfToolPaths,
         OvfToolSslError,
         deploy_ovf_or_ova,
         export_to_ova,
@@ -69,6 +70,7 @@ except ImportError:  # pragma: no cover
     OvfToolAuthError = None  # type: ignore
     OvfToolError = None  # type: ignore
     OvfToolNotFound = None  # type: ignore
+    OvfToolPaths = None  # type: ignore
     OvfToolSslError = None  # type: ignore
     deploy_ovf_or_ova = None  # type: ignore
     export_to_ova = None  # type: ignore
@@ -160,7 +162,7 @@ def _parse_vm_datastore_dir(vmx_path: str) -> tuple[str, str]:
     """Parse VM datastore directory from VMX path."""
     s = (vmx_path or "").strip()
     if not s.startswith("[") or "]" not in s:
-        raise VMwareError(f"Unexpected vmPathName format: {vmx_path}")
+        raise VMwareError(msg=f"Unexpected vmPathName format: {vmx_path}")
     ds = s[1 : s.index("]")]
     rest = s[s.index("]") + 1 :].strip()
     folder = "" if "/" not in rest else rest.rsplit("/", 1)[0].lstrip("/")
@@ -171,7 +173,7 @@ def _parse_datastore_dir_override(s: str, *, default_ds: str | None = None) -> t
     """Parse datastore directory override."""
     t = (s or "").strip()
     if not t:
-        raise VMwareError("Empty vs_datastore_dir override")
+        raise VMwareError(msg="Empty vs_datastore_dir override")
 
     if t.startswith("[") and "]" in t:
         ds = t[1 : t.index("]")]
@@ -181,7 +183,7 @@ def _parse_datastore_dir_override(s: str, *, default_ds: str | None = None) -> t
         return ds, folder.strip("/")
 
     if not default_ds:
-        raise VMwareError("vs_datastore_dir provided without datastore and default datastore is unknown")
+        raise VMwareError(msg="vs_datastore_dir provided without datastore and default datastore is unknown")
 
     folder = t.strip().lstrip("/").rstrip("/")
     if "/" in folder and "." in folder.split("/")[-1]:
@@ -200,16 +202,16 @@ def _safe_rel_ds_path(ds_path: str) -> str:
     raw = str(ds_path or "").replace("\\", "/").strip()
     raw = raw.lstrip("/")  # datastore-relative
     if not raw:
-        raise VMwareError("empty ds_path")
+        raise VMwareError(msg="empty ds_path")
 
     parts = [p for p in raw.split("/") if p not in ("", ".")]
     if any(p == ".." for p in parts):
-        raise VMwareError(f"refusing ds_path with '..' segments: {ds_path!r}")
+        raise VMwareError(msg=f"refusing ds_path with '..' segments: {ds_path!r}")
 
     # Reconstruct stable posix-ish relative path
     clean = "/".join(parts)
     if clean.startswith(("/", "..")):
-        raise VMwareError(f"refusing unsafe ds_path: {ds_path!r}")
+        raise VMwareError(msg=f"refusing unsafe ds_path: {ds_path!r}")
     return clean
 
 
@@ -221,7 +223,9 @@ def _get_transport_preference(args: argparse.Namespace) -> str:
         v = os.environ.get("VMDK2KVM_VSPHERE_TRANSPORT") or os.environ.get("VSPHERE_TRANSPORT")
     v = str(v).strip().lower() if v else "https"
     if v not in ("https", "http", "auto"):
-        logging.getLogger(__name__).warning("Unsupported vSphere transport %r; using HTTPS /folder instead.", v)
+        logging.getLogger(__name__).warning(
+            "Unsupported vSphere transport %r; using HTTPS /folder instead.", v
+        )
     return "https"
 
 
@@ -274,7 +278,7 @@ def _download_one_folder_file(
 ) -> None:
     """Download a single file via HTTPS /folder endpoint using HTTPDownloadClient."""
     if HTTPDownloadClient is None:
-        raise VMwareError("HTTPDownloadClient not available. Install: pip install requests")
+        raise VMwareError(msg="HTTPDownloadClient not available. Install: pip install requests")
 
     # Create download client
     timeout_tuple = _get_http_timeout(args)
@@ -374,7 +378,7 @@ def _get_session_cookie(client: VMwareClient) -> str:
         pass
 
     raise VMwareError(
-        "Cannot get session cookie: VMwareClient is not properly connected or returned empty cookie"
+        msg="Cannot get session cookie: VMwareClient is not properly connected or returned empty cookie"
     )
 
 
@@ -436,6 +440,8 @@ def _update_progress(
 ) -> None:
     """No-op progress update (Rich progress has been removed)."""
     return
+
+
 # pylint: enable=too-many-arguments,too-many-positional-arguments,unused-argument
 
 
@@ -779,7 +785,7 @@ class VsphereMode:
         self.args = args
         self.govc = GovcRunner(logger=logger, args=args)
 
-        self.ovftool_paths = None
+        self.ovftool_paths: OvfToolPaths | None = None
         if getattr(args, "ovftool_path", None):
             try:
                 self.ovftool_paths = find_ovftool(args.ovftool_path)
@@ -798,7 +804,7 @@ class VsphereMode:
                 "Install govc and ensure GOVC_* env / args are configured.",
             )
 
-    def _require_ovftool(self) -> None:
+    def _require_ovftool(self) -> OvfToolPaths:
         if not self.ovftool_paths:
             try:
                 self.ovftool_paths = find_ovftool()
@@ -810,6 +816,7 @@ class VsphereMode:
                 )
             except Exception as e:
                 raise Fatal(2, f"OVF Tool is required but not found: {e}") from e
+        return self.ovftool_paths
 
     # govc helpers (public GovcRunner methods)
     # pylint: disable-next=too-many-locals  # each govc vm.info field is unpacked individually to build the flat inventory row
@@ -866,9 +873,7 @@ class VsphereMode:
                     }
                 )
             except Exception as e:  # pylint: disable=broad-exception-caught  # per-VM inventory detail lookup; one VM's failure must not abort listing the others
-                detailed.append(
-                    {"name": str(pth).rsplit("/", maxsplit=1)[-1], "path": pth, "error": str(e)}
-                )
+                detailed.append({"name": str(pth).rsplit("/", maxsplit=1)[-1], "path": pth, "error": str(e)})
 
         detailed = sorted(detailed, key=lambda x: x.get("name", ""))
         if _debug_enabled(self.args):
@@ -877,7 +882,7 @@ class VsphereMode:
 
     # OVF Tool helpers
     def _ovftool_export_vm(self, client: VMwareClient, vm_name: str, out_dir: Path) -> None:
-        self._require_ovftool()
+        ovftool_paths = self._require_ovftool()
 
         source_url = _build_ovftool_source_url(client, vm_name, self.args, _get_dc_name(self.args))
         ova_path = out_dir / f"{vm_name}.ova"
@@ -899,7 +904,7 @@ class VsphereMode:
         t0 = time.monotonic()
 
         export_to_ova(
-            paths=self.ovftool_paths,
+            paths=ovftool_paths,
             source=source_url,
             ova_path=ova_path,
             options=options,
@@ -910,7 +915,7 @@ class VsphereMode:
 
     # pylint: disable-next=too-many-locals  # builds the full OvfDeployOptions surface (target path, network map, ssl/retry/eula options) from args
     def _ovftool_deploy_ova(self, source_ova: Path, target_vm_name: str | None = None) -> None:
-        self._require_ovftool()
+        ovftool_paths = self._require_ovftool()
 
         if not source_ova.exists():
             raise Fatal(2, f"Source OVA/OVF not found: {source_ova}")
@@ -964,7 +969,7 @@ class VsphereMode:
         t0 = time.monotonic()
 
         deploy_ovf_or_ova(
-            paths=self.ovftool_paths,
+            paths=ovftool_paths,
             source_ovf_or_ova=source_ova,
             target_vi=target_url,
             options=options,
@@ -1033,7 +1038,7 @@ class VsphereMode:
             vc_host,
             vc_user,
             vc_pass,
-            port=getattr(self.args, "vc_port", None),
+            port=int(getattr(self.args, "vc_port", None) or 443),
             insecure=bool(getattr(self.args, "vc_insecure", False)),
         )
 
@@ -1320,8 +1325,8 @@ class VsphereMode:
             print(f"Downloaded {len(downloaded)}/{len(files)} files into {out_dir}")
             if errors:
                 print("Some downloads failed:")
-                for e in errors[:20]:
-                    print(f" - {e}")
+                for err in errors[:20]:
+                    print(f" - {err}")
                 if len(errors) > 20:
                     print(f" ... and {len(errors) - 20} more")
         return 0

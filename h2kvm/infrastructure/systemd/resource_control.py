@@ -14,9 +14,10 @@ import logging
 import subprocess
 import threading
 import time
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 try:
     import psutil
@@ -258,7 +259,7 @@ class SystemdResourceControl:
         Returns:
             Dictionary of current limits
         """
-        limits = {}
+        limits: dict[str, Any] = {}
         cgroup_path = self.get_cgroup_path(pid)
 
         if not cgroup_path:
@@ -316,7 +317,7 @@ class ResourceMonitor:
         self.interval = interval
         self.logger = logging.getLogger(__name__)
         self.monitoring = False
-        self.monitor_thread = None
+        self.monitor_thread: threading.Thread | None = None
         self.history: list[ResourceUsage] = []
         self.max_history = 300  # Keep 5 minutes at 1s interval
 
@@ -468,7 +469,7 @@ class ResourceMonitor:
         return stats
 
     @staticmethod
-    def _calculate_stats(values: list[float]) -> dict[str, float]:
+    def _calculate_stats(values: Sequence[float]) -> dict[str, float]:
         """Calculate min/max/avg for a list of values"""
         if not values:
             return {}

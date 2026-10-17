@@ -151,7 +151,7 @@ def download_with_resume(
                         msg = f"Size mismatch: expected {expected_total}, got {bytes_written}"
                         if strict_verify:
                             temp.unlink(missing_ok=True)
-                            raise AzureDownloadError(msg)
+                            raise AzureDownloadError(msg=msg)
                         LOG.warning(msg)
 
                 # Success - move to final location
@@ -177,7 +177,7 @@ def download_with_resume(
 
         # All retries exhausted
         temp.unlink(missing_ok=True)
-        raise AzureDownloadError(f"Download failed after {retries} attempts: {last_error}")
+        raise AzureDownloadError(msg=f"Download failed after {retries} attempts: {last_error}")
 
     finally:
         session.close()

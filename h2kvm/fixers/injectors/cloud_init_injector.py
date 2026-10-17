@@ -29,15 +29,16 @@ if TYPE_CHECKING:
         # pylint: disable=invalid-name,missing-class-docstring,too-few-public-methods
         class guestfs:  # type: ignore
             class GuestFS(Protocol): ...
+
         # pylint: enable=invalid-name,missing-class-docstring,too-few-public-methods
 
 
 try:
-    import yaml  # type: ignore
+    import yaml
 
     YAML_AVAILABLE = True
 except ImportError:
-    yaml = None
+    yaml = None  # type: ignore[assignment]  # optional-dependency fallback; guarded by YAML_AVAILABLE
     YAML_AVAILABLE = False
 
 
@@ -95,7 +96,7 @@ def _write_atomic_or_plain(
     """
     # If you already have a helper, use it.
     if hasattr(self, "write_file_atomic"):
-        self.write_file_atomic(g, path, data)  # type: ignore[attr-defined]
+        self.write_file_atomic(g, path, data)
         return
 
     # Minimal atomic fallback

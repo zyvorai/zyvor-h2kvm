@@ -19,9 +19,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 
 def _is_probably_regf(path: Path) -> bool:

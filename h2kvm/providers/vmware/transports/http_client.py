@@ -33,8 +33,8 @@ except ImportError:  # pragma: no cover
 # pylint: disable=duplicate-code
 # Optional: HTTP download (requests)
 try:
-    import requests  # type: ignore
-    import requests.adapters  # type: ignore
+    import requests
+    import requests.adapters
 
     REQUESTS_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -151,7 +151,7 @@ class HTTPDownloadClient:
             )
 
         if not REQUESTS_AVAILABLE:
-            raise VMwareError("requests not installed. Install: pip install requests")
+            raise VMwareError(msg="requests not installed. Install: pip install requests")
 
         self.logger = logger
         self.host = host.strip()
@@ -171,7 +171,7 @@ class HTTPDownloadClient:
         if not self.insecure or urllib3 is None:
             return
         try:
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # type: ignore[attr-defined]
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         # best-effort warning suppression; must not fail client construction
         except Exception:  # pylint: disable=broad-exception-caught
             pass
@@ -180,7 +180,7 @@ class HTTPDownloadClient:
         if not self.host:
             raise ValueError("VMware host not configured. Call the constructor with a valid host address.")
         if not self._cookie_header_value:
-            raise VMwareError("Session cookie not set. Call set_session_cookie() first.")
+            raise VMwareError(msg="Session cookie not set. Call set_session_cookie() first.")
 
     def set_session_cookie(self, cookie: str) -> None:
         """
@@ -208,7 +208,7 @@ class HTTPDownloadClient:
     def get_session_cookie(self) -> str:
         """Return the normalized Cookie header value set via set_session_cookie()."""
         if not self._cookie_header_value:
-            raise VMwareError("Session cookie not set. Call set_session_cookie() first.")
+            raise VMwareError(msg="Session cookie not set. Call set_session_cookie() first.")
         return self._cookie_header_value
 
     @property
@@ -471,7 +471,7 @@ class HTTPDownloadClient:
                     reporter.finish()
                     reporter = create_progress_reporter(opt, file_name, self.logger)
                     reporter.start(f"Downloading {file_name}", total_remaining)
-                    raise VMwareError("Range not honored; restarted download")
+                    raise VMwareError(msg="Range not honored; restarted download")
 
                 # Success: if atomic, replace
                 if opt.atomic and temp_path is not None:
@@ -527,7 +527,7 @@ class HTTPDownloadClient:
 
                 reporter.finish()
                 raise VMwareError(
-                    f"Download failed after {max_attempts} attempts: {last_exception}"
+                    msg=f"Download failed after {max_attempts} attempts: {last_exception}"
                 ) from last_exception
 
     def test_connection(self) -> bool:
@@ -686,7 +686,7 @@ class HTTPDownloadManager:
             results.append((success, ds_path, msg))
 
             if not success and fail_on_error:
-                raise VMwareError(f"Download failed: {ds_path}: {msg}")
+                raise VMwareError(msg=f"Download failed: {ds_path}: {msg}")
 
         self._show_batch_summary(start, ok, fail, datastore, results, options)
         return results
@@ -760,7 +760,7 @@ class HTTPDownloadManager:
                     if fail_on_error:
                         for f in future_to_file:
                             f.cancel()
-                        raise VMwareError(f"Download failed: {ds_path}: {e}") from e
+                        raise VMwareError(msg=f"Download failed: {ds_path}: {e}") from e
 
         self._show_batch_summary(start, ok, fail, datastore, results, options)
         return results
@@ -804,7 +804,7 @@ class HTTPDownloadManager:
                     time.sleep(retry_delay)
                 else:
                     raise VMwareError(
-                        f"Download failed after {max_retries + 1} attempts: {last_exception}"
+                        msg=f"Download failed after {max_retries + 1} attempts: {last_exception}"
                     ) from last_exception
 
     # pylint: disable-next=too-many-arguments,too-many-positional-arguments  # batch summary needs each stat individually

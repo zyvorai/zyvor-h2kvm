@@ -558,7 +558,7 @@ class NetworkFixersBackend:
                 # Collect VMware NICs first, then pick the best one to keep.
                 # Prefer NIC with static config over DHCP (static IP = identity).
                 vmware_nics: list[tuple[str, dict[str, Any]]] = []
-                rekeyed: dict[str, dict[str, Any]] = {}
+                rekeyed: dict[str, Any] = {}
                 for ifname, icfg in list(eths.items()):
                     if not isinstance(icfg, dict):
                         rekeyed[ifname] = icfg

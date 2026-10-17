@@ -11,7 +11,7 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
+import datetime as dt
 import hashlib
 import json
 import os
@@ -28,11 +28,14 @@ from .utils import U
 if TYPE_CHECKING:
     import logging
     from collections.abc import Sequence
+    from types import ModuleType
+    from typing import TextIO
 
+fcntl: ModuleType | None
 try:
     import fcntl  # POSIX only
 except ImportError:  # pragma: no cover
-    fcntl = None  # type: ignore
+    fcntl = None
 
 
 # Helpers
@@ -99,7 +102,7 @@ def _atomic_write_text(path: Path, text: str, *, encoding: str = "utf-8") -> Non
                 os.close(fd)
         if tmp_name:
             try:
-                Path(tmp_name).unlink(missing_ok=True)  # type: ignore[arg-type]
+                Path(tmp_name).unlink(missing_ok=True)
             except Exception:  # pylint: disable=broad-exception-caught
                 # Best-effort temp-file cleanup; must not mask the real write outcome.
                 pass
@@ -276,7 +279,7 @@ class Checkpoint:  # pylint: disable=too-many-instance-attributes
             resumable=bool(d.get("resumable", True)),
             safe_to_resume=bool(d.get("safe_to_resume", True)),
             sha256=(None if d.get("sha256") in (None, "") else str(d.get("sha256"))),
-            bytes_len=(None if d.get("bytes_len") in (None, "") else int(d.get("bytes_len"))),
+            bytes_len=(None if d.get("bytes_len") in (None, "") else int(d["bytes_len"])),
         )
 
     @staticmethod
@@ -373,7 +376,7 @@ class RecoveryManager:  # pylint: disable=too-many-instance-attributes
             for sd in stage_defs:
                 self.stage_defs[_safe_stage(sd.name)] = sd
 
-        self._lock_fp = None  # file handle for flock
+        self._lock_fp: TextIO | None = None  # file handle for flock
 
         # Write run manifest early (so you can find run metadata even if you crash).
         self._manifest = RunManifest(
@@ -1072,7 +1075,7 @@ class RecoveryManager:  # pylint: disable=too-many-instance-attributes
         self.logger.info("Cleaning %d old checkpoints", len(to_delete))
         for p in to_delete:
             try:
-                p.unlink(missing_ok=True)  # type: ignore[arg-type]
+                p.unlink(missing_ok=True)
                 self.logger.debug("Cleaned old checkpoint: %s", p.name)
             except Exception:  # pylint: disable=broad-exception-caught
                 # Best-effort retention cleanup; a single stuck/missing file must not abort the loop.
@@ -1115,5 +1118,5 @@ class RecoveryManager:  # pylint: disable=too-many-instance-attributes
         """
         if days is None or days <= 0:
             return None
-        cutoff_dt = datetime.datetime.now() - datetime.timedelta(days=days)
+        cutoff_dt = dt.datetime.now() - dt.timedelta(days=days)
         return cutoff_dt.strftime("%Y%m%d-%H%M%S")

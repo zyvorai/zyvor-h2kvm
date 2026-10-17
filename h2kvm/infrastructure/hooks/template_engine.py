@@ -80,7 +80,7 @@ class TemplateEngine:
         Returns:
             Dictionary with all string values substituted
         """
-        result = {}
+        result: dict[str, Any] = {}
 
         for key, value in template_dict.items():
             if isinstance(value, str):
@@ -118,7 +118,7 @@ class TemplateEngine:
         Returns:
             List with all string values substituted
         """
-        result = []
+        result: list[Any] = []
 
         for item in template_list:
             if isinstance(item, str):

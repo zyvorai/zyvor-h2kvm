@@ -10,7 +10,7 @@ after VM migration, supporting MAK, KMS, and Retail license types.
 
 import json
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 from .extractor import LicenseInfo, LicenseType
 
@@ -233,7 +233,7 @@ def stage_reactivation_script(
     """
     logger.info("Staging Windows license reactivation script")
 
-    result = {
+    result: dict[str, Any] = {
         "success": False,
         "script_path": None,
         "license_info_path": None,

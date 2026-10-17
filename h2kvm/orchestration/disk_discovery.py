@@ -10,6 +10,7 @@ Handles input disk detection for different conversion modes.
 
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -124,7 +125,7 @@ class DiskDiscovery:  # pylint: disable=too-few-public-methods
             "generate-systemd": lambda _o: ([], None),
         }
 
-        handler = handlers.get(cmd)
+        handler = handlers.get(cmd or "")
         if not handler:
             valid_cmds = sorted(handlers.keys())
             U.die(
@@ -171,7 +172,7 @@ class DiskDiscovery:  # pylint: disable=too-few-public-methods
                 user=self.args.user,
                 port=self.args.port,
                 identity=getattr(self.args, "identity", None),
-                ssh_opts=self._normalize_ssh_opts(getattr(self.args, "ssh_opt", None)),
+                ssh_opts=self._normalize_ssh_opts(getattr(self.args, "ssh_opt", None)) or [],
                 sudo=False,
             ),
         )
@@ -182,12 +183,15 @@ class DiskDiscovery:  # pylint: disable=too-few-public-methods
         )
         U.ensure_dir(fetch_dir)
         Log.step(self.logger, f"Fetching remote VMDK descriptor/extent → {fetch_dir}")
-        desc = Fetch.fetch_descriptor_and_extent(
-            self.logger,
-            sshc,
-            self.args.remote,
-            fetch_dir,
-            getattr(self.args, "fetch_all", False),
+        # Fetch.fetch_descriptor_and_extent is a coroutine; this code path is synchronous
+        desc = asyncio.run(
+            Fetch.fetch_descriptor_and_extent(
+                self.logger,
+                sshc,
+                self.args.remote,
+                fetch_dir,
+                getattr(self.args, "fetch_all", False),
+            )
         )
         disks = [desc]
         Log.ok(self.logger, f"Fetched: {desc.name}")
@@ -302,6 +306,7 @@ class DiskDiscovery:  # pylint: disable=too-few-public-methods
         if not raw_src:
             raise Fatal(2, "raw mode requires --raw <path> (or config: raw/img/raw_src/raw_path)")
 
+        qcow2_dir = getattr(self.args, "qcow2_dir", None)
         disks = RAW.extract_raw_or_tar(
             self.logger,
             Path(raw_src).expanduser().resolve(),
@@ -309,11 +314,7 @@ class DiskDiscovery:  # pylint: disable=too-few-public-methods
             convert_to_qcow2=bool(
                 getattr(self.args, "to_qcow2", False) or getattr(self.args, "convert_to_qcow2", False)
             ),
-            convert_outdir=(
-                Path(getattr(self.args, "qcow2_dir", None)).expanduser().resolve()
-                if getattr(self.args, "qcow2_dir", None)
-                else (out_root / "qcow2")
-            ),
+            convert_outdir=(Path(qcow2_dir).expanduser().resolve() if qcow2_dir else out_root / "qcow2"),
             convert_compress=bool(getattr(self.args, "compress", False)),
             convert_compress_level=getattr(self.args, "compress_level", None),
             log_virt_filesystems=bool(getattr(self.args, "log_virt_filesystems", False)),
@@ -366,7 +367,7 @@ class DiskDiscovery:  # pylint: disable=too-few-public-methods
                 port=self.args.port,
                 identity=getattr(self.args, "identity", None),
                 password=getattr(self.args, "ssh_password", None),
-                ssh_opts=self._normalize_ssh_opts(getattr(self.args, "ssh_opt", None)),
+                ssh_opts=self._normalize_ssh_opts(getattr(self.args, "ssh_opt", None)) or [],
                 sudo=getattr(self.args, "sudo", False),
             ),
         )

@@ -43,7 +43,7 @@ def govc_export_ovf(client: Any, opt: Any) -> Path:
     """Export a VM to an OVF directory via govc."""
     g = client._govc()  # pylint: disable=protected-access  # tight internal coupling: split-module client helper
     if g is None:
-        raise VMwareError("govc not available (or disabled); cannot run OVF export")
+        raise VMwareError(msg="govc not available (or disabled); cannot run OVF export")
 
     out_base = _ensure_output_dir(opt.output_dir)
     out_dir = out_base / f"{_safe_vm_name(opt.vm_name)}.ovfdir"
@@ -63,7 +63,7 @@ def govc_export_ova(client: Any, opt: Any) -> Path:
     """Export a VM to an OVA file via govc."""
     g = client._govc()  # pylint: disable=protected-access  # tight internal coupling: split-module client helper
     if g is None:
-        raise VMwareError("govc not available (or disabled); cannot run OVA export")
+        raise VMwareError(msg="govc not available (or disabled); cannot run OVA export")
 
     out_base = _ensure_output_dir(opt.output_dir)
     out_file = out_base / f"{_safe_vm_name(opt.vm_name)}.ova"
@@ -89,7 +89,7 @@ def _vm_inventory_path_under_vmfolder(client: Any, vm_obj: Any, dc_obj: Any) -> 
 
     vm_folder = getattr(dc_obj, "vmFolder", None)
     if vm_folder is None:
-        raise VMwareError("Datacenter has no vmFolder (unexpected)")
+        raise VMwareError(msg="Datacenter has no vmFolder (unexpected)")
 
     parts: list[str] = []
     obj = vm_obj
@@ -123,14 +123,14 @@ def _build_ovftool_source_url(client: Any, vm_name: str) -> str:
     """
     vm_obj = client.get_vm_by_name(vm_name)
     if not vm_obj:
-        raise VMwareError(f"VM not found: {vm_name}")
+        raise VMwareError(msg=f"VM not found: {vm_name}")
 
     dc_name = client.resolve_datacenter_for_vm(vm_name, "auto")
     dc_obj = client.get_datacenter_by_name(dc_name, refresh=False)
     if dc_obj is None:
         dc_obj = client.get_datacenter_by_name(dc_name, refresh=True)
     if dc_obj is None:
-        raise VMwareError(f"Could not resolve datacenter object for dc={dc_name!r}")
+        raise VMwareError(msg=f"Could not resolve datacenter object for dc={dc_name!r}")
 
     inv_rel = _vm_inventory_path_under_vmfolder(client, vm_obj, dc_obj)
     inv_rel_q = _quote_inventory_path(inv_rel)
@@ -142,7 +142,7 @@ def _build_ovftool_source_url(client: Any, vm_name: str) -> str:
 
 def _ovftool_export_options(_client: Any, opt: Any) -> Any:
     if OvfExportOptions is None:
-        raise VMwareError("OvfExportOptions not available (ovftool_client import failed)")
+        raise VMwareError(msg="OvfExportOptions not available (ovftool_client import failed)")
     return OvfExportOptions(
         no_ssl_verify=opt.ovftool_no_ssl_verify,
         thumbprint=opt.ovftool_thumbprint,
@@ -159,7 +159,7 @@ def _ovftool_export_options(_client: Any, opt: Any) -> Any:
 
 def _ovftool_deploy_options(_client: Any, opt: Any, *, name: str) -> Any:
     if OvfDeployOptions is None:
-        raise VMwareError("OvfDeployOptions not available (ovftool_client import failed)")
+        raise VMwareError(msg="OvfDeployOptions not available (ovftool_client import failed)")
     return OvfDeployOptions(
         no_ssl_verify=opt.ovftool_no_ssl_verify,
         thumbprint=opt.ovftool_thumbprint,
@@ -198,7 +198,7 @@ def ovftool_export_vm(client: Any, opt: Any) -> Path:
             log_prefix="ovftool",
         )
     except OvfToolError as e:
-        raise VMwareError(f"OVF Tool export failed: {e}") from e
+        raise VMwareError(msg=f"OVF Tool export failed: {e}") from e
 
     client.logger.info("OVF Tool export completed in %.1fs", time.time() - t0)
     return ova_path
@@ -211,7 +211,7 @@ def ovftool_deploy_ova(client: Any, source_ova: Path, opt: Any) -> None:
     if deploy_ovf_or_ova is None:
         raise VMwareError("OVF Tool client not available. Ensure ovftool_client.py is importable.")
     if not source_ova.exists():
-        raise VMwareError(f"Source OVA/OVF not found: {source_ova}")
+        raise VMwareError(msg=f"Source OVA/OVF not found: {source_ova}")
 
     dc_name = client.resolve_datacenter_for_vm(opt.vm_name, opt.datacenter)
     dc_q = _quote_inventory_path(dc_name)
@@ -232,6 +232,6 @@ def ovftool_deploy_ova(client: Any, source_ova: Path, opt: Any) -> None:
             log_prefix="ovftool",
         )
     except OvfToolError as e:
-        raise VMwareError(f"OVF Tool deployment failed: {e}") from e
+        raise VMwareError(msg=f"OVF Tool deployment failed: {e}") from e
 
     client.logger.info("OVF Tool deployment completed in %.1fs", time.time() - t0)

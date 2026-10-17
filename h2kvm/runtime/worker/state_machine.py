@@ -303,6 +303,15 @@ class JobRegistry:
 
         return sm
 
+    def load_all(self) -> int:
+        """
+        Load every persisted job state from ``state_dir`` into memory.
+
+        Returns:
+            Number of jobs now known to the registry
+        """
+        return len(self.list_jobs())
+
     def update_state(self, job_id: str, new_state: JobState, reason: str = "") -> None:
         """
         Update job state.

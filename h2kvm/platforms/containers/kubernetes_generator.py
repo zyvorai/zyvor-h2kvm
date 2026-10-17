@@ -58,7 +58,7 @@ class KubernetesManifestGenerator:
         Returns:
             Generation result dict
         """
-        result = {"success": False, "manifest_file": None, "errors": []}
+        result: dict[str, Any] = {"success": False, "manifest_file": None, "errors": []}
 
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -67,7 +67,7 @@ class KubernetesManifestGenerator:
 
         try:
             # Build deployment manifest
-            deployment = {
+            deployment: dict[str, Any] = {
                 "apiVersion": "apps/v1",
                 "kind": "Deployment",
                 "metadata": {"name": deployment_name, "namespace": namespace},
@@ -124,7 +124,7 @@ class KubernetesManifestGenerator:
         Returns:
             Generation result dict
         """
-        result = {"success": False, "manifest_file": None, "errors": []}
+        result: dict[str, Any] = {"success": False, "manifest_file": None, "errors": []}
 
         if not container.ports:
             result["errors"].append("Container has no exposed ports")
@@ -202,7 +202,7 @@ class KubernetesManifestGenerator:
         Returns:
             Generation result dict
         """
-        result = {"success": False, "manifest_file": None, "errors": []}
+        result: dict[str, Any] = {"success": False, "manifest_file": None, "errors": []}
 
         if not container.env_vars:
             result["errors"].append("Container has no environment variables")
@@ -259,7 +259,7 @@ class KubernetesManifestGenerator:
         Returns:
             Generation result dict
         """
-        result = {"success": False, "manifest_files": [], "errors": []}
+        result: dict[str, Any] = {"success": False, "manifest_files": [], "errors": []}
 
         if not container.volumes:
             result["errors"].append("Container has no volumes")
@@ -321,7 +321,10 @@ class KubernetesManifestGenerator:
         Returns:
             Kubernetes container spec dict
         """
-        k8s_container = {"name": container.name, "image": f"{container.image}:{container.image_tag}"}
+        k8s_container: dict[str, Any] = {
+            "name": container.name,
+            "image": f"{container.image}:{container.image_tag}",
+        }
 
         # Command
         if container.command:

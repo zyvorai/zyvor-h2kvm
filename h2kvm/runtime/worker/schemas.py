@@ -52,9 +52,9 @@ class ImageSpec(BaseModel):
     """Disk image specification."""
 
     path: str = Field(..., description="Absolute path to disk image")
-    format: str | None = Field(None, description="Image format (qcow2, vmdk, raw, etc.)")
-    checksum: str | None = Field(None, description="SHA-256 checksum for validation")
-    size_bytes: int | None = Field(None, description="Image size in bytes", ge=0)
+    format: str | None = Field(default=None, description="Image format (qcow2, vmdk, raw, etc.)")
+    checksum: str | None = Field(default=None, description="SHA-256 checksum for validation")
+    size_bytes: int | None = Field(default=None, description="Image size in bytes", ge=0)
 
     @field_validator("format")
     @classmethod
@@ -69,38 +69,38 @@ class ImageSpec(BaseModel):
 class CapabilityRequirements(BaseModel):
     """Job capability requirements."""
 
-    needs_nbd: bool = Field(False, description="Requires NBD device access")
-    needs_lvm: bool = Field(False, description="Requires LVM tools and activation")
-    needs_mount: bool = Field(False, description="Requires filesystem mount capability")
-    needs_selinux_tools: bool = Field(False, description="Requires SELinux tools")
-    min_memory_gb: int | None = Field(None, description="Minimum RAM in GB", ge=1)
-    min_disk_space_gb: int | None = Field(None, description="Minimum free disk space in GB", ge=1)
+    needs_nbd: bool = Field(default=False, description="Requires NBD device access")
+    needs_lvm: bool = Field(default=False, description="Requires LVM tools and activation")
+    needs_mount: bool = Field(default=False, description="Requires filesystem mount capability")
+    needs_selinux_tools: bool = Field(default=False, description="Requires SELinux tools")
+    min_memory_gb: int | None = Field(default=None, description="Minimum RAM in GB", ge=1)
+    min_disk_space_gb: int | None = Field(default=None, description="Minimum free disk space in GB", ge=1)
 
 
 class ExecutionPolicy(BaseModel):
     """Job execution policy."""
 
-    retry_count: int = Field(0, description="Number of retries on failure", ge=0, le=5)
-    timeout_seconds: int = Field(7200, description="Execution timeout in seconds", ge=60, le=86400)
-    idempotent: bool = Field(True, description="Whether job can be safely retried")
-    priority: int = Field(5, description="Job priority (1=highest, 10=lowest)", ge=1, le=10)
+    retry_count: int = Field(default=0, description="Number of retries on failure", ge=0, le=5)
+    timeout_seconds: int = Field(default=7200, description="Execution timeout in seconds", ge=60, le=86400)
+    idempotent: bool = Field(default=True, description="Whether job can be safely retried")
+    priority: int = Field(default=5, description="Job priority (1=highest, 10=lowest)", ge=1, le=10)
 
 
 class ArtifactConfig(BaseModel):
     """Artifact storage configuration."""
 
-    log_upload: bool = Field(True, description="Upload execution logs")
-    store_fixed_image: bool = Field(True, description="Store repaired image")
+    log_upload: bool = Field(default=True, description="Upload execution logs")
+    store_fixed_image: bool = Field(default=True, description="Store repaired image")
     output_path: str = Field(..., description="Output directory path")
-    keep_intermediates: bool = Field(False, description="Keep intermediate files for debugging")
+    keep_intermediates: bool = Field(default=False, description="Keep intermediate files for debugging")
 
 
 class AuditInfo(BaseModel):
     """Audit trail information."""
 
     requested_by: str = Field(..., description="User or service requesting the job")
-    ticket: str | None = Field(None, description="Associated ticket ID (e.g., INC-1234)")
-    tags: dict[str, str] | None = Field(None, description="Custom tags for job categorization")
+    ticket: str | None = Field(default=None, description="Associated ticket ID (e.g., INC-1234)")
+    tags: dict[str, str] | None = Field(default=None, description="Custom tags for job categorization")
 
 
 class JobSpec(BaseModel):
@@ -110,7 +110,7 @@ class JobSpec(BaseModel):
     This is the primary schema for submitting jobs to workers.
     """
 
-    version: str = Field("1.0", description="Protocol version")
+    version: str = Field(default="1.0", description="Protocol version")
     job_id: str = Field(..., description="Unique job identifier (UUID)")
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Job creation timestamp")
 
@@ -132,7 +132,7 @@ class JobSpec(BaseModel):
     artifacts: ArtifactConfig = Field(..., description="Artifact storage configuration")
     audit: AuditInfo = Field(..., description="Audit trail information")
 
-    parameters: dict[str, Any] | None = Field(None, description="Operation-specific parameters")
+    parameters: dict[str, Any] | None = Field(default=None, description="Operation-specific parameters")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -175,7 +175,7 @@ class ProgressEvent(BaseModel):
     progress_percent: int = Field(..., description="Progress percentage", ge=0, le=100)
     message: str = Field(..., description="Human-readable progress message")
 
-    details: dict[str, Any] | None = Field(None, description="Additional phase-specific details")
+    details: dict[str, Any] | None = Field(default=None, description="Additional phase-specific details")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -197,30 +197,32 @@ class ErrorInfo(BaseModel):
     phase: str = Field(..., description="Phase where error occurred")
     code: str = Field(..., description="Error code (e.g., FS_CORRUPTION_UNRECOVERABLE)")
     message: str = Field(..., description="Human-readable error message")
-    details: dict[str, Any] | None = Field(None, description="Additional error context")
-    stack_trace: str | None = Field(None, description="Stack trace for debugging")
+    details: dict[str, Any] | None = Field(default=None, description="Additional error context")
+    stack_trace: str | None = Field(default=None, description="Stack trace for debugging")
 
 
 class JobOutput(BaseModel):
     """Job output artifacts."""
 
-    fixed_image: str | None = Field(None, description="Path to repaired image")
-    logs: str | None = Field(None, description="Path to execution logs")
-    report: str | None = Field(None, description="Path to detailed report")
-    intermediates: list[str] | None = Field(None, description="Paths to intermediate files")
+    fixed_image: str | None = Field(default=None, description="Path to repaired image")
+    logs: str | None = Field(default=None, description="Path to execution logs")
+    report: str | None = Field(default=None, description="Path to detailed report")
+    intermediates: list[str] | None = Field(default=None, description="Paths to intermediate files")
 
 
 class JobMetrics(BaseModel):
     """Execution metrics."""
 
     execution_seconds: int = Field(..., description="Total execution time in seconds", ge=0)
-    nbd_attach_seconds: int | None = Field(None, description="Time spent attaching NBD", ge=0)
-    lvm_activate_seconds: int | None = Field(None, description="Time spent activating LVM", ge=0)
-    fsck_seconds: int | None = Field(None, description="Time spent on filesystem check", ge=0)
-    initramfs_seconds: int | None = Field(None, description="Time spent regenerating initramfs", ge=0)
+    nbd_attach_seconds: int | None = Field(default=None, description="Time spent attaching NBD", ge=0)
+    lvm_activate_seconds: int | None = Field(default=None, description="Time spent activating LVM", ge=0)
+    fsck_seconds: int | None = Field(default=None, description="Time spent on filesystem check", ge=0)
+    initramfs_seconds: int | None = Field(
+        default=None, description="Time spent regenerating initramfs", ge=0
+    )
 
-    disk_read_bytes: int | None = Field(None, description="Bytes read from disk", ge=0)
-    disk_write_bytes: int | None = Field(None, description="Bytes written to disk", ge=0)
+    disk_read_bytes: int | None = Field(default=None, description="Bytes read from disk", ge=0)
+    disk_write_bytes: int | None = Field(default=None, description="Bytes written to disk", ge=0)
 
 
 class JobResult(BaseModel):
@@ -234,12 +236,12 @@ class JobResult(BaseModel):
     status: JobState = Field(..., description="Final job status")
     completed_at: datetime = Field(default_factory=datetime.utcnow, description="Completion timestamp")
 
-    outputs: JobOutput | None = Field(None, description="Output artifacts")
-    metrics: JobMetrics | None = Field(None, description="Execution metrics")
-    error: ErrorInfo | None = Field(None, description="Error information if failed")
+    outputs: JobOutput | None = Field(default=None, description="Output artifacts")
+    metrics: JobMetrics | None = Field(default=None, description="Execution metrics")
+    error: ErrorInfo | None = Field(default=None, description="Error information if failed")
 
-    worker_id: str | None = Field(None, description="Worker that executed the job")
-    retry_attempt: int = Field(0, description="Retry attempt number (0 = first attempt)", ge=0)
+    worker_id: str | None = Field(default=None, description="Worker that executed the job")
+    retry_attempt: int = Field(default=0, description="Retry attempt number (0 = first attempt)", ge=0)
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -276,20 +278,20 @@ class WorkerCapabilities(BaseModel):
     """
 
     worker_id: str = Field(..., description="Unique worker identifier")
-    hostname: str | None = Field(None, description="Worker hostname")
+    hostname: str | None = Field(default=None, description="Worker hostname")
 
     capabilities: dict[str, bool] = Field(
         ..., description="Supported capabilities (nbd, lvm, mount, selinux, etc.)"
     )
 
-    max_disk_size_tb: int = Field(10, description="Maximum supported disk size in TB", ge=1)
-    max_concurrent_jobs: int = Field(1, description="Maximum concurrent jobs", ge=1, le=10)
+    max_disk_size_tb: int = Field(default=10, description="Maximum supported disk size in TB", ge=1)
+    max_concurrent_jobs: int = Field(default=1, description="Maximum concurrent jobs", ge=1, le=10)
 
     memory_gb: int = Field(..., description="Available RAM in GB", ge=1)
     disk_space_gb: int = Field(..., description="Available disk space in GB", ge=10)
 
-    os_info: dict[str, str] | None = Field(None, description="OS information")
-    kernel_version: str | None = Field(None, description="Kernel version")
+    os_info: dict[str, str] | None = Field(default=None, description="OS information")
+    kernel_version: str | None = Field(default=None, description="Kernel version")
 
     last_heartbeat: datetime = Field(default_factory=datetime.utcnow, description="Last heartbeat timestamp")
 

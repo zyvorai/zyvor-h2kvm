@@ -26,7 +26,7 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .utils import detect_os_from_root
 
@@ -100,7 +100,7 @@ class SELinuxFixer:
 
         logger.info("SELinuxFixer initialized (root=%s, dry_run=%s)", root_mount, dry_run)
 
-    def fix(self) -> dict[str, any]:
+    def fix(self) -> dict[str, Any]:
         """
         Run SELinux relabel fix.
 
@@ -233,6 +233,12 @@ class SELinuxFixer:
             autorelabel_path=autorelabel_path,
         )
 
+    def _require_info(self) -> SELinuxInfo:
+        """Return the detected SELinux info (raises if detection has not run yet)."""
+        if self.selinux_info is None:
+            raise RuntimeError("SELinux configuration has not been detected yet")
+        return self.selinux_info
+
     def _touch_autorelabel(self) -> bool:
         """
         Touch /.autorelabel to trigger boot-time relabel.
@@ -240,7 +246,7 @@ class SELinuxFixer:
         Returns:
             True if file was created, False if it already existed
         """
-        autorelabel_path = self.selinux_info.autorelabel_path
+        autorelabel_path = self._require_info().autorelabel_path
 
         if not autorelabel_path:
             raise ValueError(
@@ -270,13 +276,14 @@ class SELinuxFixer:
 
     def _validate_selinux(self):
         """Validate SELinux configuration."""
-        if not self.selinux_info.policy_exists:
+        info = self._require_info()
+        if not info.policy_exists:
             logger.warning("SELinux policy directory not found, relabel may fail")
             self.stats["warnings"] += 1
             return
 
         # Verify autorelabel was created (if not dry-run)
-        if not self.dry_run and not self.selinux_info.autorelabel_path.exists():
+        if not self.dry_run and (info.autorelabel_path is None or not info.autorelabel_path.exists()):
             logger.error("/.autorelabel was not created")
             self.stats["errors"] += 1
             return

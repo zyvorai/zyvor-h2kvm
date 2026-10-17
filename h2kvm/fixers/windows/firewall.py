@@ -48,7 +48,7 @@ def stage_firewall_export_script(  # pylint: disable=unused-argument
                 "error": str
             }
     """
-    result = {
+    result: dict[str, Any] = {
         "staged": False,
         "script_path": None,
         "error": None,
@@ -189,7 +189,7 @@ def _stage_firewall_migration_task(  # pylint: disable=unused-argument
 
     Uses Windows Task Scheduler XML format.
     """
-    result = {"staged": False, "error": None}
+    result: dict[str, Any] = {"staged": False, "error": None}
 
     try:
         task_xml = r"""<?xml version="1.0" encoding="UTF-16"?>
@@ -403,7 +403,7 @@ def verify_firewall_service_enabled(g: guestfs.GuestFS, root: str) -> dict[str, 
 
     If firewall is disabled, rules don't matter - document this.
     """
-    result = {
+    result: dict[str, Any] = {
         "firewall_service_enabled": None,
         "warnings": [],
     }

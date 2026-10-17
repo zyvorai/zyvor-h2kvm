@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from h2kvm.core.utils import U, guest_has_cmd
-from h2kvm.fixers.filesystem import fixer as filesystem_fixer  # type: ignore
+from h2kvm.fixers.filesystem import fixer as filesystem_fixer
 from h2kvm.fixers.filesystem.fstab import parse_btrfsvol_spec
 
 # This TYPE_CHECKING guestfs/GuestFS typing shim is intentionally duplicated
@@ -404,8 +404,6 @@ class OfflineMountEngine:
             return
         if mode.startswith("opts:"):
             opts = mode.split(":", 1)[1]
-            if self.dry_run and "ro" not in opts:
-                opts = f"ro,{opts}"
             g.mount_options(opts, dev, "/")
             return
 
@@ -426,7 +424,7 @@ class OfflineMountEngine:
             return
         # first attempt of a multi-step mount ladder; failure falls through to the fallbacks below
         except Exception as first_err:  # pylint: disable=broad-exception-caught
-            last_err: Exception = first_err  # type: ignore[assignment]
+            last_err: Exception = first_err
 
         # 2) fallback ladder
         tries = ["ro", "opts:noload", "opts:ro,noload", "opts:ro,norecovery"]
@@ -437,7 +435,7 @@ class OfflineMountEngine:
                 return
             # best-effort mount ladder retry, must not abort the fixer
             except Exception as e:  # pylint: disable=broad-exception-caught
-                last_err = e  # type: ignore[misc]
+                last_err = e
 
         # 3) fsck then ro retry
         self.safe_umount_all(g)
@@ -449,7 +447,7 @@ class OfflineMountEngine:
             return
         # final mount ladder retry, must not abort the fixer
         except Exception as e:  # pylint: disable=broad-exception-caught
-            last_err = e  # type: ignore[misc]
+            last_err = e
 
         raise RuntimeError(
             f"Failed to mount root filesystem from {dev}"
@@ -593,8 +591,8 @@ class OfflineMountEngine:
                 self.logger.debug(f"Host-direct LV scan failed: {e}")
 
             # Also add any /dev/mapper/vg* devices
-            for mp in Path("/dev/mapper").glob("vg*"):
-                mp = str(mp)
+            for mp_path in Path("/dev/mapper").glob("vg*"):
+                mp = str(mp_path)
                 if mp not in candidates:
                     candidates.append(mp)
                     self.logger.info(f"Added mapper candidate: {mp}")
@@ -633,9 +631,9 @@ class OfflineMountEngine:
             else:
                 standard.append(d)
 
-        result = priority + standard
-        self.logger.info(f"📋 Candidate priority order: {result}")
-        return result
+        ordered = priority + standard
+        self.logger.info(f"📋 Candidate priority order: {ordered}")
+        return ordered
 
     # tries every candidate device, then every btrfs subvolume on top; the two
     # scan passes are safer kept inline than split into helpers

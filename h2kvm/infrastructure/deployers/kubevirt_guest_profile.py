@@ -191,9 +191,10 @@ def resolve_guest_profile(args: Any, *, vm_name: str = "") -> GuestProfile:
         or parsed.get("PRETTY_NAME")
     )
 
-    variant = _explicit_os_variant(args)
-    if variant and not _looks_windows_variant(variant):
-        os_variant = variant
+    explicit_variant = _explicit_os_variant(args)
+    os_variant: str | None
+    if explicit_variant and not _looks_windows_variant(explicit_variant):
+        os_variant = explicit_variant
     else:
         os_variant = kubevirt_os_variant(
             distro_id=distro,
@@ -304,14 +305,14 @@ def propagate_linux_metadata_from_report(args: Any, report: dict[str, Any] | Non
     if explicit == "windows":
         return
 
-    args.last_fixer_report = report  # type: ignore[attr-defined]
-    args.linux_os_release = osr_text  # type: ignore[attr-defined]
+    args.last_fixer_report = report
+    args.linux_os_release = osr_text
     if parsed.get("ID"):
-        args.linux_distro = parsed["ID"]  # type: ignore[attr-defined]
+        args.linux_distro = parsed["ID"]
     if parsed.get("VERSION_ID"):
-        args.linux_version = parsed["VERSION_ID"]  # type: ignore[attr-defined]
+        args.linux_version = parsed["VERSION_ID"]
     if parsed.get("PRETTY_NAME"):
-        args.linux_os_pretty_name = parsed["PRETTY_NAME"]  # type: ignore[attr-defined]
+        args.linux_os_pretty_name = parsed["PRETTY_NAME"]
 
     variant = kubevirt_os_variant(
         distro_id=parsed.get("ID", ""),
@@ -319,10 +320,10 @@ def propagate_linux_metadata_from_report(args: Any, report: dict[str, Any] | Non
         id_like=parsed.get("ID_LIKE", ""),
     )
     if variant and not getattr(args, "k8s_os_variant", None):
-        args.k8s_os_variant = variant  # type: ignore[attr-defined]
+        args.k8s_os_variant = variant
 
     if explicit not in ("linux", "lin"):
-        args.guest_os = "linux"  # type: ignore[attr-defined]
+        args.guest_os = "linux"
 
 
 def build_kubevirt_vm_manifest(

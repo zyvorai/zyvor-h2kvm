@@ -39,11 +39,11 @@ from h2kvm.core.constants import DELAY_LIBVIRT_OPERATION
 from h2kvm.core.exceptions import InfrastructureError
 
 try:
-    import libvirt  # type: ignore
+    import libvirt
 
     LIBVIRT_AVAILABLE = True
 except ImportError:
-    libvirt = None  # type: ignore
+    libvirt = None
     LIBVIRT_AVAILABLE = False
 
 
@@ -79,7 +79,7 @@ class LibvirtManager:
         """
         if not LIBVIRT_AVAILABLE:
             raise InfrastructureError(
-                "libvirt Python bindings not available. Install with: pip install libvirt-python"
+                msg="libvirt Python bindings not available. Install with: pip install libvirt-python"
             )
 
         self.logger = logger or logging.getLogger(__name__)
@@ -99,13 +99,13 @@ class LibvirtManager:
         try:
             self.conn = libvirt.open(self.uri)
             if self.conn is None:
-                raise InfrastructureError(f"Failed to connect to libvirt at {self.uri}")
+                raise InfrastructureError(msg=f"Failed to connect to libvirt at {self.uri}")
 
             self.logger.info("Connected to libvirt: %s", self.uri)
 
         except libvirt.libvirtError as e:
             raise InfrastructureError(
-                f"Libvirt connection failed at {self.uri}: {e}. "
+                msg=f"Libvirt connection failed at {self.uri}: {e}. "
                 "Ensure libvirtd is running (systemctl start libvirtd) "
                 "and the current user has access (add to 'libvirt' group: usermod -aG libvirt $USER)."
             ) from e
@@ -174,19 +174,19 @@ class LibvirtManager:
         xml_path = Path(xml_path).resolve()
 
         if not xml_path.exists():
-            raise InfrastructureError(f"Domain XML not found: {xml_path}")
+            raise InfrastructureError(msg=f"Domain XML not found: {xml_path}")
 
         # Read and validate XML
         try:
             xml_content = xml_path.read_text(encoding="utf-8")
         except Exception as e:
-            raise InfrastructureError(f"Failed to read XML: {e}") from e
+            raise InfrastructureError(msg=f"Failed to read XML: {e}") from e
 
         # Extract domain name from XML for logging
         try:
             root = ET.fromstring(xml_content)
             domain_name = root.find("name")
-            name = domain_name.text if domain_name is not None else "unknown"
+            name = (domain_name.text if domain_name is not None else None) or "unknown"
         except ET.ParseError:
             name = "unknown"
 
@@ -196,20 +196,22 @@ class LibvirtManager:
                 self.logger.warning("Domain '%s' exists, undefining for overwrite", name)
                 self.undefine_domain(name)
             else:
-                raise InfrastructureError(f"Domain '{name}' already exists (use overwrite=True to replace)")
+                raise InfrastructureError(
+                    msg=f"Domain '{name}' already exists (use overwrite=True to replace)"
+                )
 
         # Define domain
         try:
             domain = self.conn.defineXML(xml_content)
             if domain is None:
-                raise InfrastructureError(f"Failed to define domain '{name}'")
+                raise InfrastructureError(msg=f"Failed to define domain '{name}'")
 
             self.logger.info("✅ Defined libvirt domain: %s", name)
             return domain
 
         except libvirt.libvirtError as e:
             raise InfrastructureError(
-                f"Failed to define libvirt domain '{name}': {e}. "
+                msg=f"Failed to define libvirt domain '{name}': {e}. "
                 "Common causes: invalid XML syntax, missing disk images referenced in the XML, "
                 "or insufficient permissions. Validate the XML with: virsh define --validate <file>"
             ) from e
@@ -249,7 +251,7 @@ class LibvirtManager:
             if "not found" in str(e).lower():
                 self.logger.warning("Domain '%s' not found, skipping undefine", name)
             else:
-                raise InfrastructureError(f"Failed to undefine domain '{name}': {e}") from e
+                raise InfrastructureError(msg=f"Failed to undefine domain '{name}': {e}") from e
 
     def start_domain(self, domain_or_name: Any | str, *, force: bool = False) -> None:
         """
@@ -270,7 +272,7 @@ class LibvirtManager:
             try:
                 domain = self.conn.lookupByName(domain_or_name)
             except libvirt.libvirtError as e:
-                raise InfrastructureError(f"Domain '{domain_or_name}' not found: {e}") from e
+                raise InfrastructureError(msg=f"Domain '{domain_or_name}' not found: {e}") from e
         else:
             domain = domain_or_name
 
@@ -301,7 +303,7 @@ class LibvirtManager:
             elif "not supported" in error_str or "qemu" in error_str:
                 hints = " Check that the QEMU binary exists and supports the VM's architecture."
             raise InfrastructureError(
-                f"Failed to start domain '{name}': {e}.{hints} Debug with: virsh start {name} --console"
+                msg=f"Failed to start domain '{name}': {e}.{hints} Debug with: virsh start {name} --console"
             ) from e
 
     def create_snapshot(
@@ -330,7 +332,7 @@ class LibvirtManager:
             try:
                 domain = self.conn.lookupByName(domain_or_name)
             except libvirt.libvirtError as e:
-                raise InfrastructureError(f"Domain '{domain_or_name}' not found: {e}") from e
+                raise InfrastructureError(msg=f"Domain '{domain_or_name}' not found: {e}") from e
         else:
             domain = domain_or_name
 
@@ -347,12 +349,12 @@ class LibvirtManager:
         try:
             snapshot = domain.snapshotCreateXML(snapshot_xml, 0)
             if snapshot is None:
-                raise InfrastructureError(f"Failed to create snapshot for domain '{name}'")
+                raise InfrastructureError(msg=f"Failed to create snapshot for domain '{name}'")
 
             self.logger.info("✅ Created snapshot '%s' for domain: %s", snapshot_name, name)
 
         except libvirt.libvirtError as e:
-            raise InfrastructureError(f"Failed to create snapshot for domain '{name}': {e}") from e
+            raise InfrastructureError(msg=f"Failed to create snapshot for domain '{name}': {e}") from e
 
     def set_autostart(self, domain_or_name: Any | str, enabled: bool = True) -> None:
         """
@@ -373,7 +375,7 @@ class LibvirtManager:
             try:
                 domain = self.conn.lookupByName(domain_or_name)
             except libvirt.libvirtError as e:
-                raise InfrastructureError(f"Domain '{domain_or_name}' not found: {e}") from e
+                raise InfrastructureError(msg=f"Domain '{domain_or_name}' not found: {e}") from e
         else:
             domain = domain_or_name
 
@@ -385,7 +387,7 @@ class LibvirtManager:
             self.logger.info("Auto-start %s for domain: %s", status, name)
 
         except libvirt.libvirtError as e:
-            raise InfrastructureError(f"Failed to set autostart for domain '{name}': {e}") from e
+            raise InfrastructureError(msg=f"Failed to set autostart for domain '{name}': {e}") from e
 
 
 __all__ = [

@@ -23,7 +23,9 @@ LOG = logging.getLogger("test")
 class FakeGuest:
     """Minimal in-memory stand-in for the guestfs handle."""
 
-    def __init__(self, files: set[str] | None = None, dirs: set[str] | None = None, fail_write: bool = False):
+    def __init__(
+        self, files: set[str] | None = None, dirs: set[str] | None = None, fail_write: bool = False
+    ):
         self.files = set(files or ())
         self.dirs = set(dirs or ())
         self.written: dict[str, bytes] = {}

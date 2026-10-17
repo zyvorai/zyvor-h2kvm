@@ -15,7 +15,7 @@ import re
 import subprocess
 import uuid
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from h2kvm.core.guest_identity import GuestDetector, GuestType, emit_guest_identity_log
 from h2kvm.core.logger import Log
@@ -30,7 +30,8 @@ from .libvirt_utils import (
 if TYPE_CHECKING:
     import argparse
 
-    from .linux_domain import Firmware, Profile
+    from .linux_domain import ClockOffset, Firmware, Graphics, Profile
+    from .windows_domain import WinStage
 
 # Common OVMF firmware paths across distributions.
 _OVMF_SEARCH_PATHS = [
@@ -51,7 +52,7 @@ def auto_detect_ovmf() -> str:
 
 
 try:
-    from .linux_domain import LinuxDomainConfig, emit_linux_domain  # type: ignore
+    from .linux_domain import LinuxDomainConfig, emit_linux_domain
 
     _LINUX_DOMAIN_OK = True
 except ImportError:  # pragma: no cover
@@ -61,7 +62,7 @@ except ImportError:  # pragma: no cover
 
 
 try:
-    from .windows_domain import WinDomainSpec, render_windows_domain_xml  # type: ignore
+    from .windows_domain import WinDomainSpec, render_windows_domain_xml
 
     _WIN_DOMAIN_OK = True
 except ImportError:  # pragma: no cover
@@ -238,10 +239,12 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
     # - headless => none
     # - otherwise => spice if supported, else vnc
     user_graphics = getattr(args, "graphics", None)
+    graphics: Graphics
     if headless:
         graphics = "none"
     elif user_graphics:
-        graphics = str(user_graphics)
+        # free-form CLI string; validated by libvirt when the XML is defined
+        graphics = cast("Graphics", str(user_graphics))
     else:
         graphics = _default_graphics()
 
@@ -277,7 +280,7 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
 
         # Always use SATA for Windows — no VirtIO disk/network support
         # without injected drivers. Windows has inbox AHCI + e1000e.
-        stage = "bootstrap"
+        stage: WinStage = "bootstrap"
 
         driver_iso = (
             getattr(args, "win_driver_iso", None)
@@ -320,7 +323,7 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
             getattr(args, "win_hyperv", True),
         )
 
-        spec = WinDomainSpec(  # type: ignore[misc]
+        spec = WinDomainSpec(
             name=name,
             img_path=str(img),
             firmware=win_firmware,
@@ -347,7 +350,7 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
             disk_boot_order=getattr(args, "boot_disk_index", None),
         )
 
-        xml = render_windows_domain_xml(spec, stage=stage)  # type: ignore[misc]
+        xml = render_windows_domain_xml(spec, stage=stage)
         xml_path = domain_dir / f"{name}.xml"
         _write_text(xml_path, xml)
         logger.debug("Windows domain XML written: %s (%d bytes)", xml_path, len(xml))
@@ -436,7 +439,7 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
     firmware: Firmware = "uefi" if uefi else "bios"
     # minimal-bios-gui only supports BIOS; auto-switch to default for UEFI
     profile: Profile = "default" if firmware == "uefi" else "minimal-bios-gui"
-    config = LinuxDomainConfig(  # type: ignore[misc]
+    config = LinuxDomainConfig(
         name=name,
         image_path=img,
         out_dir=domain_dir,
@@ -461,7 +464,7 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
         serial_pty=True,
         console_pty=True,
         cloudinit_iso=str(cloudinit_iso) if cloudinit_iso else None,
-        clock=str(getattr(args, "clock", "utc")),
+        clock=cast("ClockOffset", str(getattr(args, "clock", "utc"))),
         ovmf_code=str(getattr(args, "ovmf_code", None) or auto_detect_ovmf()),
         nvram_vars=getattr(args, "nvram_vars", None),
         ovmf_vars_template=getattr(args, "ovmf_vars_template", None),

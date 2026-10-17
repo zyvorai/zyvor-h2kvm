@@ -20,7 +20,7 @@ try:
 
     _GUESTFS_AVAILABLE = True
 except ImportError:
-    guestfs = None  # type: ignore[assignment]
+    guestfs = None
     _GUESTFS_AVAILABLE = False
 
 
@@ -335,9 +335,7 @@ class ManifestOrchestrator:
                                 "major_version": g.inspect_get_major_version(root),
                                 "minor_version": g.inspect_get_minor_version(root),
                             }
-                            self.logger.info(
-                                "   📦 Guest: %s", disk_result["guest"]["product_name"]
-                            )
+                            self.logger.info("   📦 Guest: %s", disk_result["guest"]["product_name"])
                     finally:
                         g.close()
                 except Exception as e:  # pylint: disable=broad-exception-caught
@@ -548,6 +546,8 @@ class ManifestOrchestrator:
 
         libvirt_config = self.loader.get_libvirt_integration_config()
 
+        if self.output_dir is None:
+            return {"enabled": False, "reason": "output directory not set"}
         domain_xml_path = self.output_dir / "domain.xml"
         if not domain_xml_path.exists():
             self.logger.warning("⚠️  Domain XML not found: %s", domain_xml_path)

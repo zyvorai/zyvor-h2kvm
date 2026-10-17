@@ -257,7 +257,7 @@ class ValidationOrchestrator:
         )
 
         # Group by type
-        checks_by_type = {}
+        checks_by_type: dict[str, Any] = {}
         for check in report.checks:
             check_type = check.check_type.value
             if check_type not in checks_by_type:

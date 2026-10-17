@@ -118,11 +118,7 @@ Migrates filesystem between devices.
 from h2kvm.pipeline import FilesystemMigrator
 
 migrator = FilesystemMigrator()
-migrator.migrate(
-    source="/dev/nbd0p1",
-    target="/dev/mapper/cryptroot",
-    fstype="ext4"
-)
+migrator.migrate(source="/dev/nbd0p1", target="/dev/mapper/cryptroot", fstype="ext4")
 ```
 
 **Supported Filesystems**:
@@ -139,9 +135,7 @@ from h2kvm.pipeline import CrypttabUpdater
 
 updater = CrypttabUpdater()
 updater.update(
-    mount_point="/mnt/root",
-    device_uuid="12345678-1234-1234-1234-123456789012",
-    mapper_name="cryptroot"
+    mount_point="/mnt/root", device_uuid="12345678-1234-1234-1234-123456789012", mapper_name="cryptroot"
 )
 ```
 
@@ -154,7 +148,7 @@ from h2kvm.pipeline import TPMEnroll
 enroll = TPMEnroll()
 enroll.enroll(
     device="/dev/nbd0p1",
-    pcrs=[0, 1, 2, 3, 7]  # Optional, defaults to 0,1,2,3,7
+    pcrs=[0, 1, 2, 3, 7],  # Optional, defaults to 0,1,2,3,7
 )
 ```
 
@@ -186,10 +180,7 @@ Updates GRUB configuration for encrypted root.
 from h2kvm.pipeline import GrubUpdater
 
 updater = GrubUpdater()
-updater.update(
-    root_mount="/mnt/root",
-    device_uuid="12345678-1234-1234-1234-123456789012"
-)
+updater.update(root_mount="/mnt/root", device_uuid="12345678-1234-1234-1234-123456789012")
 ```
 
 ---
@@ -206,7 +197,7 @@ from h2kvm.pipeline import H2KVMVMwareToLUKSPipeline
 pipeline = H2KVMVMwareToLUKSPipeline()
 output = pipeline.run(
     vmdk="/path/to/vm.vmdk",
-    output="/path/to/encrypted.raw"  # Optional, default: {vmdk}.encrypted.raw
+    output="/path/to/encrypted.raw",  # Optional, default: {vmdk}.encrypted.raw
 )
 ```
 
@@ -241,10 +232,7 @@ encrypted_image = pipeline.run("/vms/centos8.vmdk")
 
 ```python
 pipeline = H2KVMVMwareToLUKSPipeline()
-encrypted_image = pipeline.run(
-    vmdk="/vms/ubuntu22.vmdk",
-    output="/encrypted/ubuntu22-secure.raw"
-)
+encrypted_image = pipeline.run(vmdk="/vms/ubuntu22.vmdk", output="/encrypted/ubuntu22-secure.raw")
 ```
 
 ### Error Handling

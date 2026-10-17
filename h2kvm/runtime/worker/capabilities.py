@@ -22,6 +22,7 @@ import tempfile
 import time
 from enum import Enum
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -231,11 +232,11 @@ class CapabilityDetector:
 
         # Check if we can list volume groups (requires device mapper access)
         try:
-            result = subprocess.run(
+            vgs_result = subprocess.run(
                 ["vgs", "--noheadings"], capture_output=True, text=True, timeout=10, check=False
             )
-            self.logger.debug(f"LVM functional: vgs returned {result.returncode}")
-            return result.returncode == 0
+            self.logger.debug(f"LVM functional: vgs returned {vgs_result.returncode}")
+            return vgs_result.returncode == 0
         except Exception as e:
             self.logger.debug(f"LVM functionality check failed: {e}")
             return False
@@ -373,12 +374,12 @@ class CapabilityDetector:
         self.logger.info(f"Detected capabilities: {self._capabilities}")
         return self._capabilities
 
-    def get_system_info(self) -> dict[str, any]:
+    def get_system_info(self) -> dict[str, Any]:
         """Get system information for worker registration."""
 
         import psutil
 
-        info = {
+        info: dict[str, Any] = {
             "hostname": platform.node(),
             "os": platform.system(),
             "os_release": platform.release(),
@@ -494,14 +495,14 @@ class CapabilityDetector:
                 return True
 
             # Try to load NBD module with partition support
-            result = subprocess.run(
+            load_result = subprocess.run(
                 ["modprobe", "nbd", "max_part=16"], capture_output=True, timeout=5, check=False
             )
 
-            if result.returncode == 0:
+            if load_result.returncode == 0:
                 self.logger.info("✅ NBD module loaded successfully")
                 return True
-            self.logger.debug(f"modprobe failed: {result.stderr.decode()}")
+            self.logger.debug(f"modprobe failed: {load_result.stderr.decode()}")
             return False
 
         except subprocess.TimeoutExpired:
@@ -663,7 +664,7 @@ class CapabilityDetector:
                 os.unlink(path)
             return None
 
-    def get_capability_level_report(self, level: CapabilityLevel) -> dict[str, any]:
+    def get_capability_level_report(self, level: CapabilityLevel) -> dict[str, Any]:
         """
         Get detailed capability report for a given level.
 
@@ -765,7 +766,7 @@ class CapabilityDetector:
         }
         return recommendations.get(level, [])
 
-    def get_detection_diagnostics(self) -> dict[str, any]:
+    def get_detection_diagnostics(self) -> dict[str, Any]:
         """
         Get detailed diagnostics about capability detection.
 
@@ -790,7 +791,7 @@ class CapabilityDetector:
 
         # Determine skip reasons
         skipped_steps = []
-        if level < CapabilityLevel.NBD_INSPECTION:
+        if level.value < CapabilityLevel.NBD_INSPECTION.value:
             skipped_steps.append(
                 {
                     "step": "nbd_inspection",
@@ -799,7 +800,7 @@ class CapabilityDetector:
                     else "NBD device inaccessible",
                 }
             )
-        if level < CapabilityLevel.FULL_OFFLINE_FIXES:
+        if level.value < CapabilityLevel.FULL_OFFLINE_FIXES.value:
             skipped_steps.append(
                 {
                     "step": "offline_fixes",
@@ -832,17 +833,15 @@ class CapabilityDetector:
             },
             "capabilities": {
                 "nbd": nbd_access,
-                "offline_mount": level >= CapabilityLevel.FULL_OFFLINE_FIXES,
-                "partition_inspection": level >= CapabilityLevel.NBD_INSPECTION,
+                "offline_mount": level.value >= CapabilityLevel.FULL_OFFLINE_FIXES.value,
+                "partition_inspection": level.value >= CapabilityLevel.NBD_INSPECTION.value,
             },
             "operations": report["operations"],
             "limitations": report["limitations"],
             "skipped_steps": skipped_steps,
             "recommended_actions": recommended_actions,
             "environment": {
-                "execution_mode": self.detect_execution_mode().name
-                if hasattr(self, "detect_execution_mode")
-                else "unknown",
+                "execution_mode": str(self.detect_execution_mode()),
                 "container_detected": Path("/.dockerenv").exists(),
                 "has_kernel_modules": Path("/lib/modules").exists(),
                 "has_dev_passthrough": Path("/dev/nbd0").exists() if nbd_module else False,

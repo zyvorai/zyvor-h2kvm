@@ -34,14 +34,14 @@ from pathlib import Path
 from .vmware_to_luks_tpm import H2KVMVMwareToLUKSPipeline
 
 
-def setup_logging(verbose: bool = False):
+def setup_logging(verbose: bool = False) -> logging.Logger:
     """Configure logging."""
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(level=level, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
     return logging.getLogger("h2kvm.encrypt")
 
 
-def cmd_convert(args):
+def cmd_convert(args: argparse.Namespace) -> int:
     """Execute VMware → LUKS + TPM conversion."""
     logger = setup_logging(args.verbose)
 
@@ -98,7 +98,8 @@ def cmd_convert(args):
         return 1
 
 
-def cmd_info(args):  # pylint: disable=unused-argument  # dispatched uniformly as args.func(args) alongside cmd_convert, must share its signature
+# pylint: disable-next=unused-argument  # dispatched uniformly as args.func(args) alongside cmd_convert
+def cmd_info(args: argparse.Namespace) -> int:
     """Show pipeline information."""
     print("""
 H2KVM Encryption Pipeline
@@ -141,7 +142,7 @@ For more information:
     return 0
 
 
-def main():
+def main() -> int:
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
         prog="h2kvm-encrypt",
@@ -203,7 +204,7 @@ Performance:
         return 1
 
     # Execute command
-    return args.func(args)
+    return int(args.func(args))
 
 
 if __name__ == "__main__":

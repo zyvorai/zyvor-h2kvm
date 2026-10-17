@@ -312,7 +312,7 @@ def safe_extract_one(  # pylint: disable=too-many-arguments,too-many-locals,too-
     try:
         # tmp_path must not already exist, and must not be a symlink
         if tmp_path.exists():
-            tmp_path.unlink(missing_ok=True)  # type: ignore[attr-defined]
+            tmp_path.unlink(missing_ok=True)
         fd = _open_for_write_nofollow(tmp_path, overwrite=False)
 
         with f, os.fdopen(fd, "wb") as out_f:
@@ -463,8 +463,7 @@ class RAW:  # pylint: disable=too-few-public-methods
                 preserve_timestamps=preserve_timestamps,
             )
 
-        U.die(logger, f"Unsupported RAW source type (expected .raw/.img or tarball): {src}", 1)
-        raise AssertionError("unreachable: U.die() always raises")
+        return U.die(logger, f"Unsupported RAW source type (expected .raw/.img or tarball): {src}", 1)
 
     @staticmethod
     def _extract_raw_tar(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements

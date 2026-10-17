@@ -34,11 +34,11 @@ class TPMSealer:
     - Same firmware/kernel (measured boot)
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize TPM sealer."""
         self._check_tpm_available()
 
-    def _check_tpm_available(self):
+    def _check_tpm_available(self) -> None:
         """Verify TPM2 is available."""
         if not os.path.exists("/dev/tpm0") and not os.path.exists("/dev/tpmrm0"):
             raise RuntimeError(
@@ -92,8 +92,8 @@ class TPMSealer:
             # 7 = Secure Boot state
             pcrs = [0, 1, 2, 3, 7]
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmpdir = Path(tmpdir)
+        with tempfile.TemporaryDirectory() as tmpdir_name:
+            tmpdir = Path(tmpdir_name)
 
             # Write key to file
             key_file = tmpdir / "luks.key"
@@ -210,8 +210,8 @@ class TPMSealer:
             pcrs = [0, 1, 2, 3, 7]
 
         try:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                tmpdir = Path(tmpdir)
+            with tempfile.TemporaryDirectory() as tmpdir_name:
+                tmpdir = Path(tmpdir_name)
 
                 # Create PCR policy session
                 policy = tmpdir / "policy.dat"
@@ -319,7 +319,7 @@ class TPMSealer:
 
         return pcr_values
 
-    def clear_handle(self, handle: str):
+    def clear_handle(self, handle: str) -> None:
         """
         Clear a persistent TPM2 handle.
 

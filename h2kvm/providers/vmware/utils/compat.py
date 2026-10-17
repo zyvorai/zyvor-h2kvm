@@ -23,7 +23,7 @@ from __future__ import annotations
 
 # Optional: select, for single-flow multiplexing of stdout/stderr without threads.
 try:  # pragma: no cover
-    import select  # type: ignore
+    import select
 
     SELECT_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -32,7 +32,7 @@ except ImportError:  # pragma: no cover
 
 # Optional: pyVmomi's vim module.
 try:
-    from pyVmomi import vim  # type: ignore
+    from pyVmomi import vim
 
     PYVMOMI_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -45,7 +45,7 @@ try:
     from h2kvm.providers.vmware.transports.http_client import VMwareError
 except ImportError:  # pragma: no cover
     try:
-        from h2kvm.core.exceptions import VMwareError  # type: ignore
+        from h2kvm.core.exceptions import VMwareError
     except ImportError:  # pragma: no cover
 
         class VMwareError(RuntimeError):  # type: ignore

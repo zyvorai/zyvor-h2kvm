@@ -160,7 +160,7 @@ class PlanMode:  # pylint: disable=too-few-public-methods  # thin mode wrapper d
     def _to_yaml(self, data: dict[str, Any]) -> str:
         # Prefer PyYAML if you already ship it; else simple fallback.
         try:
-            import yaml as _yaml  # type: ignore  # pylint: disable=import-outside-toplevel  # optional dependency; fall back to json below if unavailable
+            import yaml as _yaml  # pylint: disable=import-outside-toplevel  # optional dependency; fall back to json below if unavailable
 
             return _yaml.safe_dump(data, sort_keys=False, default_flow_style=False)
         except Exception:  # pylint: disable=broad-exception-caught  # covers both "yaml not installed" and any yaml.dump failure; falls back to json either way

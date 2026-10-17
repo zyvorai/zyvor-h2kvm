@@ -672,7 +672,7 @@ class RHELBootRepair:
         """
         rhel_version = self.detect_rhel_version()
 
-        report = {
+        report: dict[str, Any] = {
             "rhel_version": rhel_version,
             "chroot_path": str(self.chroot),
             "issues_detected": len(self.detected_issues),

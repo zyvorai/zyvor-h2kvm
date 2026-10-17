@@ -211,9 +211,7 @@ class Convert:
             tail = "\n".join(tail_lines) if tail_lines else ""
 
             match = Convert._RE_EXPECTED_FALLBACK.search(tail) if tail else None
-            is_expected = match is not None
-
-            if is_expected:
+            if match is not None:
                 snippet = Convert._extract_match_snippet(tail, match, radius=140)
                 U.banner(logger, f"Fallback attempt {attempt_no}/{len(plan)} (options rejected)")
                 logger.warning(f"Reason: {snippet}")

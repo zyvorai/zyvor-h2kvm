@@ -14,9 +14,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 import contextlib
 

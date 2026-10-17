@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import json
 import logging
 from pathlib import Path
@@ -20,7 +20,7 @@ class ManifestReporter:
         self.logger = logger or logging.getLogger(__name__)
         self.report: dict[str, Any] = {
             "version": "1.0",
-            "timestamp": datetime.datetime.now().isoformat(),
+            "timestamp": dt.datetime.now().isoformat(),
             "pipeline": {
                 "success": False,
                 "duration_seconds": 0.0,
@@ -50,7 +50,7 @@ class ManifestReporter:
             {
                 "stage": stage,
                 "message": message,
-                "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": dt.datetime.now().isoformat(),
             }
         )
 
@@ -60,7 +60,7 @@ class ManifestReporter:
             {
                 "stage": stage,
                 "message": message,
-                "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": dt.datetime.now().isoformat(),
             }
         )
 
@@ -126,11 +126,9 @@ class ManifestReporter:
     def _get_h2kvm_version(self) -> str:
         """Get h2kvm version."""
         try:
-            # __version__ may not be defined on h2kvm.orchestration; keep this import scoped to
-            # the try/except so a missing attribute here doesn't fail module import for callers who
-            # never need the version string
+            # Lazy: keep the (top-level package) import out of module import time
             # pylint: disable-next=import-outside-toplevel,cyclic-import
-            from h2kvm.orchestration import __version__
+            from h2kvm import __version__
 
             return __version__
         except ImportError:

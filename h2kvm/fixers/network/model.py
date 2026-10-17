@@ -17,7 +17,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 if TYPE_CHECKING:
     import builtins
@@ -318,6 +318,12 @@ class IfcfgKV:
             warnings.append(f"ifcfg duplicate active key {k} on lines {where} (last one wins)")
 
         return IfcfgKV(lines=lines, kv=kv, key_line_idx=idx, duplicates=dups, warnings=warnings)
+
+    @overload
+    def get(self, key: str) -> str | None: ...
+
+    @overload
+    def get(self, key: str, default: str) -> str: ...
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """Return the active value for `key` (case-insensitive), or `default`."""

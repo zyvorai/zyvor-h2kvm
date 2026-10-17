@@ -214,7 +214,7 @@ class VsphereExporter:
         failures: list[str] = []
 
         # SYNC context manager (no async-with)
-        with VMwareClient(  # type: ignore[misc]
+        with VMwareClient(
             self.logger,
             host=str(creds.host),
             user=str(creds.user),
@@ -236,14 +236,8 @@ class VsphereExporter:
                                 code=50,
                                 msg=vm_not_found_error(vm_name, vcenter=str(creds.host)),
                             )
-                        # NOTE: VMwareClient does not yet implement create_snapshot()/
-                        # snapshot_moref() (same gap as VsphereCommands.create_snapshot()
-                        # in providers/vmware/vsphere/command.py) -- a known missing
-                        # feature, not guessed at here.
-                        snap_obj = vc.create_snapshot(  # pylint: disable=no-member
-                            vm_obj, name=f"h2kvm-{vm_name}", quiesce=True, memory=False
-                        )
-                        snap_moref = vc.snapshot_moref(snap_obj)  # pylint: disable=no-member
+                        snap_obj = vc.create_snapshot(vm_obj, f"h2kvm-{vm_name}", quiesce=True, memory=False)
+                        snap_moref = vc.snapshot_moref(snap_obj)
                         self.logger.info("📸 Snapshot created: %s (moref=%s)", vm_name, snap_moref)
 
                     job_dir = out_root / "vsphere-export" / vm_name
@@ -253,7 +247,7 @@ class VsphereExporter:
 
                     Log.trace(self.logger, "🧭 export_mode=%s job_dir=%s", export_mode, job_dir)
 
-                    opt = ExportOptions(  # type: ignore[misc]
+                    opt = ExportOptions(
                         vm_name=vm_name,
                         export_mode=export_mode,
                         datacenter=datacenter,
@@ -266,7 +260,7 @@ class VsphereExporter:
                     )
 
                     # This must be SYNC in VMwareClient implementation
-                    out_path = vc.export_vm(opt)  # type: ignore[attr-defined]
+                    out_path = vc.export_vm(opt)
                     Log.trace(self.logger, "📤 export_vm returned: %r", out_path)
 
                     if export_mode == "download_only":

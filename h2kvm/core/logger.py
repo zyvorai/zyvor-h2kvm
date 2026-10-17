@@ -8,17 +8,17 @@
 from __future__ import annotations
 
 import contextlib
-import datetime as _dt
+import datetime as dt
 import json
 import logging
 import multiprocessing as _mp
 import os
 import sys
 import time
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from h2kvm.providers.vmware.utils.utils import is_tty
 
@@ -151,18 +151,22 @@ class ContextLoggerAdapter(logging.LoggerAdapter):
     def __init__(self, logger: logging.Logger, ctx: Ctx | None = None):
         super().__init__(logger, extra={"ctx": dict(ctx or {})})
 
-    def process(self, msg: Any, kwargs: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
+    def process(self, msg: Any, kwargs: MutableMapping[str, Any]) -> tuple[Any, MutableMapping[str, Any]]:
         extra = kwargs.get("extra") or {}
         call_ctx = extra.get("ctx")
-        merged = _merge_ctx(self.extra.get("ctx"), call_ctx)
+        merged = _merge_ctx(self._base_ctx(), call_ctx)
         extra["ctx"] = merged
         kwargs["extra"] = extra
         return msg, kwargs
 
     def bind(self, **ctx: Any) -> ContextLoggerAdapter:
         """Return a new adapter with `ctx` merged on top of this adapter's context."""
-        merged = _merge_ctx(self.extra.get("ctx"), ctx)
+        merged = _merge_ctx(self._base_ctx(), ctx)
         return ContextLoggerAdapter(self.logger, merged)
+
+    def _base_ctx(self) -> Ctx | None:
+        """Context bound to this adapter (stored under ``extra["ctx"]``)."""
+        return cast("Ctx | None", (self.extra or {}).get("ctx"))
 
 
 # Style (process-first; no thread support)
@@ -195,43 +199,43 @@ class EmojiFormatter(logging.Formatter):
 
     def __init__(self, style: LogStyle):
         super().__init__()
-        self._style = style
+        self._log_style = style
 
     def _now(self, created: float) -> str:
-        dt = (
-            _dt.datetime.fromtimestamp(created, tz=_dt.timezone.utc)
-            if self._style.utc
-            else _dt.datetime.fromtimestamp(created)
+        stamp = (
+            dt.datetime.fromtimestamp(created, tz=dt.timezone.utc)
+            if self._log_style.utc
+            else dt.datetime.fromtimestamp(created)
         )
-        return dt.strftime("%H:%M:%S.%f")[:-3] if self._style.show_ms else dt.strftime("%H:%M:%S")
+        return stamp.strftime("%H:%M:%S.%f")[:-3] if self._log_style.show_ms else stamp.strftime("%H:%M:%S")
 
     def _emoji(self, levelname: str) -> str:
-        if not self._style.unicode:
+        if not self._log_style.unicode:
             return "·"
         return _LEVEL_EMOJI.get(levelname, "•")
 
     def _prefix_bits(self, record: logging.LogRecord) -> str:
         bits: list[str] = []
 
-        if self._style.show_pid:
+        if self._log_style.show_pid:
             bits.append(f"pid={os.getpid()}")
 
-        if self._style.show_ppid:
+        if self._log_style.show_ppid:
             try:
                 bits.append(f"ppid={os.getppid()}")
             except Exception:  # pylint: disable=broad-exception-caught  # best-effort prefix bit, formatting a log line must never raise
                 bits.append("ppid=?")
 
-        if self._style.show_proc:
+        if self._log_style.show_proc:
             try:
                 bits.append(f"proc={_mp.current_process().name}")
             except Exception:  # pylint: disable=broad-exception-caught  # best-effort prefix bit, formatting a log line must never raise
                 bits.append("proc=?")
 
-        if self._style.show_logger:
+        if self._log_style.show_logger:
             bits.append(record.name)
 
-        if self._style.show_src:
+        if self._log_style.show_src:
             bits.append(f"{record.module}:{record.lineno}")
 
         return (" [" + " ".join(bits) + "]") if bits else ""
@@ -252,11 +256,11 @@ class EmojiFormatter(logging.Formatter):
 
         block_text = "\n".join(parts)
 
-        if not self._style.indent_exceptions:
+        if not self._log_style.indent_exceptions:
             out = "\n" + block_text
             return c(out, "red", enable=color_ok) if (color_ok and exc_text) else out
 
-        indent = " " * max(0, int(self._style.exception_indent))
+        indent = " " * max(0, int(self._log_style.exception_indent))
         lines = block_text.splitlines()
         indented = "\n".join(indent + ln for ln in lines)
         if color_ok and exc_text:
@@ -270,7 +274,7 @@ class EmojiFormatter(logging.Formatter):
         lvl = record.levelname
         msg = record.getMessage()
 
-        color_ok = bool(self._style.color and _is_tty() and _colored is not None)
+        color_ok = bool(self._log_style.color and _is_tty() and _colored is not None)
 
         lvl = c(lvl, _LEVEL_COLOR.get(record.levelname), enable=color_ok)
         if record.levelno >= logging.WARNING:
@@ -282,7 +286,7 @@ class EmojiFormatter(logging.Formatter):
         ctx = getattr(record, "ctx", None)
         ctx_s = _format_ctx_kv(ctx)
 
-        line = f"{ts} {emoji} {lvl:<{self._style.align_level}}{bits} {msg}{ctx_s}"
+        line = f"{ts} {emoji} {lvl:<{self._log_style.align_level}}{bits} {msg}{ctx_s}"
         line += self._format_exception_block(record, color_ok)
         return line
 
@@ -302,12 +306,12 @@ class JsonFormatter(logging.Formatter):
         self._include_src = bool(include_src)
 
     def _iso(self, created: float) -> str:
-        dt = (
-            _dt.datetime.fromtimestamp(created, tz=_dt.timezone.utc)
+        stamp = (
+            dt.datetime.fromtimestamp(created, tz=dt.timezone.utc)
             if self._utc
-            else _dt.datetime.fromtimestamp(created)
+            else dt.datetime.fromtimestamp(created)
         )
-        return dt.isoformat(timespec="milliseconds")
+        return stamp.isoformat(timespec="milliseconds")
 
     def format(self, record: logging.LogRecord) -> str:
         try:

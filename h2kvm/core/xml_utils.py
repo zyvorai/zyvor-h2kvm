@@ -11,7 +11,35 @@ Uses xml.sax.saxutils for standard escaping with additional entity support.
 
 from __future__ import annotations
 
+import xml.etree.ElementTree as ET
+from typing import TYPE_CHECKING
 from xml.sax.saxutils import escape as _sax_escape
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+
+def parse_xml_root(path: Path) -> ET.Element:
+    """Parse an XML file and return its root element.
+
+    Uses ``defusedxml`` (mitigates entity-expansion DoS) when it is installed and falls
+    back to the standard library parser otherwise.
+
+    Raises:
+        xml.etree.ElementTree.ParseError: malformed XML (including an empty document)
+        OSError: the file cannot be read
+    """
+    root: ET.Element | None
+    try:
+        # pylint: disable-next=import-outside-toplevel  # optional hardening dependency; stdlib parser is the fallback
+        from defusedxml.ElementTree import parse as safe_parse
+    except ImportError:
+        root = ET.parse(path).getroot()
+    else:
+        root = safe_parse(path).getroot()
+    if root is None:
+        raise ET.ParseError("XML document has no root element")
+    return root
 
 
 def xml_escape(s: object) -> str:
@@ -84,6 +112,7 @@ def xml_escape_text(s: str) -> str:
 
 
 __all__ = [
+    "parse_xml_root",
     "xml_escape",
     "xml_escape_attr",
     "xml_escape_text",

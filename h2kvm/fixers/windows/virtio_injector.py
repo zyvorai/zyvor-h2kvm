@@ -336,6 +336,18 @@ class VirtIOOfflineInjector:
         self._win_mount: Path | None = None
         self._iso_mount: Path | None = None
 
+    def _win_root(self) -> Path:
+        """Mount point of the Windows system partition (raises if not mounted yet)."""
+        if self._win_mount is None:
+            raise RuntimeError("Windows partition is not mounted")
+        return self._win_mount
+
+    def _iso_root(self) -> Path:
+        """Mount point of the VirtIO ISO (raises if not mounted yet)."""
+        if self._iso_mount is None:
+            raise RuntimeError("VirtIO ISO is not mounted")
+        return self._iso_mount
+
     def run(self) -> InjectionResult:
         """Execute the full offline injection pipeline.
 
@@ -452,7 +464,7 @@ class VirtIOOfflineInjector:
                 "or sudo apt install python3-hivex (Debian/Ubuntu)"
             ) from e
 
-        cfg = self._win_mount / "Windows" / "System32" / "config"
+        cfg = self._win_root() / "Windows" / "System32" / "config"
         if not cfg.exists():
             raise RuntimeError(
                 "Windows System32\\config directory not found on the mounted disk. "
@@ -470,7 +482,7 @@ class VirtIOOfflineInjector:
 
         # Detect architecture from ntoskrnl.exe presence in System32
         arch = "amd64"
-        syswow = self._win_mount / "Windows" / "SysWOW64"
+        syswow = self._win_root() / "Windows" / "SysWOW64"
         if not syswow.exists():
             arch = "x86"
 
@@ -513,7 +525,7 @@ class VirtIOOfflineInjector:
     # pylint: disable-next=too-many-locals
     def _inject_driver(self, drv: DriverDef, os_folder: str, arch: str) -> None:
         """Copy driver files from ISO to Windows System32/drivers."""
-        src_dir = self._iso_mount / drv.iso_dir / os_folder / arch
+        src_dir = self._iso_root() / drv.iso_dir / os_folder / arch
         if not src_dir.exists():
             raise FileNotFoundError(
                 f"VirtIO driver directory '{drv.iso_dir}/{os_folder}/{arch}' not found on the ISO. "
@@ -521,7 +533,7 @@ class VirtIOOfflineInjector:
                 f"Download the latest VirtIO drivers ISO from https://fedorapeople.org/groups/virt/virtio-win/"
             )
 
-        drivers_dir = self._win_mount / "Windows" / "System32" / "drivers"
+        drivers_dir = self._win_root() / "Windows" / "System32" / "drivers"
         if not drivers_dir.exists():
             raise RuntimeError(
                 "Windows System32\\drivers directory not found on the mounted disk. "
@@ -554,7 +566,7 @@ class VirtIOOfflineInjector:
 
         # Stage to DriverStore with proper naming: <inf>_<arch>_<hash>
         store_dir = (
-            self._win_mount
+            self._win_root()
             / "Windows"
             / "System32"
             / "DriverStore"
@@ -567,7 +579,7 @@ class VirtIOOfflineInjector:
                 shutil.copy2(f, store_dir / f.name)
 
         # Register as OEM INF in Windows\INF (required for PnP discovery)
-        inf_dir = self._win_mount / "Windows" / "INF"
+        inf_dir = self._win_root() / "Windows" / "INF"
         existing_oem = sorted(inf_dir.glob("oem*.inf"))
         next_num = 0
         if existing_oem:
@@ -601,7 +613,7 @@ class VirtIOOfflineInjector:
             logger.warning("python-hivex not available — skipping VMware disable")
             return
 
-        hive_path = str(self._win_mount / "Windows" / "System32" / "config" / "SYSTEM")
+        hive_path = str(self._win_root() / "Windows" / "System32" / "config" / "SYSTEM")
         h = hivex.Hivex(hive_path, write=True)
         try:
             cs = h.node_get_child(h.root(), "ControlSet001")
@@ -630,7 +642,7 @@ class VirtIOOfflineInjector:
         except ImportError:
             return
 
-        hive_path = str(self._win_mount / "Windows" / "System32" / "config" / "SYSTEM")
+        hive_path = str(self._win_root() / "Windows" / "System32" / "config" / "SYSTEM")
         h = hivex.Hivex(hive_path, write=True)
         try:
             cs = h.node_get_child(h.root(), "ControlSet001")
@@ -687,7 +699,7 @@ class VirtIOOfflineInjector:
             "netkvm": 2,  # AUTO_START — early NIC binding
         }
 
-        hive_path = str(self._win_mount / "Windows" / "System32" / "config" / "SYSTEM")
+        hive_path = str(self._win_root() / "Windows" / "System32" / "config" / "SYSTEM")
         h = hivex.Hivex(hive_path, write=True)
         try:
             cs = h.node_get_child(h.root(), "ControlSet001")
@@ -773,7 +785,7 @@ class VirtIOOfflineInjector:
                 "or sudo apt install python3-hivex (Debian/Ubuntu)"
             ) from e
 
-        hive_path = str(self._win_mount / "Windows" / "System32" / "config" / "SYSTEM")
+        hive_path = str(self._win_root() / "Windows" / "System32" / "config" / "SYSTEM")
         h = hivex.Hivex(hive_path, write=True)
         try:
             cs = h.node_get_child(h.root(), "ControlSet001")
@@ -901,14 +913,14 @@ class VirtIOOfflineInjector:
 
         # Stage batch file
         for win_dir in ["Windows", "WINDOWS"]:
-            temp_dir = self._win_mount / win_dir / "Temp"
+            temp_dir = self._win_root() / win_dir / "Temp"
             if temp_dir.exists():
                 bat_path = temp_dir / "h2kvm-virtio-install.bat"
                 bat_path.write_text(VIRTIO_INSTALL_BAT, encoding="utf-8")
                 logger.info("Staged batch file: %s", bat_path.name)
                 break
 
-        sw_path = str(self._win_mount / "Windows" / "System32" / "config" / "SOFTWARE")
+        sw_path = str(self._win_root() / "Windows" / "System32" / "config" / "SOFTWARE")
         h = hivex.Hivex(sw_path, write=True)
         try:
             ms = h.node_get_child(h.root(), "Microsoft")
@@ -1059,7 +1071,7 @@ class VirtIOOfflineInjector:
         - EULA
         - Privacy settings
         """
-        panther = self._win_mount / "Windows" / "Panther"
+        panther = self._win_root() / "Windows" / "Panther"
         panther.mkdir(parents=True, exist_ok=True)
 
         unattend = panther / "Unattend.xml"

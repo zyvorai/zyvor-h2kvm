@@ -222,7 +222,7 @@ class AsyncVMwareOperations:
                 else:
                     logger.exception("All %d attempts failed for %s", max_retries, vm_name)
                     raise
-        return None
+        raise ValueError(f"max_retries must be at least 1 (got {max_retries})")
 
     async def get_vms_by_pattern(
         self,

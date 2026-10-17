@@ -154,7 +154,7 @@ class MockOfflineFixRunner:
                 family=request.os_hint.family,
                 name=f"{request.os_hint.family.title()} Linux",
                 version=request.os_hint.version or "unknown",
-                architecture=request.os_hint.architecture,
+                architecture=request.os_hint.architecture or "x86_64",
                 boot_mode=request.os_hint.boot_mode,
                 root_filesystem="xfs" if request.os_hint.family == OSFamily.CENTOS else "ext4",
                 has_lvm=True,

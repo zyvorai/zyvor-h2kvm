@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING, Any
 
 from h2kvm.core.constants import SIZE_1_GIB, SIZE_1_KIB, SIZE_1_MIB
 from h2kvm.core.utils import U
+from h2kvm.core.xml_utils import parse_xml_root
 
 if TYPE_CHECKING:
     import logging
@@ -123,7 +124,7 @@ class LibvirtXML:  # pylint: disable=too-few-public-methods  # namespace class o
             U.die(logger, "No disks found in domain XML", 1)
 
         return _DomainInfo(
-            domain_name=LibvirtXML._get_text(root, "name", "unknown"),
+            domain_name=LibvirtXML._get_text(root, "name", "unknown") or "unknown",
             domain_uuid=LibvirtXML._get_text(root, "uuid"),
             firmware=LibvirtXML._detect_firmware(root),
             os_type=os_type,
@@ -137,14 +138,8 @@ class LibvirtXML:  # pylint: disable=too-few-public-methods  # namespace class o
     @staticmethod
     def _parse_xml_tree(logger: logging.Logger | None, xml_path: Path) -> ET.Element:
         """Parse the domain XML file into an ElementTree root, dying with a helpful message on failure."""
-        # Prefer defusedxml if available (optional dependency, only used if installed)
         try:
-            from defusedxml.ElementTree import parse as safe_parse  # pylint: disable=import-outside-toplevel
-        except ImportError:
-            safe_parse = None
-
-        try:
-            tree = safe_parse(xml_path) if safe_parse else ET.parse(xml_path)
+            root = parse_xml_root(xml_path)
         except ET.ParseError as e:
             U.die(
                 logger,
@@ -169,7 +164,7 @@ class LibvirtXML:  # pylint: disable=too-few-public-methods  # namespace class o
                 1,
             )
 
-        return tree.getroot()
+        return root
 
     @staticmethod
     def _log_summary(logger: logging.Logger | None, info: _DomainInfo) -> None:

@@ -75,7 +75,8 @@ def run_job(job_file: str, worker_id: str, follow: bool):
     print()
     if result.status == JobState.COMPLETED:
         print("✓ Job completed successfully!")
-        print(f"  Execution time: {result.metrics.execution_seconds}s")
+        if result.metrics:
+            print(f"  Execution time: {result.metrics.execution_seconds}s")
 
         if result.outputs:
             if result.outputs.fixed_image:

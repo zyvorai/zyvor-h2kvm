@@ -31,7 +31,7 @@ from .io import _is_probably_regf
 if TYPE_CHECKING:
     import logging
 
-    import guestfs  # type: ignore
+    import guestfs
 else:
     try:
         import guestfs  # type: ignore
@@ -39,9 +39,9 @@ else:
         guestfs = None  # type: ignore
 
 try:
-    import hivex  # type: ignore
+    import hivex
 except ImportError:
-    hivex = None  # type: ignore
+    hivex = None
 # pylint: enable=duplicate-code
 
 # Guest file helpers
@@ -233,7 +233,7 @@ def _delete_child_if_exists(
         tried.append(repr(args))
         # hivex's node_delete_child signature varies across versions; probe each call shape
         try:
-            h.node_delete_child(*args)  # type: ignore[misc]
+            h.node_delete_child(*args)
             if logger:
                 logger.debug("Deleted child key %r using node_delete_child%s", name, args)
             return True
@@ -373,10 +373,10 @@ def _commit_best_effort(h: hivex.Hivex) -> None:
     """Commit hive changes (handles version differences)."""
     if hasattr(h, "commit") and callable(h.commit):
         try:
-            h.commit(None)  # type: ignore[arg-type]
+            h.commit(None)
             return
         except TypeError:
-            h.commit()  # type: ignore[call-arg]
+            h.commit()
             return
         # hivex API varies by version; fall through to the hivex_commit method name on any failure
         except Exception:  # pylint: disable=broad-exception-caught
@@ -384,10 +384,10 @@ def _commit_best_effort(h: hivex.Hivex) -> None:
 
     if hasattr(h, "hivex_commit") and callable(h.hivex_commit):
         try:
-            h.hivex_commit(None)  # type: ignore[arg-type]
+            h.hivex_commit(None)
             return
         except TypeError:
-            h.hivex_commit()  # type: ignore[call-arg]
+            h.hivex_commit()
             return
 
     raise RuntimeError(

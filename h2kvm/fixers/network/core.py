@@ -203,7 +203,7 @@ class NetworkFixer:  # pylint: disable=too-many-instance-attributes  # orchestra
             self.logger.info("Interface rename map (AGGRESSIVE): %s", rename_map)
 
         # Statistics tracking
-        stats = {
+        stats: dict[str, Any] = {
             "total_files": len(configs),
             "files_modified": 0,
             "files_failed": 0,

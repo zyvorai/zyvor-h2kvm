@@ -45,6 +45,7 @@ if TYPE_CHECKING:  # pylint: disable=duplicate-code
         class guestfs:  # type: ignore
             class GuestFS(Protocol): ...
 
+
 GUESTFS_AVAILABLE = True  # Native implementation always available
 
 logger = logging.getLogger(__name__)

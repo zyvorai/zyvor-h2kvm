@@ -9,22 +9,21 @@ on:
 jobs:
   pylint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v7
 
-    - name: Set up Python ${{ matrix.python-version }}
+    # One pinned interpreter + the full dependency set: pylint infers members of installed
+    # packages, so the result must not depend on which optional extras are present.
+    - name: Set up Python
       uses: actions/setup-python@v7
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.13"
+        cache: pip
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install hatch "hypersdk-guestkit>=1.0.1"
+        pip install -e ".[dev,test,full]"
 
-    - name: Run pylint via hatch
-      run: |
-        hatch run python -m pylint h2kvm/ --disable=import-error,import-outside-toplevel,unused-import,no-member,no-name-in-module,ungrouped-imports,unreachable,unused-argument,too-many-arguments
+    - name: Run pylint (zero messages required)
+      run: pylint h2kvm/

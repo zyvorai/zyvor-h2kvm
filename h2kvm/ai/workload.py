@@ -190,9 +190,7 @@ _RULES: dict[WorkloadType, dict[str, list[str]]] = {
 }
 
 
-def _score_rule(
-    rule: dict[str, Any], pkg_set: set[str], svc_set: set[str]
-) -> tuple[float, list[str]]:
+def _score_rule(rule: dict[str, Any], pkg_set: set[str], svc_set: set[str]) -> tuple[float, list[str]]:
     """Return (score, matched_indicators) for a single workload rule."""
     matches: list[str] = []
     rule_pkgs = rule.get("packages", [])

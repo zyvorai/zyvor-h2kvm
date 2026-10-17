@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import os
 import shutil
+import warnings
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -97,7 +98,7 @@ _auto_detect_libguestfs_hv()
 
 # Check native guestfs availability (import + supermin appliance)
 try:
-    import guestfs  # type: ignore
+    import guestfs
 
     GUESTFS_AVAILABLE = True
 except ImportError:
@@ -107,7 +108,7 @@ except ImportError:
 def _guestkit_available() -> bool:
     """Return True if the GuestKit Python module is importable."""
     try:
-        import guestkit  # type: ignore  # noqa: F401  # pylint: disable=import-outside-toplevel,unused-import
+        import guestkit  # noqa: F401  # pylint: disable=import-outside-toplevel,unused-import
 
         return True
     except ImportError:
@@ -135,7 +136,7 @@ def _guestfs_appliance_available() -> bool:
 def _create_guestkit() -> Any:
     """Instantiate GuestKit Guestfs (PyO3 bindings)."""
     try:
-        from guestkit import Guestfs  # type: ignore  # pylint: disable=import-outside-toplevel
+        from guestkit import Guestfs  # pylint: disable=import-outside-toplevel
     except ImportError as e:
         raise ImportError(
             "GuestKit backend requested but the 'guestkit' Python module is not installed.\n"
@@ -159,7 +160,7 @@ def _normalize_backend(backend: str) -> str:
 
 def create_guestfs(
     *,
-    python_return_dict: bool = True,
+    python_return_dict: bool = True,  # pylint: disable=unused-argument  # kept for call-site compatibility; GuestKit ignores it
     backend: str | None = None,
     conversion_dir: str | None = None,
     allowed_dirs: list[str] | None = None,
@@ -207,8 +208,6 @@ def create_guestfs(
     if env_backend:
         backend = env_backend.lower()
         if backend in ("vmcraft", "namespace"):
-            import warnings
-
             warnings.warn(
                 f"backend '{backend}' is deprecated; use 'guestkit'",
                 DeprecationWarning,

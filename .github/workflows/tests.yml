@@ -74,19 +74,19 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v7
       with:
-        python-version: "3.12"
+        python-version: "3.13"
         cache: 'pip'
 
-    - name: Install linting tools
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install hatch
+        pip install -e ".[dev,test,full]"
 
     - name: Run lint
       run: |
-        hatch run ruff check h2kvm/
-        # The tree still has a large mypy backlog. Ruff is the gate.
-        hatch run mypy h2kvm/ --ignore-missing-imports || true
+        ruff check h2kvm/
+        ruff format --check h2kvm/
+        mypy h2kvm/
 
   integration:
     name: Integration Tests

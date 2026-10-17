@@ -143,23 +143,15 @@ from h2kvm.systemd import (
 
 # Define boot environment
 boot_env = BootEnvironment(
-    boot_type=BootType.UEFI,
-    root_device="/dev/vda2",
-    root_fstype=FilesystemType.EXT4,
-    hostname="my-vm"
+    boot_type=BootType.UEFI, root_device="/dev/vda2", root_fstype=FilesystemType.EXT4, hostname="my-vm"
 )
 
 # Initialize integration
-integration = SystemdBootIntegration(
-    root_path="/mnt/vmroot",
-    vm_name="my-vm"
-)
+integration = SystemdBootIntegration(root_path="/mnt/vmroot", vm_name="my-vm")
 
 # Prepare boot environment
 results = integration.prepare_vm_boot_environment(
-    boot_env=boot_env,
-    setup_machine_id=True,
-    configure_recovery=True
+    boot_env=boot_env, setup_machine_id=True, configure_recovery=True
 )
 
 # Configure auto-grow for root filesystem
@@ -173,10 +165,7 @@ from h2kvm.systemd import integrate_with_vm_repair
 
 # Simple one-line integration
 success = integrate_with_vm_repair(
-    vm_name="production-vm",
-    root_path="/mnt/vmroot",
-    root_device="/dev/vda2",
-    hostname="prod-vm.example.com"
+    vm_name="production-vm", root_path="/mnt/vmroot", root_device="/dev/vda2", hostname="prod-vm.example.com"
 )
 ```
 
@@ -195,18 +184,11 @@ from h2kvm.systemd import (
 repart = SystemdRepartManager()
 
 # Create standard partition layout
-configs = repart.create_standard_layout(
-    boot_type=BootType.UEFI,
-    disk_size_gb=50
-)
+configs = repart.create_standard_layout(boot_type=BootType.UEFI, disk_size_gb=50)
 
 # Custom partition
 data_partition = PartitionDefinition(
-    type=PartitionType.DATA,
-    size_min="10G",
-    filesystem=FilesystemType.XFS,
-    label="data",
-    grow=True
+    type=PartitionType.DATA, size_min="10G", filesystem=FilesystemType.XFS, label="data", grow=True
 )
 
 repart.create_partition_config(data_partition)
@@ -225,16 +207,8 @@ growfs = SystemdGrowfsManager()
 
 # Configure auto-grow for multiple mounts
 mounts = [
-    MountConfiguration(
-        what="/dev/vda2",
-        where="/",
-        type=FilesystemType.EXT4
-    ),
-    MountConfiguration(
-        what="/dev/vda3",
-        where="/var",
-        type=FilesystemType.XFS
-    ),
+    MountConfiguration(what="/dev/vda2", where="/", type=FilesystemType.EXT4),
+    MountConfiguration(what="/dev/vda3", where="/var", type=FilesystemType.XFS),
 ]
 
 growfs.configure_growfs(mounts)
@@ -253,7 +227,7 @@ firstboot.configure_firstboot(
     hostname="web-server-01",
     timezone="America/New_York",
     locale="en_US.UTF-8",
-    keymap="us"
+    keymap="us",
 )
 
 # Setup machine ID
@@ -301,9 +275,9 @@ resource_ctl = SystemdResourceControl()
 # Set resource limits for a process
 resource_ctl.set_process_limits(
     pid=12345,
-    cpu_quota=50,      # 50% CPU
+    cpu_quota=50,  # 50% CPU
     memory_limit_mb=2048,
-    io_weight=100
+    io_weight=100,
 )
 
 # Monitor resource usage
@@ -318,10 +292,7 @@ print(f"Memory: {usage['memory_mb']}MB")
 from h2kvm.systemd import RepairSocketServer
 
 # Create socket server for on-demand repairs
-server = RepairSocketServer(
-    socket_path="/run/h2kvm-repair.sock",
-    max_workers=4
-)
+server = RepairSocketServer(socket_path="/run/h2kvm-repair.sock", max_workers=4)
 
 # Start server (systemd will activate on connection)
 server.start()
@@ -333,10 +304,7 @@ server.start()
 from h2kvm.systemd import VMPathMonitor
 
 # Monitor directory for new VMDKs
-monitor = VMPathMonitor(
-    watch_path="/var/lib/vmware/vmdks",
-    output_dir="/var/lib/libvirt/images"
-)
+monitor = VMPathMonitor(watch_path="/var/lib/vmware/vmdks", output_dir="/var/lib/libvirt/images")
 
 # Process detected VMs
 monitor.process_detected_vms()
@@ -411,7 +379,7 @@ Boot-ready VM
 recovery = BootEnvironmentRecovery()
 verification = recovery.verify_boot_environment("/mnt/vmroot")
 
-if not verification['ready']:
+if not verification["ready"]:
     print(f"Issues: {verification['issues']}")
     # Fix issues before booting VM
 ```
@@ -427,10 +395,7 @@ integration.configure_auto_grow_filesystems(["/"])
 
 ```python
 # Always configure rescue mode for production VMs
-integration.prepare_vm_boot_environment(
-    boot_env=boot_env,
-    configure_recovery=True
-)
+integration.prepare_vm_boot_environment(boot_env=boot_env, configure_recovery=True)
 ```
 
 ### 4. Monitor Boot Performance

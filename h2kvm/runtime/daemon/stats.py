@@ -59,7 +59,7 @@ class DaemonStatistics:
 
         # Performance tracking
         self.total_processing_time = 0.0
-        self.by_file_type: dict[str, dict[str, int]] = {}
+        self.by_file_type: dict[str, dict[str, float]] = {}
 
         # Periodic save
         self._last_save = time.time()
@@ -130,7 +130,7 @@ class DaemonStatistics:
 
             # Track by file type
             if job.file_type not in self.by_file_type:
-                self.by_file_type[job.file_type] = {"processed": 0, "failed": 0, "total_time": 0}
+                self.by_file_type[job.file_type] = {"processed": 0, "failed": 0, "total_time": 0.0}
 
             if success:
                 self.by_file_type[job.file_type]["processed"] += 1

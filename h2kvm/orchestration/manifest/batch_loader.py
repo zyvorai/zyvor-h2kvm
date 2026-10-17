@@ -15,16 +15,17 @@ from typing import Any
 from h2kvm.core.exceptions import ManifestError
 
 try:
-    import yaml  # type: ignore
+    import yaml
 
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
 
-# Exception types raised by YAML parsing, used in a starred except-tuple below
-# so the handler is a statically-verifiable tuple of exception classes even
+# Exception types raised by YAML parsing; kept as a plain tuple so the except
+# clause below is a statically-verifiable tuple of exception classes even
 # when PyYAML is not installed.
 _YAML_LOAD_EXCEPTIONS: tuple[type[Exception], ...] = (yaml.YAMLError,) if YAML_AVAILABLE else ()
+_MANIFEST_PARSE_EXCEPTIONS: tuple[type[Exception], ...] = (json.JSONDecodeError, *_YAML_LOAD_EXCEPTIONS)
 
 
 class VMBatchItem:  # pylint: disable=too-few-public-methods  # simple data holder for one VM entry from the batch manifest
@@ -100,7 +101,7 @@ class BatchLoader:
                             msg="Could not parse manifest as JSON and PyYAML not available"
                         ) from json_exc
 
-        except (json.JSONDecodeError, *_YAML_LOAD_EXCEPTIONS) as e:
+        except _MANIFEST_PARSE_EXCEPTIONS as e:
             raise ManifestError(
                 msg=(
                     f"Invalid batch manifest format in '{self.path}': {e}\n"

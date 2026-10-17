@@ -37,7 +37,7 @@ class SystemdPipelineIntegration:
     - Resource-limited task execution
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize systemd pipeline integration."""
         self.detect_virt = SystemdDetectVirt()
         self.dissect = SystemdDissect()
@@ -243,7 +243,7 @@ def enhanced_migration_pipeline(
     target_image: Path,
     *,
     vcenter_password: str | None = None,
-):
+) -> None:
     """
     Example migration pipeline with systemd integration.
 

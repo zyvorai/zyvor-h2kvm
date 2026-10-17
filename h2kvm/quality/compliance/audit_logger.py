@@ -336,7 +336,7 @@ class AuditLogger:
         Returns:
             List of matching AuditEvent objects
         """
-        events = []
+        events: list[Any] = []
 
         try:
             if not self.audit_file.exists():
@@ -388,7 +388,7 @@ class AuditLogger:
         """
         events = self.get_events()
 
-        summary = {
+        summary: dict[str, Any] = {
             "total_events": len(events),
             "by_type": {},
             "by_result": {"success": 0, "failure": 0, "error": 0},

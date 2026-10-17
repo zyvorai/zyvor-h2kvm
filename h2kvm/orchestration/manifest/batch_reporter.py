@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import json
 import logging
 from typing import TYPE_CHECKING, Any
@@ -23,7 +23,7 @@ class BatchReporter:
         self.report: dict[str, Any] = {
             "version": "1.0",
             "report_type": "batch_conversion",
-            "timestamp": datetime.datetime.now().isoformat(),
+            "timestamp": dt.datetime.now().isoformat(),
             "batch": {
                 "batch_id": "",
                 "manifest_path": "",
@@ -90,7 +90,7 @@ class BatchReporter:
             "manifest": manifest,
             "success": success,
             "duration_seconds": round(duration, 2),
-            "timestamp": datetime.datetime.now().isoformat(),
+            "timestamp": dt.datetime.now().isoformat(),
         }
 
         if error:
@@ -107,7 +107,7 @@ class BatchReporter:
             {
                 "vm_id": vm_id or "batch",
                 "message": message,
-                "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": dt.datetime.now().isoformat(),
             }
         )
 
@@ -117,7 +117,7 @@ class BatchReporter:
             {
                 "vm_id": vm_id or "batch",
                 "message": message,
-                "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": dt.datetime.now().isoformat(),
             }
         )
 

@@ -45,9 +45,7 @@ def _refresh_datacenter_cache(client: Any) -> None:
     """Rebuild client's datacenter object/name caches from the inventory."""
     _require_pyvmomi(client)
     content = _content(client)
-    view = content.viewManager.CreateContainerView(  # type: ignore[attr-defined]
-        content.rootFolder, [vim.Datacenter], True
-    )
+    view = content.viewManager.CreateContainerView(content.rootFolder, [vim.Datacenter], True)
     try:
         dcs = list(view.view)
         names = sorted([str(getattr(dc, "name", "")) for dc in dcs if getattr(dc, "name", None)])
@@ -88,9 +86,7 @@ def _refresh_host_cache(client: Any) -> None:
     """Rebuild client's ESXi host name cache from the inventory."""
     _require_pyvmomi(client)
     content = _content(client)
-    view = content.viewManager.CreateContainerView(  # type: ignore[attr-defined]
-        content.rootFolder, [vim.HostSystem], True
-    )
+    view = content.viewManager.CreateContainerView(content.rootFolder, [vim.HostSystem], True)
     try:
         client._host_name_cache = sorted(
             [str(getattr(h, "name", "")) for h in view.view if getattr(h, "name", None)]
@@ -120,9 +116,7 @@ def get_vm_by_name(client: Any, name: str) -> Any:
         return client._vm_obj_by_name_cache[n]
 
     content = _content(client)
-    view = content.viewManager.CreateContainerView(  # type: ignore[attr-defined]
-        content.rootFolder, [vim.VirtualMachine], True
-    )
+    view = content.viewManager.CreateContainerView(content.rootFolder, [vim.VirtualMachine], True)
     try:
         for vm_obj in view.view:
             if getattr(vm_obj, "name", None) == n:
@@ -141,7 +135,7 @@ def vm_to_datacenter(client: Any, vm_obj: Any) -> Any:
     for _ in range(64):
         if obj is None:
             break
-        if isinstance(obj, vim.Datacenter):  # type: ignore[attr-defined]
+        if isinstance(obj, vim.Datacenter):
             return obj
         obj = getattr(obj, "parent", None)
     return None
@@ -188,7 +182,7 @@ def resolve_datacenter_for_vm(client: Any, vm_name: str, preferred: str | None) 
     if len(dcs) == 1:
         return dcs[0]
     raise VMwareError(
-        f"Could not resolve datacenter for VM={vm_name!r}. Preferred={pref!r}, VM_dc={vm_dc!r}. "
+        msg=f"Could not resolve datacenter for VM={vm_name!r}. Preferred={pref!r}, VM_dc={vm_dc!r}. "
         f"Available datacenters: {dcs}"
     )
 
@@ -221,12 +215,12 @@ def resolve_host_system_for_vm(client: Any, vm_name: str) -> str:
     """Resolve the `host/<cluster>/<host>` (or `host/<host>`) compute path for vm_name."""
     vm_obj = get_vm_by_name(client, vm_name)
     if vm_obj is None:
-        raise VMwareError(f"VM not found: {vm_name!r}")
+        raise VMwareError(msg=f"VM not found: {vm_name!r}")
 
     host_obj = _vm_runtime_host(client, vm_obj)
     if host_obj is None:
         raise VMwareError(
-            f"VM {vm_name!r} has no runtime.host; cannot build vpx compute path. "
+            msg=f"VM {vm_name!r} has no runtime.host; cannot build vpx compute path. "
             f"Specify opt.compute='host/<cluster>/<host>' or opt.compute='host/<host>'. "
             f"Known hosts: {list_host_names(client, refresh=True)}"
         )
@@ -234,7 +228,7 @@ def resolve_host_system_for_vm(client: Any, vm_name: str) -> str:
     host_name = str(getattr(host_obj, "name", "") or "").strip()
     if not host_name:
         raise VMwareError(
-            f"Could not resolve ESXi host name for VM={vm_name!r}. "
+            msg=f"Could not resolve ESXi host name for VM={vm_name!r}. "
             f"Known hosts: {list_host_names(client, refresh=True)}"
         )
 
@@ -265,7 +259,7 @@ def parse_backing_filename(file_name: str) -> tuple[str, str]:
     """
     m = _BACKING_RE.match(file_name or "")
     if not m:
-        raise VMwareError(f"Could not parse backing filename: {file_name}")
+        raise VMwareError(msg=f"Could not parse backing filename: {file_name}")
     return m.group(1), m.group(2)
 
 
@@ -297,7 +291,7 @@ def _resolve_datacenter_for_download(client: Any, dc_name: str | None) -> str:
         return dcs[0]
     if dcs:
         return sorted(dcs)[0]
-    raise VMwareError("No datacenters found; cannot build /folder URL")
+    raise VMwareError(msg="No datacenters found; cannot build /folder URL")
 
 
 # pylint: disable-next=too-many-arguments  # keyword-only download parameters
@@ -330,7 +324,7 @@ def download_datastore_file(
                 client.logger.warning("govc datastore.download failed; falling back to /folder HTTP: %s", e)
 
     if not client.si:
-        raise VMwareError("Not connected to vSphere; cannot download. Call connect() first.")
+        raise VMwareError(msg="Not connected to vSphere; cannot download. Call connect() first.")
 
     dc_use = _resolve_datacenter_for_download(client, dc_name)
 
@@ -350,10 +344,10 @@ def download_datastore_file(
 def wait_for_task(client: Any, task: Any) -> None:
     """Block until a vSphere Task completes, raising VMwareError if it fails."""
     _require_pyvmomi(client)
-    while task.info.state not in (vim.TaskInfo.State.success, vim.TaskInfo.State.error):  # type: ignore[attr-defined]
+    while task.info.state not in (vim.TaskInfo.State.success, vim.TaskInfo.State.error):
         time.sleep(DELAY_STATUS_POLL)
-    if task.info.state == vim.TaskInfo.State.error:  # type: ignore[attr-defined]
-        raise VMwareError(f"vSphere task failed: {task.info.error}")
+    if task.info.state == vim.TaskInfo.State.error:
+        raise VMwareError(msg=f"vSphere task failed: {task.info.error}")
 
 
 def _get_vm_datastore_browser(client: Any, vm_obj: Any) -> Any:
@@ -367,10 +361,10 @@ def _get_vm_datastore_browser(client: Any, vm_obj: Any) -> Any:
     except Exception:  # pylint: disable=broad-exception-caught
         ds = None
     if ds is None:
-        raise VMwareError("Could not resolve VM datastore reference (vm.datastore empty)")
+        raise VMwareError(msg="Could not resolve VM datastore reference (vm.datastore empty)")
     browser = getattr(ds, "browser", None)
     if browser is None:
-        raise VMwareError("Datastore has no browser (unexpected)")
+        raise VMwareError(msg="Datastore has no browser (unexpected)")
     return browser
 
 
@@ -387,7 +381,7 @@ def _vmx_pathname(_client: Any, vm_obj: Any) -> str:
         except Exception:  # pylint: disable=broad-exception-caught
             vmx = None
     if not vmx:
-        raise VMwareError("Could not determine VMX path (summary.config.vmPathName missing)")
+        raise VMwareError(msg="Could not determine VMX path (summary.config.vmPathName missing)")
     return str(vmx)
 
 
@@ -404,6 +398,7 @@ def _list_vm_directory_files(client: Any, vm_obj: Any) -> tuple[str, str, list[s
     search_root = f"[{ds_name}] {folder_rel}" if folder_rel else f"[{ds_name}]"
     browser = _get_vm_datastore_browser(client, vm_obj)
 
+    # pylint: disable=c-extension-no-member  # pyVmomi.vim types are generated at runtime, invisible to static analysis
     q = vim.HostDatastoreBrowserSearchSpec()  # type: ignore[attr-defined]
     q.matchPattern = ["*"]
     q.details = vim.HostDatastoreBrowserFileInfoDetails()  # type: ignore[attr-defined]
@@ -411,7 +406,7 @@ def _list_vm_directory_files(client: Any, vm_obj: Any) -> tuple[str, str, list[s
     q.details.modification = True
     q.details.fileType = True
 
-    task = browser.SearchDatastoreSubFolders_Task(search_root, q)  # type: ignore[attr-defined]
+    task = browser.SearchDatastoreSubFolders_Task(search_root, q)
     wait_for_task(client, task)
 
     results = getattr(task.info, "result", None) or []
@@ -448,7 +443,7 @@ def _filter_download_only_files(
         out.append(f)
     if max_files and len(out) > int(max_files):
         raise VMwareError(
-            f"Refusing to download {len(out)} files (limit={max_files}). "
+            msg=f"Refusing to download {len(out)} files (limit={max_files}). "
             "Tune download_only_max_files / include/exclude globs."
         )
     return out
@@ -485,21 +480,21 @@ def _download_selected_files(
             msg = f"{name}: {e}"
             failures.append(msg)
             if fail_on_missing:
-                raise VMwareError(f"{log_prefix} download failed:\n" + "\n".join(failures)) from e
+                raise VMwareError(msg=f"{log_prefix} download failed:\n" + "\n".join(failures)) from e
             client.logger.exception("%s download failed (non-fatal): %s", log_prefix, msg)
 
     if failures and fail_on_missing:
-        raise VMwareError(f"{log_prefix}: one or more downloads failed:\n" + "\n".join(failures))
+        raise VMwareError(msg=f"{log_prefix}: one or more downloads failed:\n" + "\n".join(failures))
 
 
 def download_only_vm(client: Any, opt: Any) -> Path:
     """Download a VM's folder contents (filtered by opt's globs) via govc/HTTPS, skipping direct export."""
     if not client.si:
-        raise VMwareError("Not connected to vSphere; cannot download. Call connect() first.")
+        raise VMwareError(msg="Not connected to vSphere; cannot download. Call connect() first.")
 
     vm_obj = get_vm_by_name(client, opt.vm_name)
     if vm_obj is None:
-        raise VMwareError(f"VM not found: {opt.vm_name!r}")
+        raise VMwareError(msg=f"VM not found: {opt.vm_name!r}")
 
     resolved_dc = resolve_datacenter_for_vm(client, opt.vm_name, opt.datacenter)
     ds_name, folder_rel, files = _list_vm_directory_files(client, vm_obj)
@@ -544,11 +539,11 @@ def _download_only_vm_force_https(client: Any, opt: Any) -> Path:
     Forced HTTPS /folder fallback. This bypasses govc even if installed.
     """
     if not client.si:
-        raise VMwareError("Not connected to vSphere; cannot download. Call connect() first.")
+        raise VMwareError(msg="Not connected to vSphere; cannot download. Call connect() first.")
 
     vm_obj = get_vm_by_name(client, opt.vm_name)
     if vm_obj is None:
-        raise VMwareError(f"VM not found: {opt.vm_name!r}")
+        raise VMwareError(msg=f"VM not found: {opt.vm_name!r}")
 
     resolved_dc = resolve_datacenter_for_vm(client, opt.vm_name, opt.datacenter)
     ds_name, folder_rel, files = _list_vm_directory_files(client, vm_obj)
@@ -594,13 +589,13 @@ def _download_only_vm_force_https(client: Any, opt: Any) -> Path:
 def _require_pyvmomi(_client: Any) -> None:
     """Raise if pyvmomi is unavailable. `_client` kept for call-site symmetry with sibling helpers."""
     if not PYVMOMI_AVAILABLE:
-        raise VMwareError("pyvmomi not installed. Install: pip install pyvmomi")
+        raise VMwareError(msg="pyvmomi not installed. Install: pip install pyvmomi")
 
 
 def _content(client: Any) -> Any:
     if not client.si:
-        raise VMwareError("Not connected")
+        raise VMwareError(msg="Not connected")
     try:
         return client.si.RetrieveContent()
     except Exception as e:
-        raise VMwareError(f"Failed to retrieve content: {e}") from e
+        raise VMwareError(msg=f"Failed to retrieve content: {e}") from e

@@ -192,7 +192,7 @@ class AzureSourceProvider:  # pylint: disable=too-few-public-methods  # single-e
 
         if not cfg.select.resource_group and not cfg.select.allow_all_rgs:
             raise AzureCLIError(
-                "Refusing to search whole subscription by default. Set resource_group or allow_all_rgs=true."
+                msg="Refusing to search whole subscription by default. Set resource_group or allow_all_rgs=true."
             )
 
         # Early exit for list_only mode to avoid any destructive operations
@@ -231,7 +231,7 @@ class AzureSourceProvider:  # pylint: disable=too-few-public-methods  # single-e
             selected.append(_resolve_vm_disks(show, power_state=ps))
 
         if not selected:
-            raise AzureCLIError("No VMs matched selection criteria.")
+            raise AzureCLIError(msg="No VMs matched selection criteria.")
 
         vm_reports: dict[tuple[str, str], AzureVMReport] = {}
         for vm in selected:
@@ -282,7 +282,7 @@ class AzureSourceProvider:  # pylint: disable=too-few-public-methods  # single-e
             for vm in selected:
                 if vm.power_state == "running" and cfg.shutdown.mode == "none":
                     raise AzureCLIError(
-                        f"Cannot export running VM '{vm.name}' without snapshots. "
+                        msg=f"Cannot export running VM '{vm.name}' without snapshots. "
                         f"Enable use_snapshots or configure shutdown mode (stop/deallocate)."
                     )
 
@@ -363,7 +363,7 @@ class AzureSourceProvider:  # pylint: disable=too-few-public-methods  # single-e
                     )
                     item.snapshot_id = snap.get("id")
                     if not item.snapshot_id:
-                        raise AzureCLIError("Snapshot creation returned no id.")
+                        raise AzureCLIError(msg="Snapshot creation returned no id.")
                     created.append(item.snapshot_id)
 
                     if cfg.export.stage_disk_from_snapshot:
@@ -376,7 +376,7 @@ class AzureSourceProvider:  # pylint: disable=too-few-public-methods  # single-e
                         )
                         item.temp_disk_id = tmpd.get("id")
                         if not item.temp_disk_id:
-                            raise AzureCLIError("Temp disk creation returned no id.")
+                            raise AzureCLIError(msg="Temp disk creation returned no id.")
                         created.append(item.temp_disk_id)
 
                         export_id = item.temp_disk_id
@@ -389,7 +389,7 @@ class AzureSourceProvider:  # pylint: disable=too-few-public-methods  # single-e
                     export_target_kind = "disk"
 
                 if export_id is None or export_target_kind is None:
-                    raise AzureCLIError("Internal error: export target not resolved.")
+                    raise AzureCLIError(msg="Internal error: export target not resolved.")
 
                 if export_target_kind == "disk":
                     sas_url = cli.disk_grant_access_by_id(

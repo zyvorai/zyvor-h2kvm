@@ -109,7 +109,7 @@ class FilesystemFixer:
     def _get_guestfs_memsize_mib_best_effort(self, ctx: Any | None = None) -> int | None:
         for key in ("guestfs_memsize_mib", "memsize_mib", "appliance_memsize_mib"):
             try:
-                v = int(getattr(ctx, key))  # type: ignore[arg-type]
+                v = int(getattr(ctx, key))
                 if v > 0:
                     return v
             except Exception:  # pylint: disable=broad-exception-caught  # best-effort probe over an untyped ctx attribute, must not abort memory sizing

@@ -135,8 +135,7 @@ del "%~f0"
 
 # Custom PnP pnputil command — installs from C:\h2kvm-drivers staging dir
 CUSTOM_PNP_RUNONCE_CMD = (
-    'cmd.exe /c "if exist C:\\h2kvm-drivers'
-    ' pnputil /add-driver C:\\h2kvm-drivers\\*.inf /subdirs /install"'
+    'cmd.exe /c "if exist C:\\h2kvm-drivers pnputil /add-driver C:\\h2kvm-drivers\\*.inf /subdirs /install"'
 )
 
 

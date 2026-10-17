@@ -62,7 +62,9 @@ def _install_ovmf() -> bool:
         result = subprocess.run(["yum", "install", "-y", "edk2-ovmf"], check=False)
         return result.returncode == 0
     if shutil.which("zypper"):
-        result = subprocess.run(["zypper", "--non-interactive", "install", "-y", "qemu-ovmf-x86_64"], check=False)
+        result = subprocess.run(
+            ["zypper", "--non-interactive", "install", "-y", "qemu-ovmf-x86_64"], check=False
+        )
         return result.returncode == 0
     return False
 

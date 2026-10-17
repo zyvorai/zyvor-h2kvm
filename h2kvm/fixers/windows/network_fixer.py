@@ -105,9 +105,9 @@ from pathlib import Path
 from typing import Any
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 from h2kvm.core.guest_utils import (
     guest_mkdir_p as _guest_mkdir_p,
@@ -1079,9 +1079,7 @@ def retain_windows_network_config(self, g: guestfs.GuestFS) -> dict[str, Any]:
         return {**result, "reason": "staging_failed", "error": str(e)}
 
     # 4) Provision firstboot: run PS
-    extra_cmd = (
-        r'powershell.exe -ExecutionPolicy Bypass -NoProfile -File "C:\h2kvm\net\apply-network.ps1"'
-    )
+    extra_cmd = r'powershell.exe -ExecutionPolicy Bypass -NoProfile -File "C:\h2kvm\net\apply-network.ps1"'
     with _step(logger, "🛠️ Provision firstboot hook for network apply"):
         try:
             fb = provision_firstboot_payload_and_service(

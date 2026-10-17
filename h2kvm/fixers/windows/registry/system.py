@@ -58,7 +58,7 @@ from .mount import _ensure_windows_root
 if TYPE_CHECKING:
     import logging
 
-    import guestfs  # type: ignore
+    import guestfs
 else:
     try:
         import guestfs  # type: ignore
@@ -66,9 +66,9 @@ else:
         guestfs = None  # type: ignore
 
 try:
-    import hivex  # type: ignore
+    import hivex
 except ImportError:
-    hivex = None  # type: ignore
+    hivex = None
 
 
 def _safe_logger(self) -> logging.Logger:
@@ -197,10 +197,11 @@ def _edit_system_services(  # pylint: disable=too-many-arguments,too-many-locals
             # hivex node/value calls (C extension, untyped exceptions) plus attribute
             # access on caller-supplied driver objects; one bad driver must not abort
             # the rest of the loop, so every failure is logged and continue.
-            svc = getattr(drv, "service_name", "?")
+            failed_svc = getattr(drv, "service_name", "?")
             drv_type = getattr(drv, "name", "?")
             msg = (
-                f"Failed to register VirtIO driver service '{svc}' (driver: {drv_type}) in Windows registry: {e}. "
+                f"Failed to register VirtIO driver service '{failed_svc}' (driver: {drv_type}) "
+                f"in Windows registry: {e}. "
                 f"Without this service entry, the '{drv_type}' driver will not load at boot. "
                 f"If this is the storage driver (viostor), Windows will BSOD. "
                 f"Verify the SYSTEM hive is not corrupted: check Windows\\System32\\config\\SYSTEM"

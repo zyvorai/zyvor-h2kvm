@@ -20,6 +20,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from h2kvm.core.exceptions import VMwareError
+from h2kvm.core.retry_decorator import api_retry
+from h2kvm.core.structured_log import log_event
 from h2kvm.providers.vmware.utils.compat import vim
 
 # govc helpers (single source of truth)
@@ -42,20 +45,13 @@ except ImportError:  # pragma: no cover
 
 # HTTP/HTTPS download client
 try:
-    from h2kvm.providers.vmware.transports.http_client import HTTPDownloadClient, VMwareError
+    from h2kvm.providers.vmware.transports.http_client import HTTPDownloadClient
 except ImportError:  # pragma: no cover
     HTTPDownloadClient = None  # type: ignore
-    try:
-        from ....core.exceptions import VMwareError  # type: ignore
-    except ImportError:  # pragma: no cover
-
-        class VMwareError(RuntimeError):
-            """Fallback VMware error type when neither http_client nor core.exceptions is importable."""
-
 
 # ✅ shared credential resolver (supports vs_password_env + vc_password_env)
 try:
-    from ....core.cred import resolve_vsphere_creds  # type: ignore
+    from ....core.cred import resolve_vsphere_creds
 except ImportError:  # pragma: no cover
     try:
         from ....core.creds import resolve_vsphere_creds  # type: ignore
@@ -64,7 +60,7 @@ except ImportError:  # pragma: no cover
 
 # Optional: vSphere / vCenter integration (pyvmomi)
 try:
-    from pyVim.connect import Disconnect, SmartConnect  # type: ignore
+    from pyVim.connect import Disconnect, SmartConnect
 
     PYVMOMI_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -74,7 +70,7 @@ except ImportError:  # pragma: no cover
 
 # Optional: requests library for HTTP operations (availability probe only; not referenced directly here)
 try:  # pragma: no cover
-    import requests  # type: ignore  # noqa: F401  # pylint: disable=unused-import
+    import requests  # noqa: F401  # pylint: disable=unused-import
 
     REQUESTS_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -82,12 +78,9 @@ except ImportError:  # pragma: no cover
 
 # Optional: silence urllib3 TLS warnings when verify=False (availability probe only)
 try:  # pragma: no cover
-    import urllib3  # type: ignore  # noqa: F401  # pylint: disable=unused-import
+    import urllib3  # noqa: F401  # pylint: disable=unused-import
 except ImportError:  # pragma: no cover
     pass
-
-from h2kvm.core.retry_decorator import api_retry
-from h2kvm.core.structured_log import log_event
 
 _BACKING_RE = re.compile(r"\[(.+?)\]\s+(.*)")
 
@@ -160,7 +153,7 @@ class ExportOptions:  # pylint: disable=too-many-instance-attributes  # models e
 
 
 # Import ovftool operations
-from h2kvm.providers.vmware.transports.ovftool_loader import (  # pylint: disable=wrong-import-position
+from h2kvm.providers.vmware.transports.ovftool_loader import (  # pylint: disable=wrong-import-position,ungrouped-imports  # deliberately after the config dataclass
     _build_ovftool_source_url as _ovftool_build_ovftool_source_url,
     _ovftool_deploy_options as _ovftool_ovftool_deploy_options,
     _ovftool_export_options as _ovftool_ovftool_export_options,
@@ -366,7 +359,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         if self._http_client is None:
             if HTTPDownloadClient is None:
                 raise VMwareError(
-                    "HTTP download client not available. Ensure http_download_client.py is importable."
+                    msg="HTTP download client not available. Ensure http_download_client.py is importable."
                 )
             self._http_client = HTTPDownloadClient(
                 logger=self.logger,
@@ -393,7 +386,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
                     version or "unknown",
                 )
             except Exception as e:
-                raise VMwareError(f"OVF Tool not found: {e}") from e
+                raise VMwareError(msg=f"OVF Tool not found: {e}") from e
         return self._ovftool_paths
 
     # Context managers
@@ -402,7 +395,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         self.connect()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         try:
             self.disconnect()
         finally:
@@ -410,13 +403,12 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 self.logger.error(
                     "Exception in context: %s: %s", getattr(exc_type, "__name__", exc_type), exc_val
                 )
-        return False
 
     # Connection
 
     def _require_pyvmomi(self) -> None:
         if not PYVMOMI_AVAILABLE:
-            raise VMwareError("pyvmomi not installed. Install: pip install pyvmomi")
+            raise VMwareError(msg="pyvmomi not installed. Install: pip install pyvmomi")
 
     def _ssl_context(self) -> ssl.SSLContext:
         """
@@ -543,7 +535,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
                 try:
                     # Attempt connection
-                    self.si = SmartConnect(  # type: ignore[misc]
+                    self.si = SmartConnect(
                         host=self.host,
                         user=self.user,
                         pwd=self.password,
@@ -626,7 +618,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
         # All retries exhausted - raise final error
         raise VMwareError(
-            f"Failed to connect to vSphere ({self.host}:{self.port}) "
+            msg=f"Failed to connect to vSphere ({self.host}:{self.port}) "
             f"after {max_attempts} attempts: {last_error}"
         ) from last_error
 
@@ -634,7 +626,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         """Disconnect from vSphere/vCenter and clear cached session state."""
         try:
             if self.si is not None:
-                Disconnect(self.si)  # type: ignore[misc]
+                Disconnect(self.si)
         except Exception as e:  # pylint: disable=broad-exception-caught  # pyvmomi raises dynamic/untyped errors; cleanup must still clear local state below
             self.logger.exception("Error during disconnect: %s", e)
         finally:
@@ -647,11 +639,11 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
     def _content(self) -> Any:
         if not self.si:
-            raise VMwareError("Not connected")
+            raise VMwareError(msg="Not connected")
         try:
             return self.si.RetrieveContent()
         except Exception as e:
-            raise VMwareError(f"Failed to retrieve content: {e}") from e
+            raise VMwareError(msg=f"Failed to retrieve content: {e}") from e
 
     # Datacenters / Hosts - Delegate to vmware_datastore
 
@@ -903,7 +895,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         disks = self.vm_disks(vm_obj)
         if not disks:
             raise VMwareError(
-                "No virtual disks found on VM. The VM may have no hard disks attached, "
+                msg="No virtual disks found on VM. The VM may have no hard disks attached, "
                 "or the disk configuration is not accessible. Check the VM's hardware "
                 "settings in vSphere to verify it has virtual disks."
             )
@@ -913,7 +905,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         if s.isdigit():
             idx = int(s)
             if idx < 0 or idx >= len(disks):
-                raise VMwareError(f"Disk index out of range: {idx} (found {len(disks)})")
+                raise VMwareError(msg=f"Disk index out of range: {idx} (found {len(disks)})")
             return disks[idx]
         sl = s.lower()
         for d in disks:
@@ -927,9 +919,72 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 available.append(label)
         available_str = ", ".join(available) if available else "none detected"
         raise VMwareError(
-            f"No disk matching label '{s}'. Available disks: {available_str}\n"
+            msg=f"No disk matching label '{s}'. Available disks: {available_str}\n"
             "Specify a disk by label (e.g., 'Hard disk 1') or index (e.g., 0, 1)."
         )
+
+    # Inventory / snapshot / CBT helpers (pyVmomi)
+
+    def list_vm_names(self) -> list[str]:
+        """List the names of all VMs visible to this vCenter/ESXi connection."""
+        self._require_pyvmomi()
+        content = self._content()
+        view = content.viewManager.CreateContainerView(content.rootFolder, [vim.VirtualMachine], True)
+        try:
+            return sorted(str(vm.name) for vm in view.view)
+        finally:
+            view.Destroy()
+
+    def create_snapshot(
+        self,
+        vm_obj: Any,
+        name: str,
+        *,
+        quiesce: bool = True,
+        memory: bool = False,
+        description: str = "Created by h2kvm",
+    ) -> Any:
+        """Create a VM snapshot and return the snapshot managed object reference."""
+        task = vm_obj.CreateSnapshot_Task(name=name, description=description, memory=memory, quiesce=quiesce)
+        self.wait_for_task(task)
+        return task.info.result
+
+    @staticmethod
+    def snapshot_moref(snapshot: Any) -> str:
+        """Return the managed-object id (moref) of a snapshot reference."""
+        return str(getattr(snapshot, "_moId", snapshot))
+
+    def enable_cbt(self, vm_obj: Any) -> None:
+        """Enable Changed Block Tracking on a VM (takes effect after the next snapshot/stun)."""
+        self._require_pyvmomi()
+        spec = vim.vm.ConfigSpec()
+        spec.changeTrackingEnabled = True
+        self.wait_for_task(vm_obj.ReconfigVM_Task(spec))
+
+    def query_changed_disk_areas(
+        self,
+        vm_obj: Any,
+        *,
+        snapshot: Any,
+        device_key: int,
+        start_offset: int = 0,
+        change_id: str = "*",
+    ) -> Any:
+        """Query CBT changed areas of one disk since ``change_id`` (``"*"`` = all allocated areas)."""
+        return vm_obj.QueryChangedDiskAreas(
+            snapshot=snapshot,
+            deviceKey=device_key,
+            startOffset=start_offset,
+            changeId=change_id,
+        )
+
+    @staticmethod
+    def _vm_disk_backing_filename(disk: Any) -> str:
+        """Return the ``[datastore] path/file.vmdk`` backing file name of a VirtualDisk."""
+        name = getattr(getattr(disk, "backing", None), "fileName", None)
+        if not name:
+            raise VMwareError(msg="Selected disk has no backing file name")
+        return str(name)
 
     # Unified entrypoint (policy) - refactored into smaller handlers
 
@@ -979,9 +1034,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         """
         Export VM using specified export mode.
         """
-        log_event(
-            "vm_export_start", vm_name=opt.vm_name, export_mode=opt.export_mode
-        )
+        log_event("vm_export_start", vm_name=opt.vm_name, export_mode=opt.export_mode)
         mode = self._normalize_export_mode(opt.export_mode)
 
         # OVF Tool requested: if it fails, fall through to stable chain

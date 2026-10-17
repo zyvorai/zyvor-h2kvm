@@ -187,7 +187,7 @@ class ComplianceOrchestrator:
         Returns:
             Summary dict
         """
-        summary = {
+        summary: dict[str, Any] = {
             "total_frameworks": len(results),
             "overall_compliant": all(r.overall_compliant for r in results.values()),
             "by_framework": {},
@@ -253,7 +253,7 @@ class ComplianceOrchestrator:
         """
         self.logger.info("Starting full compliance workflow...")
 
-        result = {
+        result: dict[str, Any] = {
             "success": False,
             "compliance_results": {},
             "reports_generated": {},

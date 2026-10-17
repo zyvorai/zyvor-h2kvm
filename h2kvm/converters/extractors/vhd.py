@@ -151,9 +151,8 @@ class VHD:  # pylint: disable=too-few-public-methods  # deliberately exposes onl
                 rename_on_collision=rename_on_collision,
                 preserve_timestamps=preserve_timestamps,
             )
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught  # any failure here is fatal and reported via U.die
             U.die(logger, f"Unsupported source type (expected .vhd/.vhdx or tarball): {src}", 1)
-            raise  # unreachable
 
     @staticmethod
     def _extract_vhd_tar(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements  # single-pass safe tar extraction covers many independent policy knobs
@@ -386,10 +385,9 @@ class VHD:  # pylint: disable=too-few-public-methods  # deliberately exposes onl
             # Lazy import: keep vhd.py importable even if the converter module fails,
             # and give a friendly error only when conversion is actually requested.
             # pylint: disable-next=import-outside-toplevel
-            from h2kvm.converters.qemu.converter import Convert  # type: ignore
-        except Exception as e:
+            from h2kvm.converters.qemu.converter import Convert
+        except Exception as e:  # pylint: disable=broad-exception-caught  # any failure here is fatal and reported via U.die
             U.die(logger, f"QCOW2 conversion requested but Convert could not be imported: {e}", 1)
-            raise
 
         U.banner(logger, "Convert extracted VHD(s) to QCOW2")
         U.ensure_dir(outdir)

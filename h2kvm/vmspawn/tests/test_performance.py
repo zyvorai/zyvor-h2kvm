@@ -7,6 +7,7 @@
 import asyncio
 import sys
 import time
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -41,7 +42,7 @@ class TestMachinePerformance:
         """Create test configuration."""
         return VMConfig(
             name="bench-vm",
-            image="/path/to/image.qcow2",
+            image=Path("/path/to/image.qcow2"),
             memory_mb=2048,
             cpus=2,
         )
@@ -84,7 +85,7 @@ class TestMachinePerformance:
             # coupling this benchmark to the correctness test's fixture.
             return VMConfig(
                 name=f"vm-{time.time_ns()}",
-                image="/path/to/image.qcow2",
+                image=Path("/path/to/image.qcow2"),
                 memory_mb=4096,
                 cpus=4,
                 tpm=True,
@@ -104,7 +105,7 @@ class TestAsyncMachinePerformance:
         """Create test configuration."""
         return VMConfig(
             name="async-bench-vm",
-            image="/path/to/image.qcow2",
+            image=Path("/path/to/image.qcow2"),
         )
 
     @pytest.mark.benchmark(group="async-machine-creation")
@@ -148,7 +149,7 @@ class TestParallelValidationPerformance:
         async def create_vms_parallel(count=10):
             manager = AsyncVMManager(max_parallel=10)
             machines = [
-                AsyncMachine(name=f"vm-{i}", image="/path/to/image.qcow2") for i in range(count)
+                AsyncMachine(name=f"vm-{i}", image=Path("/path/to/image.qcow2")) for i in range(count)
             ]
             return await manager.validate_batch(machines, _MockValidator)
 
@@ -168,7 +169,7 @@ class TestParallelValidationPerformance:
         async def validate_batch(vm_count):
             manager = AsyncVMManager(max_parallel=100)
             machines = [
-                AsyncMachine(name=f"vm-{i}", image="/path/to/image.qcow2") for i in range(vm_count)
+                AsyncMachine(name=f"vm-{i}", image=Path("/path/to/image.qcow2")) for i in range(vm_count)
             ]
 
             start = time.perf_counter()
@@ -197,7 +198,7 @@ class TestMemoryPerformance:
             for i in range(count):
                 config = VMConfig(
                     name=f"vm-{i}",
-                    image="/path/to/image.qcow2",
+                    image=Path("/path/to/image.qcow2"),
                 )
                 machines.append(Machine(config))
             return machines
@@ -244,7 +245,7 @@ class TestConcurrencyPerformance:
         """Benchmark async queue processing."""
 
         async def process_queue(items=100):
-            queue = asyncio.Queue()
+            queue: asyncio.Queue[int | None] = asyncio.Queue()
 
             # Producer
             async def produce():
@@ -291,7 +292,7 @@ class TestPerformanceRegression:
         # coupling this benchmark to the correctness test's fixture.
         config = VMConfig(
             name="test-vm",
-            image="/path/to/image.qcow2",
+            image=Path("/path/to/image.qcow2"),
             memory_mb=4096,
             cpus=4,
             tpm=True,
@@ -317,7 +318,7 @@ class TestPerformanceRegression:
 
         async def measure_time(vm_count, max_parallel):
             manager = AsyncVMManager(max_parallel=max_parallel)
-            machines = [AsyncMachine(name=f"vm-{i}", image="/test.qcow2") for i in range(vm_count)]
+            machines = [AsyncMachine(name=f"vm-{i}", image=Path("/test.qcow2")) for i in range(vm_count)]
 
             start = time.perf_counter()
             await manager.validate_batch(machines, _MockValidator)

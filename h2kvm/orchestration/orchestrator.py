@@ -46,6 +46,8 @@ if TYPE_CHECKING:
     import argparse
     import logging
 
+    from h2kvm.ai.orchestrator import AIOrchestrator
+
 # Check availability
 try:
     from h2kvm.providers.vmware.clients.client import PYVMOMI_AVAILABLE
@@ -99,7 +101,7 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
         self.config = MigrationConfig.from_args(args)
         self.recovery_manager: RecoveryManager | None = None
         self.disks: list[Path] = []
-        self._ai = None  # AIOrchestrator (fail-safe, optional)
+        self._ai: AIOrchestrator | None = None  # fail-safe, optional
 
         # Initialize component handlers
         # Note: using only internal converters
@@ -122,6 +124,8 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
         from .manifest.batch_orchestrator import BatchOrchestrator
 
         batch_manifest_path = self.config.batch_manifest
+        if not batch_manifest_path:
+            U.die(self.logger, "Batch mode requires a manifest path (--batch-manifest)", 1)
         self.logger.info(
             "🔄 Batch mode detected",
             extra={"ctx": {"event": "batch_mode_start", "manifest": str(batch_manifest_path)}},
@@ -545,9 +549,9 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
         Log.trace(self.logger, "_process_disks: produced=%d", len(fixed_images))
         return fixed_images
 
-    def _get_vm_test_params(self) -> dict[str, object]:
+    def _get_vm_test_params(self) -> dict[str, Any]:
         """Extract common VM test parameters from config."""
-        params: dict[str, object] = {
+        params: dict[str, Any] = {
             "memory_mib": self.config.memory,
             "vcpus": self.config.vcpus,
             "uefi": self.config.uefi,
@@ -758,9 +762,7 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
                             "   Instance: %s (%s)", result.get("server_name"), result.get("server_id")
                         )
                 except Exception as e:  # pylint: disable=broad-exception-caught  # one image's deployment failure must not abort the rest
-                    err_text = (
-                        e.user_message(include_context=True) if isinstance(e, H2KvmError) else str(e)
-                    )
+                    err_text = e.user_message(include_context=True) if isinstance(e, H2KvmError) else str(e)
                     self.logger.exception("OpenStack deployment failed for '%s': %s", img, err_text)
                     if not self.config.openstack_continue_on_error:
                         raise Fatal(
@@ -1092,7 +1094,7 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
                 propagate_linux_metadata_from_report,
             )
 
-            self.args.last_fixer_report = report  # type: ignore[attr-defined]
+            self.args.last_fixer_report = report
             propagate_linux_metadata_from_report(self.args, report)
             variant = getattr(self.args, "k8s_os_variant", None)
             pretty = getattr(self.args, "linux_os_pretty_name", None)
@@ -1418,7 +1420,7 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
                 Log.trace(self.logger, "legacy qcow2 dir skipped: %s", e)
                 continue
             legacy_path = legacy_dir / img.name
-            if legacy_path.exists(follow_symlinks=False) or legacy_path.is_symlink():
+            if legacy_path.exists() or legacy_path.is_symlink():
                 try:
                     if legacy_path.is_symlink():
                         if legacy_path.resolve() == img:

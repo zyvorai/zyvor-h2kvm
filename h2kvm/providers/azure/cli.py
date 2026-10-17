@@ -61,13 +61,13 @@ def run_az_json(args: list[str], *, timeout_s: int = 300, retries: int = 3) -> A
         try:
             p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_s, check=False)
         except FileNotFoundError:
-            raise AzureCLIError("Azure CLI 'az' not found. Install Azure CLI.") from None
+            raise AzureCLIError(msg="Azure CLI 'az' not found. Install Azure CLI.") from None
         except subprocess.TimeoutExpired:
             last_err = f"az timed out after {timeout_s}s"
             if attempt + 1 < retries:
                 _backoff_sleep(attempt, 1.0, 15.0)
                 continue
-            raise AzureCLIError(last_err) from None
+            raise AzureCLIError(msg=last_err) from None
 
         if p.returncode == 0:
             out = (p.stdout or "").strip()
@@ -76,16 +76,16 @@ def run_az_json(args: list[str], *, timeout_s: int = 300, retries: int = 3) -> A
             try:
                 return json.loads(out)
             except Exception as e:
-                raise AzureCLIError(f"Failed to parse az JSON output: {e}") from e
+                raise AzureCLIError(msg=f"Failed to parse az JSON output: {e}") from e
 
         last_err = (p.stderr or p.stdout or "").strip()
         if attempt + 1 < retries and _is_transient(last_err):
             _backoff_sleep(attempt, 1.0, 15.0)
             continue
 
-        raise AzureCLIError(f"az failed: {' '.join(args)} :: {last_err}")
+        raise AzureCLIError(msg=f"az failed: {' '.join(args)} :: {last_err}")
 
-    raise AzureCLIError(f"az failed: {' '.join(args)} :: {last_err}")
+    raise AzureCLIError(msg=f"az failed: {' '.join(args)} :: {last_err}")
 
 
 def validate_account(subscription: str | None, tenant: str | None) -> dict[str, Any]:
@@ -94,14 +94,14 @@ def validate_account(subscription: str | None, tenant: str | None) -> dict[str, 
     try:
         acct = run_az_json(["account", "show"], timeout_s=30, retries=2)
     except AzureCLIError as e:
-        raise AzureAuthError(f"Azure CLI not logged in or not usable: {e}") from e
+        raise AzureAuthError(msg=f"Azure CLI not logged in or not usable: {e}") from e
 
     if subscription:
         run_az_json(["account", "set", "--subscription", subscription], timeout_s=60, retries=2)
         acct = run_az_json(["account", "show"], timeout_s=30, retries=2)
 
     if tenant and str(acct.get("tenantId")) != str(tenant):
-        raise AzureAuthError(f"Tenant mismatch: expected {tenant}, got {acct.get('tenantId')}")
+        raise AzureAuthError(msg=f"Tenant mismatch: expected {tenant}, got {acct.get('tenantId')}")
 
     return acct
 
@@ -244,7 +244,7 @@ def disk_grant_access_by_id(*, disk_id: str, duration_s: int) -> str:
     )
     sas = (out or {}).get("accessSas")
     if not sas:
-        raise AzureCLIError("disk grant-access returned no accessSas")
+        raise AzureCLIError(msg="disk grant-access returned no accessSas")
     return sas
 
 
@@ -271,7 +271,7 @@ def snapshot_grant_access_by_id(*, snapshot_id: str, duration_s: int) -> str:
     )
     sas = (out or {}).get("accessSas")
     if not sas:
-        raise AzureCLIError("snapshot grant-access returned no accessSas")
+        raise AzureCLIError(msg="snapshot grant-access returned no accessSas")
     return sas
 
 
@@ -296,7 +296,7 @@ def vm_stop_or_deallocate(*, rg: str, name: str, mode: str, wait: bool) -> None:
     elif mode == "deallocate":
         args = ["vm", "deallocate", "--resource-group", rg, "--name", name]
     else:
-        raise AzureCLIError(f"Unknown shutdown.mode={mode}")
+        raise AzureCLIError(msg=f"Unknown shutdown.mode={mode}")
 
     if not wait:
         args.append("--no-wait")
@@ -311,7 +311,7 @@ def vm_stop_or_deallocate(*, rg: str, name: str, mode: str, wait: bool) -> None:
             if mode == "deallocate" and ps == "deallocated":
                 return
             time.sleep(5)
-        raise AzureCLIError(f"VM did not reach expected power state after {mode}: {rg}/{name}")
+        raise AzureCLIError(msg=f"VM did not reach expected power state after {mode}: {rg}/{name}")
 
 
 def best_effort_quiesce_vm(rg: str, name: str, guest_hint: str | None) -> None:

@@ -53,7 +53,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Health check result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "healthy": True,
             "checks": {
                 "accessible": False,
@@ -114,7 +114,12 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Quiesce result dict
         """
-        result = {"success": False, "method": "checkpoint", "duration_seconds": 0.0, "errors": []}
+        result: dict[str, Any] = {
+            "success": False,
+            "method": "checkpoint",
+            "duration_seconds": 0.0,
+            "errors": [],
+        }
 
         self.logger.info(f"Quiescing PostgreSQL instance: {self.db_info.instance_name}")
 
@@ -154,7 +159,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Resume result dict
         """
-        result = {"success": True, "duration_seconds": 0.0, "errors": []}
+        result: dict[str, Any] = {"success": True, "duration_seconds": 0.0, "errors": []}
 
         self.logger.info(
             f"Resuming PostgreSQL instance: {self.db_info.instance_name} "
@@ -179,7 +184,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Validation result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "valid": True,
             "checks": {
                 "starts": False,
@@ -242,7 +247,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Tuning result dict
         """
-        result = {"applied": [], "recommended": [], "errors": []}
+        result: dict[str, Any] = {"applied": [], "recommended": [], "errors": []}
 
         self.logger.info(f"Tuning PostgreSQL for KVM: {self.db_info.instance_name}")
 
@@ -283,7 +288,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Configuration update result dict
         """
-        result = {"updated": [], "warnings": [], "errors": []}
+        result: dict[str, Any] = {"updated": [], "warnings": [], "errors": []}
 
         self.logger.info(f"Updating PostgreSQL configuration: {self.db_info.instance_name}")
 
@@ -328,7 +333,7 @@ class PostgreSQLHandler(DatabaseMigrationHandler):
         Returns:
             Backup result dict
         """
-        result = {"success": False, "log_files": [], "total_size_mb": 0.0, "errors": []}
+        result: dict[str, Any] = {"success": False, "log_files": [], "total_size_mb": 0.0, "errors": []}
 
         if not self.db_info.data_directory:
             result["errors"].append("Data directory unknown")

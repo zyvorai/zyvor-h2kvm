@@ -24,8 +24,9 @@ import logging
 import os
 import subprocess
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Protocol, Union
 
 try:
     from cryptography.hazmat.primitives import hashes
@@ -34,11 +35,22 @@ try:
     HAS_CRYPTOGRAPHY = True
 except ImportError:
     HAS_CRYPTOGRAPHY = False
-    HKDF = None
-    hashes = None
+    HKDF = None  # type: ignore[assignment,misc]  # optional dependency fallback (guarded by HAS_CRYPTOGRAPHY)
+    hashes = None  # type: ignore[assignment]  # optional dependency fallback (guarded by HAS_CRYPTOGRAPHY)
 
 
 LOG = logging.getLogger("h2kvm.luks")
+
+# Key material may be a mutable bytearray (so it can be wiped) or plain bytes.
+KeyMaterial = Union[bytes, bytearray]
+
+
+class KeySource(Protocol):  # pylint: disable=too-few-public-methods
+    """Anything that can hand out LUKS key material."""
+
+    def get_key(self) -> Optional[KeyMaterial]:
+        """Return the key material, or None when this source cannot provide it."""
+        ...
 
 
 # ============================================================
@@ -46,7 +58,7 @@ LOG = logging.getLogger("h2kvm.luks")
 # ============================================================
 
 
-def secure_wipe(data: bytearray):
+def secure_wipe(data: bytearray) -> None:
     """
     Securely wipe sensitive data from memory.
 
@@ -74,7 +86,7 @@ class Cryptsetup:
     """
 
     @staticmethod
-    def open(device: str, mapper: str, key: bytes) -> bool:
+    def open(device: str, mapper: str, key: KeyMaterial) -> bool:
         """
         Open LUKS device with cryptsetup.
 
@@ -166,7 +178,7 @@ class TPM2KeySource:
         """
         self.handle = handle
 
-    def get_key(self) -> Optional[bytes]:
+    def get_key(self) -> Optional[KeyMaterial]:
         """
         Unseal key from TPM2.
 
@@ -240,7 +252,7 @@ class VaultKeySource:
         self.client = hvac.Client(url=addr, token=token)
         self.path = path
 
-    def get_key(self) -> Optional[bytes]:
+    def get_key(self) -> Optional[KeyMaterial]:
         """
         Retrieve key from Vault.
 
@@ -261,7 +273,7 @@ class VaultKeySource:
             return None
 
     @staticmethod
-    def from_kubernetes_sa(addr: str, role: str, path: str):
+    def from_kubernetes_sa(addr: str, role: str, path: str) -> "VaultKeySource":
         """
         Create VaultKeySource using Kubernetes service account auth.
 
@@ -322,7 +334,7 @@ class ClevisKeySource:
         """
         self.tang_url = tang_url
 
-    def get_key(self, device: str | None = None) -> Optional[bytes]:
+    def get_key(self, device: str | None = None) -> Optional[KeyMaterial]:
         """
         Recover key using clevis luks pass.
 
@@ -475,7 +487,7 @@ class KeyfileSource:  # pylint: disable=too-few-public-methods  # simple single-
         """
         self.keyfile_path = Path(keyfile_path)
 
-    def get_key(self) -> Optional[bytes]:
+    def get_key(self) -> Optional[KeyMaterial]:
         """Read key from file."""
         try:
             if not self.keyfile_path.exists():
@@ -510,7 +522,7 @@ class KeyCombiner:  # pylint: disable=too-few-public-methods  # single-purpose H
     """
 
     @staticmethod
-    def combine(keys: list[bytes]) -> bytes:
+    def combine(keys: Sequence[KeyMaterial]) -> bytes:
         """
         Combine multiple keys into one using HKDF.
 
@@ -629,7 +641,7 @@ class LUKSUnlocker:
             clevis_enabled: Enable Clevis/NBDE auto-unlock
             clevis_tang_url: Optional Tang server URL (for logging only)
         """
-        self.sources = []
+        self.sources: list[KeySource] = []
         self._clevis_source: Optional[ClevisKeySource] = None
 
         # Add Clevis/NBDE source (checked per-device, not globally)
@@ -721,7 +733,7 @@ class LUKSUnlocker:
                 LOG.debug("No clevis binding on %s, trying other sources", device)
 
         # Try to get keys from all configured sources
-        keys = []
+        keys: list[KeyMaterial] = []
         for source in self.sources:
             key = source.get_key()
             if key:
@@ -732,6 +744,7 @@ class LUKSUnlocker:
             return False
 
         # Combine keys if multiple sources
+        combined: KeyMaterial
         if len(keys) > 1:
             LOG.debug("Combining %d keys with HKDF", len(keys))
             combined = KeyCombiner.combine(keys)
@@ -747,10 +760,9 @@ class LUKSUnlocker:
         # bytearray, but as a best-effort we wipe the combined key used for unlock.
         if isinstance(combined, bytearray):
             secure_wipe(combined)
-        if isinstance(keys, list):
-            for key in keys:
-                if isinstance(key, bytearray):
-                    secure_wipe(key)
+        for key in keys:
+            if isinstance(key, bytearray):
+                secure_wipe(key)
 
         return success
 

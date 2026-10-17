@@ -25,7 +25,7 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .utils import create_backup, detect_os_from_root, run_command
 
@@ -102,7 +102,7 @@ class GrubFixer:  # pylint: disable=too-many-instance-attributes  # tracks detec
         # Statistics
         self.stats = {"config_regenerated": False, "grub_installed": False, "warnings": 0, "errors": 0}
 
-    def fix(self) -> dict[str, any]:
+    def fix(self) -> dict[str, Any]:
         """
         Execute GRUB fixes.
 
@@ -115,7 +115,7 @@ class GrubFixer:  # pylint: disable=too-many-instance-attributes  # tracks detec
         """
         self.logger.info("Starting GRUB fix: boot_disk=%s, dry_run=%s", self.boot_disk, self.dry_run)
 
-        results = {"success": False, "stats": {}, "warnings": [], "errors": []}
+        results: dict[str, Any] = {"success": False, "stats": {}, "warnings": [], "errors": []}
 
         try:
             # Step 1: Detect OS, boot mode, GRUB version
@@ -532,7 +532,7 @@ class GrubFixer:  # pylint: disable=too-many-instance-attributes  # tracks detec
 # Convenience function for direct usage
 def fix_grub(
     root_mount: str = "/mnt", boot_disk: str = "/dev/vda", skip_install: bool = False, dry_run: bool = False
-) -> dict[str, any]:
+) -> dict[str, Any]:
     """
     Fix GRUB in mounted root filesystem.
 

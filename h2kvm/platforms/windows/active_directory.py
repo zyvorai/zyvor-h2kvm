@@ -107,9 +107,9 @@ class ActiveDirectoryManager:
         ou_path = domain_info.get("ou_path")
 
         # Generate script based on whether credentials are provided
-        if credentials:
-            username = credentials.get("username")
-            password = credentials.get("password")
+        username = credentials.get("username") if credentials else None
+        password = credentials.get("password") if credentials else None
+        if username and password:
             script = self._generate_rejoin_script_with_creds(
                 domain_name, computer_name, ou_path, username, password, force_rejoin
             )

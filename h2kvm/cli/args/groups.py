@@ -173,9 +173,7 @@ def _add_fixing_behavior(p: argparse.ArgumentParser) -> None:
         dest="backend",
         default="guestkit",
         choices=["guestkit", "guestfs", "auto"],
-        help=(
-            "Offline guest fix backend: guestkit only."
-        ),
+        help=("Offline guest fix backend: guestkit only."),
     )
     p.add_argument(
         "--container-isolation",

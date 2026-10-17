@@ -11,9 +11,9 @@ import logging
 from dataclasses import dataclass
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 from h2kvm.core.logging_utils import log_with_emoji as _log
 

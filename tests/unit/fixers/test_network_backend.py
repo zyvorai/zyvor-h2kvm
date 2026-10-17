@@ -609,9 +609,7 @@ class TestValidation:
         from h2kvm.fixers.network.validation import NetworkValidation
 
         validator = NetworkValidation(logging.getLogger("test"))
-        fixed = (
-            "# DEVICE=ens192  # VMware NIC name (vmware-ens-pattern) removed by h2kvm\nTYPE=Ethernet\n"
-        )
+        fixed = "# DEVICE=ens192  # VMware NIC name (vmware-ens-pattern) removed by h2kvm\nTYPE=Ethernet\n"
         errors = validator.validate_fix(
             original="DEVICE=ens192\nTYPE=Ethernet\n",
             fixed=fixed,

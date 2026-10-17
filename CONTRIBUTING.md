@@ -196,24 +196,34 @@ pytest h2kvm/vmspawn/tests/test_performance.py \
 
 ### Python
 
-We use **ruff** for linting and formatting:
+We use **ruff** for linting and formatting, **mypy** for types and **pylint**. All four checks
+must report zero problems (CI enforces them). mypy and pylint resolve the types of installed
+packages, so install the full dependency set first:
 
 ```bash
+pip install -e ".[dev,test,full]"
+
 # Check code style
 ruff check h2kvm/
 
 # Fix automatically
 ruff check --fix h2kvm/
 
-# Format code
+# Format code (CI runs `ruff format --check h2kvm/`)
 ruff format h2kvm/
 
 # Type checking
 mypy h2kvm/
+
+# Static analysis
+pylint h2kvm/
 ```
 
+Fix findings instead of silencing them. A `# type: ignore[code]` or `# pylint: disable=...`
+is acceptable only on an untyped third-party boundary or a deliberate pattern, and must say why.
+
 **Style guidelines:**
-- Line length: 100 characters
+- Line length: 109 characters (see `ruff.toml`; pylint allows 120)
 - Use type hints
 - Document all public APIs
 - Follow PEP 8

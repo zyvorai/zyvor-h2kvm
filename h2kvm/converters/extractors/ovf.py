@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any
 
 from h2kvm.core.constants import SIZE_1_MIB
 from h2kvm.core.utils import U
+from h2kvm.core.xml_utils import parse_xml_root
 
 if TYPE_CHECKING:
     import logging
@@ -189,8 +190,8 @@ class OVF:
         missing = [d for d in uniq if not d.exists()]
         if missing:
             logger.warning("Some OVF-referenced disks were not found after extraction:")
-            for m in missing:
-                logger.warning(f" - {m}")
+            for missing_disk in missing:
+                logger.warning(f" - {missing_disk}")
             uniq = [d for d in uniq if d.exists()]
             if not uniq:
                 U.die(logger, "OVF referenced disks but none were found on disk after extraction.", 1)
@@ -236,15 +237,8 @@ class OVF:
 
         logger.info(f"OVF: {ovf}")
 
-        # Prefer defusedxml if installed
         try:
-            # pylint: disable-next=import-outside-toplevel  # defusedxml is an optional hardening dependency; fall back to stdlib ET if absent
-            from defusedxml.ElementTree import parse as safe_parse  # type: ignore
-        except ImportError:
-            safe_parse = None
-
-        try:
-            tree = safe_parse(ovf) if safe_parse else ET.parse(ovf)
+            root = parse_xml_root(ovf)
         except ET.ParseError as e:
             U.die(
                 logger,
@@ -260,8 +254,6 @@ class OVF:
                 f"Failed to read OVF file '{ovf}': {e}\n    Verify the file exists and is readable.",
                 1,
             )
-
-        root = tree.getroot()
 
         # Try to detect OVF namespace dynamically, fallback to common one.
         ns_uri = None
@@ -352,10 +344,9 @@ class OVF:
         """
         try:
             # pylint: disable-next=import-outside-toplevel  # keeps the qemu converter (and its deps) optional for callers that only extract
-            from h2kvm.converters.qemu.converter import Convert  # type: ignore
+            from h2kvm.converters.qemu.converter import Convert
         except ImportError as e:
             U.die(logger, f"QCOW2 conversion requested but Convert could not be imported: {e}", 1)
-            raise  # unreachable
 
         U.banner(logger, "Convert extracted disks to QCOW2")
         U.ensure_dir(outdir)

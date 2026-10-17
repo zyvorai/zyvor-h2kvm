@@ -3,6 +3,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 # pylint: disable=too-many-lines  # cohesive offline-fixing orchestrator; splitting would fragment the fix pipeline
+# pylint: disable=broad-exception-caught  # every fix stage is best-effort: errors are recorded in the report, never abort the migration
 """
 Offline guest fixing for migrated VMs.
 
@@ -34,7 +35,7 @@ Architecture:
 from __future__ import annotations
 
 import contextlib
-import datetime as _dt
+import datetime as dt
 import os
 import subprocess
 import tempfile
@@ -50,6 +51,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 # chain), the top-level h2kvm package is already fully initialized in
 # sys.modules -- this import cannot actually trigger a circular ImportError.
 from h2kvm import __version__  # pylint: disable=cyclic-import
+from h2kvm.core import guestkit_client
 from h2kvm.core.constants import DEFAULT_CONTAINER_ISOLATION
 from h2kvm.core.guestfs_factory import create_guestfs
 from h2kvm.core.structured_log import PhaseTimer
@@ -58,17 +60,17 @@ from h2kvm.core.utils import U
 from h2kvm.fixers.network.dhcp_fallback import ensure_dhcp_fallback
 
 # Delegated fixers (keep OfflineFSFix "thin")
-from .filesystem import fixer as filesystem_fixer  # type: ignore
+from .filesystem import fixer as filesystem_fixer
 from .filesystem.fstab import (
     FstabMode,
     parse_btrfsvol_spec,
 )
 from .injectors import (
-    firstboot_injector,  # type: ignore
-    hostname_config_injector,  # type: ignore
-    network_config_injector,  # type: ignore
-    service_config_injector,  # type: ignore
-    user_config_injector,  # type: ignore
+    firstboot_injector,
+    hostname_config_injector,
+    network_config_injector,
+    service_config_injector,
+    user_config_injector,
 )
 from .offline.config_rewriter import FstabCrypttabRewriter
 
@@ -141,7 +143,7 @@ class OfflineFixConfig:  # pylint: disable=too-many-instance-attributes
     luks_enable: bool = False
     luks_passphrase: str | None = None
     luks_passphrase_env: str | None = None
-    luks_keyfile: Path | None = None
+    luks_keyfile: str | Path | None = None
     luks_mapper_prefix: str = "h2kvm-crypt"
 
     # Filesystem repair
@@ -223,6 +225,9 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         self.recovery_manager = config.recovery_manager
         self.resize = config.resize
         self.virtio_drivers_dir = config.virtio_drivers_dir
+        # Set by DiskProcessor after construction (pipeline-level options)
+        self.initramfs_add_drivers: list[str] | None = None
+        self.serial_console: bool = True
 
         # LUKS configuration
         self.luks_enable = bool(config.luks_enable)
@@ -278,7 +283,7 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
             "dry_run": self.dry_run,
             "changes": {},
             "analysis": {},
-            "timestamps": {"start": _dt.datetime.now().isoformat()},
+            "timestamps": {"start": dt.datetime.now().isoformat()},
         }
 
         # Timings/metrics stash
@@ -306,11 +311,11 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         try:
             yield
         finally:
-            dt = time.time() - t0
-            self._timings[name] = dt
+            elapsed = time.time() - t0
+            self._timings[name] = elapsed
             try:
                 self.report.setdefault("analysis", {}).setdefault("stages", {})[name] = {
-                    "duration_s": round(dt, 6),
+                    "duration_s": round(elapsed, 6),
                 }
             except (KeyError, TypeError) as e:
                 self.logger.debug(f"Failed to record stage timing for {name}: {e}")
@@ -377,7 +382,7 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         g = create_guestfs(
             python_return_dict=True,
             backend=backend,
-            conversion_dir=self.conversion_dir,
+            conversion_dir=str(self.conversion_dir) if self.conversion_dir is not None else None,
             allowed_dirs=self.allowed_dirs,
             container_isolation=self.container_isolation,
         )
@@ -660,8 +665,6 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 return
             if mode.startswith("opts:"):
                 opts = mode.split(":", 1)[1]
-                if self.dry_run and "ro" not in opts:
-                    opts = f"ro, {opts}"
                 g.mount_options(opts, dev, "/")
                 return
 
@@ -1494,14 +1497,13 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 mount_failures.append({"device": dev, "error": f"best_root_mount_failed:{e}"})
 
         # Phase 3: If no root found, try btrfs subvolumes
+        best_btrfs: tuple[int, str | None, str | None] = (-(10**9), None, None)
         if not best[1]:
             self.logger.warning(
                 "No candidate devices passed _looks_like_root check. Trying btrfs subvolumes..."
             )
             best_btrfs, btrfs_failures = self._find_best_btrfs_subvolume(g, candidates)
             mount_failures.extend(btrfs_failures)
-        else:
-            best_btrfs: tuple[int, str | None, str | None] = (-(10**9), None, None)
 
         # Phase 4: Mount best btrfs subvolume if found
         if best_btrfs[1] and best_btrfs[2]:
@@ -1621,32 +1623,41 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 reasons.append("LUKS")
             self.logger.info("Detected %s on disk", "+".join(reasons))
 
-    def _activate_storage(self, g: Any) -> dict[str, str]:
+    def _mount_root_ok(self, g: Any) -> bool:
+        """Mount the guest root filesystem; returns True once mounted (failures raise)."""
+        self.detect_and_mount_root(g)
+        return True
+
+    def _activate_storage(self, g: Any) -> dict[str, str] | None:
         """Phase 1: Activate storage stack (LUKS, LVM, UUIDs) and mount root."""
         # Detect LVM/LUKS for later appliance-based initramfs rebuild
         self._detect_and_record_lvm_luks(g)
 
         # Storage activation always goes through guestfs/VMCraft
         # (the disk is already NBD-attached, so appliance VM can't access it)
-        luks_audit = self._run_stage("luks_unlock", lambda: self._unlock_luks_devices(g), default={})
+        luks_audit: dict[str, Any] = self._run_stage(
+            "luks_unlock", lambda: self._unlock_luks_devices(g), default={}
+        )
         self.report["analysis"]["luks"] = luks_audit
         self.logger.info(f"LUKS audit: {U.json_dump(luks_audit)}")
 
-        stack_audit = self._run_stage(
+        stack_audit: dict[str, Any] = self._run_stage(
             "storage_stack", lambda: self._pre_mount_activate_storage_stack(g), default={}
         )
         self.report.setdefault("analysis", {})["storage_stack"] = stack_audit
 
         self._run_stage("lvm_activate", lambda: self._activate_lvm(g), default=None)
 
-        uuid_audit = self._run_stage("regenerate_uuids", lambda: self._regenerate_uuids(g), default={})
+        uuid_audit: dict[str, Any] = self._run_stage(
+            "regenerate_uuids", lambda: self._regenerate_uuids(g), default={}
+        )
         self.report.setdefault("analysis", {})["uuid_regeneration"] = uuid_audit
         uuid_map: dict[str, str] = uuid_audit.get("uuid_map", {}) if uuid_audit else {}
 
         mount_ok = self._run_stage(
-            "mount_root", lambda: self.detect_and_mount_root(g), critical=False, default="failed"
+            "mount_root", lambda: self._mount_root_ok(g), critical=False, default=False
         )
-        if mount_ok == "failed":
+        if not mount_ok:
             self.logger.info("")
             self.logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
             self.logger.info("⚠️  Root filesystem could not be mounted for offline fixes.")
@@ -1685,11 +1696,11 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         if (fs_audit or {}).get("enabled"):
             remount_ok = self._run_stage(
                 "remount_root_after_fs_repair",
-                lambda: self.detect_and_mount_root(g),
+                lambda: self._mount_root_ok(g),
                 critical=False,
-                default="failed",
+                default=False,
             )
-            if remount_ok == "failed":
+            if not remount_ok:
                 self.logger.warning(
                     "⚠️  Could not remount root after filesystem repair — continuing without offline fixes"
                 )
@@ -1865,8 +1876,6 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
     def _run_guestkit_pipeline(self) -> None:
         """Delegate boot/fstab/grub/virtio repair to GuestKit; run injectors locally."""
-        from h2kvm.core import guestkit_client
-
         if self.backend == "guestfs":
             self.logger.warning("backend 'guestfs' is ignored; h2kvm uses GuestKit only")
 
@@ -1880,7 +1889,7 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         if self.resize:
             self.report["analysis"]["image_resize"] = self._run_stage(
                 "image_resize", self._resize_image_container
-            )  # type: ignore
+            )
 
         gk = guestkit_client.migrate_repair(
             self.image,
@@ -1931,7 +1940,7 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                 with contextlib.suppress(Exception):
                     g.close()
 
-        self.report["timestamps"]["end"] = _dt.datetime.now().isoformat()
+        self.report["timestamps"]["end"] = dt.datetime.now().isoformat()
         self.write_report()
 
     # ── Main entry point ─────────────────────────────────────────────

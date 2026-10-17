@@ -53,7 +53,7 @@ def enable_trim_discard(
     # reason: mirrors the results-dict-init + SYSTEM-hive-lookup-guard shape
     # in h2kvm/fixers/windows/performance/msi.py's enable_msi_interrupts()
     # -- coincidental, each fixer's results dict has different keys.
-    results = {
+    results: dict[str, Any] = {
         "success": False,
         "trim_enabled": False,
         "optimization_scheduled": False,
@@ -79,9 +79,7 @@ def enable_trim_discard(
         # results dict and hive-editing logic still differs.
         with tempfile.TemporaryDirectory() as tmpdir:
             local_hive = Path(tmpdir) / "SYSTEM"
-            hive, root_node, controlset_name = open_system_hive_for_edit(
-                logger, g, system_path, local_hive
-            )
+            hive, root_node, controlset_name = open_system_hive_for_edit(logger, g, system_path, local_hive)
 
             try:
                 # Enable TRIM by setting DisableDeleteNotification = 0

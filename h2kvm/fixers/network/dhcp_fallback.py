@@ -98,7 +98,9 @@ def install_dhcp_fallback(g: Any, logger: logging.Logger, *, dry_run: bool = Fal
         return {"installed": False, "backend": None, "path": None, "reason": reason}
 
     path, content, mode = (
-        (NETPLAN_PATH, NETPLAN_CONTENT, 0o600) if backend == "netplan" else (NETWORKD_PATH, NETWORKD_CONTENT, 0o644)
+        (NETPLAN_PATH, NETPLAN_CONTENT, 0o600)
+        if backend == "netplan"
+        else (NETWORKD_PATH, NETWORKD_CONTENT, 0o644)
     )
     if dry_run:
         logger.info("DHCP fallback (dry run): would write %s", path)

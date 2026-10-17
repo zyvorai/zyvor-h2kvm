@@ -36,7 +36,7 @@ def run_sudo(  # pylint: disable=too-many-arguments  # thin sudo/subprocess wrap
     as root. Set ``H2KVM_USE_SUDO=1`` (or legacy ``H2KVM_VMCRAFT_USE_SUDO=1``)
     to force sudo prefixing when running as non-root.
     """
-    use_sudo_env = os.getenv("H2KVM_USE_SUDO") or os.getenv("H2KVM_VMCRAFT_USE_SUDO", "")
+    use_sudo_env = os.getenv("H2KVM_USE_SUDO") or os.getenv("H2KVM_VMCRAFT_USE_SUDO") or ""
     use_sudo = use_sudo_env.strip().lower() in {
         "1",
         "true",

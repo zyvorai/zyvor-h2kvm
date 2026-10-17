@@ -197,7 +197,7 @@ class KaironDeployer:
         fmt = image_format(path)
         name = vm_name_for(self.args, path)
         image_url = getattr(self.args, "kairon_image_url", None)
-        serve = getattr(self.args, "kairon_serve", None)
+        serve = str(getattr(self.args, "kairon_serve", None) or "")
         advertise = (getattr(self.args, "kairon_advertise_url", None) or "").rstrip("/")
         start = not getattr(self.args, "kairon_no_start", False)
         if not image_url and not serve:

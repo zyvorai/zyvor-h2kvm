@@ -110,8 +110,8 @@ class ImageSpec(BaseModel):
 
     path: str = Field(..., description="Absolute path to input image file")
     format: str = Field(..., description="Image format (qcow2, vmdk, raw)")
-    size_bytes: Optional[int] = Field(None, description="Image file size in bytes")
-    virtual_size_bytes: Optional[int] = Field(None, description="Virtual disk size in bytes")
+    size_bytes: Optional[int] = Field(default=None, description="Image file size in bytes")
+    virtual_size_bytes: Optional[int] = Field(default=None, description="Virtual disk size in bytes")
 
     class Config:
         schema_extra = {
@@ -128,8 +128,8 @@ class OSHint(BaseModel):
     """Operating system detection hints to optimize fix operations."""
 
     family: OSFamily = Field(OSFamily.UNKNOWN, description="OS family")
-    version: Optional[str] = Field(None, description="OS version (e.g., '9', '22.04')")
-    architecture: Optional[str] = Field("x86_64", description="CPU architecture")
+    version: Optional[str] = Field(default=None, description="OS version (e.g., '9', '22.04')")
+    architecture: Optional[str] = Field(default="x86_64", description="CPU architecture")
     boot_mode: BootMode = Field(BootMode.UNKNOWN, description="Boot mode")
 
     class Config:
@@ -142,37 +142,39 @@ class FixParameters(BaseModel):
     """Parameters controlling offline fix behavior."""
 
     # Bootloader
-    update_grub: bool = Field(True, description="Regenerate GRUB configuration")
-    grub_timeout: Optional[int] = Field(None, description="GRUB timeout in seconds")
-    kernel_args: Optional[list[str]] = Field(None, description="Additional kernel arguments")
+    update_grub: bool = Field(default=True, description="Regenerate GRUB configuration")
+    grub_timeout: Optional[int] = Field(default=None, description="GRUB timeout in seconds")
+    kernel_args: Optional[list[str]] = Field(default=None, description="Additional kernel arguments")
 
     # Initramfs
-    regen_initramfs: bool = Field(True, description="Regenerate initramfs with virtio")
-    extra_modules: Optional[list[str]] = Field(None, description="Extra kernel modules to include")
+    regen_initramfs: bool = Field(default=True, description="Regenerate initramfs with virtio")
+    extra_modules: Optional[list[str]] = Field(default=None, description="Extra kernel modules to include")
 
     # Filesystem
-    fstab_mode: str = Field("uuid", description="fstab mode: uuid, label, or device")
-    validate_filesystems: bool = Field(True, description="Run filesystem checks")
+    fstab_mode: str = Field(default="uuid", description="fstab mode: uuid, label, or device")
+    validate_filesystems: bool = Field(default=True, description="Run filesystem checks")
 
     # Drivers
-    inject_virtio: bool = Field(True, description="Inject virtio drivers")
-    remove_vmware_tools: bool = Field(True, description="Remove VMware tools")
+    inject_virtio: bool = Field(default=True, description="Inject virtio drivers")
+    remove_vmware_tools: bool = Field(default=True, description="Remove VMware tools")
 
     # SELinux
-    selinux_relabel: bool = Field(True, description="Relabel SELinux contexts")
-    selinux_mode: Optional[str] = Field(None, description="SELinux mode: enforcing, permissive, disabled")
+    selinux_relabel: bool = Field(default=True, description="Relabel SELinux contexts")
+    selinux_mode: Optional[str] = Field(
+        default=None, description="SELinux mode: enforcing, permissive, disabled"
+    )
 
     # Network
-    network_config: Optional[str] = Field(None, description="Network configuration mode")
-    enable_serial_console: bool = Field(False, description="Enable serial console")
+    network_config: Optional[str] = Field(default=None, description="Network configuration mode")
+    enable_serial_console: bool = Field(default=False, description="Enable serial console")
 
     # Cloud-init
-    disable_cloud_init: bool = Field(False, description="Disable cloud-init")
-    preserve_cloud_init_config: bool = Field(True, description="Preserve existing cloud-init config")
+    disable_cloud_init: bool = Field(default=False, description="Disable cloud-init")
+    preserve_cloud_init_config: bool = Field(default=True, description="Preserve existing cloud-init config")
 
     # Safety
-    dry_run: bool = Field(False, description="Perform dry run without modifications")
-    create_backup: bool = Field(True, description="Create backup before modifications")
+    dry_run: bool = Field(default=False, description="Perform dry run without modifications")
+    create_backup: bool = Field(default=True, description="Create backup before modifications")
 
     class Config:
         schema_extra = {
@@ -194,12 +196,12 @@ class OfflineFixRequest(BaseModel):
     This is the input contract sent from K8s worker to offline-fix environment.
     """
 
-    version: str = Field("1.0", description="Contract version")
+    version: str = Field(default="1.0", description="Contract version")
     job_id: str = Field(..., description="Unique job identifier")
 
     # Input
     image: ImageSpec = Field(..., description="Input image specification")
-    os_hint: Optional[OSHint] = Field(None, description="OS detection hints")
+    os_hint: Optional[OSHint] = Field(default=None, description="OS detection hints")
 
     # Configuration
     parameters: FixParameters = Field(default_factory=FixParameters, description="Fix parameters")
@@ -215,12 +217,12 @@ class OfflineFixRequest(BaseModel):
     )
 
     # Execution control
-    timeout_seconds: int = Field(3600, description="Maximum execution time")
-    output_path: str = Field("/work/output.qcow2", description="Output image path")
+    timeout_seconds: int = Field(default=3600, description="Maximum execution time")
+    output_path: str = Field(default="/work/output.qcow2", description="Output image path")
 
     # Metadata
-    requested_by: Optional[str] = Field(None, description="Requester identifier")
-    tags: Optional[dict[str, str]] = Field(None, description="Custom tags")
+    requested_by: Optional[str] = Field(default=None, description="Requester identifier")
+    tags: Optional[dict[str, str]] = Field(default=None, description="Custom tags")
 
     class Config:
         schema_extra = {
@@ -241,9 +243,9 @@ class FixOperationResult(BaseModel):
 
     operation: FixOperation = Field(..., description="Operation performed")
     result: FixResult = Field(..., description="Operation result")
-    message: Optional[str] = Field(None, description="Human-readable message")
-    duration_seconds: Optional[float] = Field(None, description="Operation duration")
-    details: Optional[dict[str, Any]] = Field(None, description="Additional details")
+    message: Optional[str] = Field(default=None, description="Human-readable message")
+    duration_seconds: Optional[float] = Field(default=None, description="Operation duration")
+    details: Optional[dict[str, Any]] = Field(default=None, description="Additional details")
 
     class Config:
         schema_extra = {
@@ -261,16 +263,16 @@ class DetectedOS(BaseModel):
     """Detected operating system information."""
 
     family: OSFamily = Field(..., description="Detected OS family")
-    name: Optional[str] = Field(None, description="OS name (e.g., 'CentOS Linux')")
-    version: Optional[str] = Field(None, description="OS version")
-    version_id: Optional[str] = Field(None, description="Version ID")
-    architecture: str = Field("x86_64", description="Architecture")
+    name: Optional[str] = Field(default=None, description="OS name (e.g., 'CentOS Linux')")
+    version: Optional[str] = Field(default=None, description="OS version")
+    version_id: Optional[str] = Field(default=None, description="Version ID")
+    architecture: str = Field(default="x86_64", description="Architecture")
     boot_mode: BootMode = Field(BootMode.UNKNOWN, description="Detected boot mode")
 
     # Filesystem info
-    root_filesystem: Optional[str] = Field(None, description="Root filesystem type (ext4, xfs)")
-    has_lvm: bool = Field(False, description="Uses LVM")
-    has_selinux: bool = Field(False, description="Has SELinux")
+    root_filesystem: Optional[str] = Field(default=None, description="Root filesystem type (ext4, xfs)")
+    has_lvm: bool = Field(default=False, description="Uses LVM")
+    has_selinux: bool = Field(default=False, description="Has SELinux")
 
     class Config:
         schema_extra = {
@@ -317,7 +319,7 @@ class OfflineFixResponse(BaseModel):
     This is the output contract returned to K8s worker.
     """
 
-    version: str = Field("1.0", description="Contract version")
+    version: str = Field(default="1.0", description="Contract version")
     job_id: str = Field(..., description="Job identifier (matches request)")
 
     # Status
@@ -327,7 +329,7 @@ class OfflineFixResponse(BaseModel):
     duration_seconds: float = Field(..., description="Total duration")
 
     # Detection results
-    detected_os: Optional[DetectedOS] = Field(None, description="Detected OS information")
+    detected_os: Optional[DetectedOS] = Field(default=None, description="Detected OS information")
 
     # Fix results
     operations_performed: list[FixOperationResult] = Field(
@@ -337,12 +339,12 @@ class OfflineFixResponse(BaseModel):
     fixes_skipped: list[str] = Field(default_factory=list, description="Summary of skipped fixes")
 
     # Output
-    output_image: Optional[str] = Field(None, description="Path to fixed image")
-    output_size_bytes: Optional[int] = Field(None, description="Output image size")
-    backup_image: Optional[str] = Field(None, description="Path to backup image")
+    output_image: Optional[str] = Field(default=None, description="Path to fixed image")
+    output_size_bytes: Optional[int] = Field(default=None, description="Output image size")
+    backup_image: Optional[str] = Field(default=None, description="Path to backup image")
 
     # Quality metrics
-    boot_confidence: Optional[BootConfidence] = Field(None, description="Boot confidence score")
+    boot_confidence: Optional[BootConfidence] = Field(default=None, description="Boot confidence score")
 
     # Diagnostics
     warnings: list[str] = Field(default_factory=list, description="Warnings (non-fatal)")
@@ -352,8 +354,8 @@ class OfflineFixResponse(BaseModel):
     recommended_actions: list[str] = Field(default_factory=list, description="Recommended next steps")
 
     # Metadata
-    worker_id: Optional[str] = Field(None, description="Worker that performed fixes")
-    environment: Optional[dict[str, Any]] = Field(None, description="Worker environment info")
+    worker_id: Optional[str] = Field(default=None, description="Worker that performed fixes")
+    environment: Optional[dict[str, Any]] = Field(default=None, description="Worker environment info")
 
     class Config:
         schema_extra = {

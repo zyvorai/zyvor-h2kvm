@@ -13,9 +13,9 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 from h2kvm.core.utils import U
 

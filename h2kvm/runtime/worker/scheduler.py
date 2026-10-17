@@ -17,6 +17,7 @@ import threading
 from collections import deque
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from .schemas import JobSpec, JobState, WorkerCapabilities
 from .state_machine import JobRegistry
@@ -127,11 +128,31 @@ class JobQueue:
 
     def list_jobs(self) -> list[JobSpec]:
         """List all jobs in queue (in priority order)."""
-        jobs = []
+        jobs: list[Any] = []
         with self._lock:
             for priority in sorted(self._queues.keys()):
                 jobs.extend(self._queues[priority])
         return jobs
+
+    def load(self) -> None:
+        """Discard the in-memory queue and reload it from disk."""
+        with self._lock:
+            for queue in self._queues.values():
+                queue.clear()
+            self._load_from_disk()
+
+    def save(self) -> None:
+        """Persist every queued job to disk (jobs are also persisted on enqueue)."""
+        with self._lock:
+            for queue in self._queues.values():
+                for job_spec in queue:
+                    self._persist_to_disk(job_spec)
+
+    def get_stats(self) -> dict[str, Any]:
+        """Queue statistics: ``total_jobs`` and ``by_priority`` (priority -> job count)."""
+        with self._lock:
+            by_priority = {priority: len(queue) for priority, queue in self._queues.items()}
+        return {"total_jobs": sum(by_priority.values()), "by_priority": by_priority}
 
     def _persist_to_disk(self, job_spec: JobSpec) -> None:
         """Persist job to disk."""
@@ -211,6 +232,22 @@ class WorkerRegistry:
                 self._workers[worker_id].last_heartbeat = datetime.utcnow()
                 return True
             return False
+
+    def cleanup_stale(self) -> list[str]:
+        """
+        Remove workers whose last heartbeat is older than ``heartbeat_timeout``.
+
+        Returns:
+            IDs of the workers that were removed
+        """
+        cutoff = datetime.utcnow().timestamp() - self.heartbeat_timeout
+        with self._lock:
+            stale = [wid for wid, w in self._workers.items() if w.last_heartbeat.timestamp() <= cutoff]
+            for wid in stale:
+                del self._workers[wid]
+        for wid in stale:
+            self.logger.info(f"Removed stale worker: {wid}")
+        return stale
 
     def unregister(self, worker_id: str) -> None:
         """Unregister a worker."""

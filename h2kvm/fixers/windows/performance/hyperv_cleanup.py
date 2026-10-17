@@ -76,7 +76,7 @@ def cleanup_hyperv_enlightenments(
     """
     logger.info("Checking for Hyper-V enlightenments")
 
-    results = {
+    results: dict[str, Any] = {
         "success": False,
         "hyperv_detected": False,
         "services_disabled": [],
@@ -113,9 +113,7 @@ def cleanup_hyperv_enlightenments(
         # hive-editing logic still differs.
         with tempfile.TemporaryDirectory() as tmpdir:
             local_hive = Path(tmpdir) / "SYSTEM"
-            hive, root_node, controlset_name = open_system_hive_for_edit(
-                logger, g, system_path, local_hive
-            )
+            hive, root_node, controlset_name = open_system_hive_for_edit(logger, g, system_path, local_hive)
 
             try:
                 # Disable Hyper-V services

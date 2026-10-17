@@ -49,7 +49,7 @@ class RedisHandler(DatabaseMigrationHandler):
         Returns:
             Health check result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "healthy": True,
             "checks": {
                 "accessible": False,
@@ -137,7 +137,12 @@ class RedisHandler(DatabaseMigrationHandler):
         Returns:
             Quiesce result dict
         """
-        result = {"success": False, "method": "bgsave", "duration_seconds": 0.0, "errors": []}
+        result: dict[str, Any] = {
+            "success": False,
+            "method": "bgsave",
+            "duration_seconds": 0.0,
+            "errors": [],
+        }
 
         self.logger.info(f"Quiescing Redis instance: {self.db_info.instance_name}")
 
@@ -201,7 +206,7 @@ class RedisHandler(DatabaseMigrationHandler):
         Returns:
             Resume result dict
         """
-        result = {"success": True, "duration_seconds": 0.0, "errors": []}
+        result: dict[str, Any] = {"success": True, "duration_seconds": 0.0, "errors": []}
 
         self.logger.info(
             f"Resuming Redis instance: {self.db_info.instance_name} "
@@ -226,7 +231,7 @@ class RedisHandler(DatabaseMigrationHandler):
         Returns:
             Validation result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "valid": True,
             "checks": {
                 "starts": False,
@@ -287,7 +292,7 @@ class RedisHandler(DatabaseMigrationHandler):
         Returns:
             Tuning result dict
         """
-        result = {"applied": [], "recommended": [], "errors": []}
+        result: dict[str, Any] = {"applied": [], "recommended": [], "errors": []}
 
         self.logger.info(f"Tuning Redis for KVM: {self.db_info.instance_name}")
 
@@ -329,7 +334,7 @@ class RedisHandler(DatabaseMigrationHandler):
         Returns:
             Configuration update result dict
         """
-        result = {"updated": [], "warnings": [], "errors": []}
+        result: dict[str, Any] = {"updated": [], "warnings": [], "errors": []}
 
         self.logger.info(f"Updating Redis configuration: {self.db_info.instance_name}")
 
@@ -373,7 +378,7 @@ class RedisHandler(DatabaseMigrationHandler):
         Returns:
             Backup result dict
         """
-        result = {"success": False, "log_files": [], "total_size_mb": 0.0, "errors": []}
+        result: dict[str, Any] = {"success": False, "log_files": [], "total_size_mb": 0.0, "errors": []}
 
         if not self.db_info.data_directory:
             result["errors"].append("Data directory unknown")

@@ -20,14 +20,14 @@ from h2kvm.fixers.windows.registry.io import detect_windows_hive, download_and_o
 
 # pylint: disable=duplicate-code  # shared optional-dependency import boilerplate, also present in registry/firstboot.py
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 try:
-    import hivex  # type: ignore
+    import hivex
 except ImportError:
-    hivex = None  # type: ignore
+    hivex = None
 # pylint: enable=duplicate-code
 
 logger = logging.getLogger(__name__)
@@ -122,7 +122,7 @@ HARDWARE_DEPENDENT_VENDORS = {
 }
 
 # Known license manager services
-LICENSE_SERVICES = {
+LICENSE_SERVICES: dict[str, dict[str, Any]] = {
     "lmgrd": {
         "name": "FlexLM License Manager",
         "risk": RiskLevel.HIGH,
@@ -146,7 +146,7 @@ LICENSE_SERVICES = {
 }
 
 # Known dongle drivers
-DONGLE_DRIVERS = {
+DONGLE_DRIVERS: dict[str, dict[str, Any]] = {
     "akshasp": {
         "name": "Aladdin HASP",
         "risk": RiskLevel.CRITICAL,
@@ -192,7 +192,7 @@ def detect_hardware_dependent_apps(g: "guestfs.GuestFS", root: str) -> list[AppC
     """
     logger.info("Scanning for hardware-dependent applications")
 
-    findings = []
+    findings: list[Any] = []
 
     try:
         software_path = detect_windows_hive(g, root, "SOFTWARE")
@@ -235,7 +235,7 @@ def _scan_uninstall_key(hive: "hivex.Hivex", uninstall_path: str) -> list[AppCom
     Returns:
         List of findings for detected applications
     """
-    findings = []
+    findings: list[Any] = []
 
     try:
         root = hive.root()
@@ -357,7 +357,7 @@ def detect_license_services(  # pylint: disable=too-many-locals  # single-pass S
     """
     logger.info("Scanning for license manager services")
 
-    findings = []
+    findings: list[Any] = []
 
     # pylint: disable=duplicate-code
     # reason: SYSTEM-hive open + current-controlset resolution mirrors the

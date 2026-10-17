@@ -14,7 +14,10 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 from .base import BackupFormat, BackupSource, BackupVMInfo, RestoreProgress
 from .generic import GenericBackupSource
@@ -88,6 +91,7 @@ class BackupRestoreOrchestrator:
                 format_hint = self._detect_format(backup_path)
 
             # Create appropriate backup source
+            source: BackupSource
             if format_hint == BackupFormat.VEEAM:
                 source = VeeamBackupSource(self.logger, backup_path)
             elif format_hint == BackupFormat.PROXMOX_PBS:
@@ -266,7 +270,7 @@ class BackupRestoreOrchestrator:
             print(f"Verified {summary['total_vms']} VMs")
             print(f"Valid: {summary['valid_vms']}, Invalid: {summary['invalid_vms']}")
         """
-        summary = {
+        summary: dict[str, Any] = {
             "total_sources": len(self._sources),
             "total_vms": 0,
             "valid_vms": 0,
@@ -299,7 +303,7 @@ class BackupRestoreOrchestrator:
         return summary
 
     def generate_dr_test_plan(
-        self, vms: list[tuple[str, BackupVMInfo]], test_env_capacity_gb: int = 1000
+        self, vms: Sequence[tuple[str, BackupVMInfo] | None], test_env_capacity_gb: int = 1000
     ) -> dict[str, Any]:
         """
         Generate DR (Disaster Recovery) test plan.
@@ -307,7 +311,7 @@ class BackupRestoreOrchestrator:
         Analyzes which VMs can be restored within capacity constraints.
 
         Args:
-            vms: List of (source_name, BackupVMInfo) tuples to test
+            vms: (source_name, BackupVMInfo) tuples to test; None entries (e.g. find_vm misses) are skipped
             test_env_capacity_gb: Available storage capacity for testing
 
         Returns:
@@ -340,9 +344,9 @@ class BackupRestoreOrchestrator:
             print(f"Estimated time: {plan['estimated_time_hours']} hours")
         """
         # Sort VMs by size (smallest first)
-        sorted_vms = sorted(vms, key=lambda x: x[1].backup_size_gb if x else 0)
+        sorted_vms = sorted((entry for entry in vms if entry is not None), key=lambda x: x[1].backup_size_gb)
 
-        plan = {
+        plan: dict[str, Any] = {
             "total_vms": len(vms),
             "vms_in_plan": 0,
             "total_size_gb": 0.0,
@@ -354,9 +358,6 @@ class BackupRestoreOrchestrator:
         used_capacity = 0.0
 
         for source_name, vm_info in sorted_vms:
-            if vm_info is None:
-                continue
-
             # Check if VM fits in remaining capacity
             if used_capacity + vm_info.backup_size_gb <= test_env_capacity_gb:
                 plan["vms_in_plan"] += 1

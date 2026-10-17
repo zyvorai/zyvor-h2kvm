@@ -205,7 +205,7 @@ class HybridMigrationManager:
         Returns:
             Fixes result dictionary
         """
-        result = {
+        result: dict[str, Any] = {
             "success": False,
             "fixes_applied": [],
             "fixes_failed": [],

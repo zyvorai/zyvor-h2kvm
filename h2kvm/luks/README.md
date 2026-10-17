@@ -344,9 +344,7 @@ h2kvm-luks seal /root/luks.key --pcr 0 7
 from h2kvm.luks.unlocker import VaultKeySource
 
 source = VaultKeySource.from_kubernetes_sa(
-    addr="https://vault:8200",
-    role="h2kvm-luks",
-    path="secret/h2kvm/luks"
+    addr="https://vault:8200", role="h2kvm-luks", path="secret/h2kvm/luks"
 )
 
 key = source.get_key()
@@ -363,7 +361,7 @@ unlocker = LUKSUnlocker(
         "addr": "https://vault:8200",
         "token": "s.xxxxxx",
         "path": "secret/h2kvm/luks",
-    }
+    },
 )
 
 results = unlocker.unlock_all()

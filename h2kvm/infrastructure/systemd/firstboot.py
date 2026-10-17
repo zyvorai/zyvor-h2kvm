@@ -207,7 +207,7 @@ WantedBy=multi-user.target
         Returns:
             Results dictionary
         """
-        results = {
+        results: dict[str, Any] = {
             "conversion_flag_created": False,
             "machine_id_reset": False,
             "dbus_machine_id_removed": False,
@@ -262,7 +262,7 @@ WantedBy=multi-user.target
         Returns:
             Installation results
         """
-        results = {
+        results: dict[str, Any] = {
             "generator_created": False,
             "service_created": False,
             "script_created": False,
@@ -316,7 +316,11 @@ WantedBy=multi-user.target
         Returns:
             Report dictionary
         """
-        report = {"components_installed": {}, "firstboot_marked": False, "expected_journal_output": []}
+        report: dict[str, Any] = {
+            "components_installed": {},
+            "firstboot_marked": False,
+            "expected_journal_output": [],
+        }
 
         # Check installed components
         generator_path = self.chroot / self.GENERATOR_DIR.relative_to("/") / "h2kvm-generator"

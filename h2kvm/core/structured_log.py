@@ -35,7 +35,7 @@ from __future__ import annotations
 import atexit
 import contextvars
 import dataclasses
-import datetime as _dt
+import datetime as dt
 import json
 import logging
 import os
@@ -99,7 +99,7 @@ class SafeJSONEncoder(json.JSONEncoder):
     def default(self, o: Any) -> Any:  # pylint: disable=too-many-return-statements
         # One early-return branch per exotic type this encoder knows how
         # to serialize; that's the point of this fallback dispatcher.
-        if isinstance(o, (_dt.datetime, _dt.date, _dt.time)):
+        if isinstance(o, (dt.datetime, dt.date, dt.time)):
             return o.isoformat()
         if isinstance(o, uuid.UUID):
             return str(o)
@@ -168,6 +168,7 @@ class DropEvent(Exception):
 
 
 Processor = Callable[[Any, str, dict[str, Any]], dict[str, Any]]
+Renderer = Callable[[Any, str, dict[str, Any]], str]
 
 
 class PrintLogger:  # pylint: disable=too-few-public-methods
@@ -330,7 +331,7 @@ class _TimeStamper:  # pylint: disable=too-few-public-methods
         _method: str,
         event_dict: dict[str, Any],
     ) -> dict[str, Any]:
-        now = _dt.datetime.now(_dt.timezone.utc) if self._utc else _dt.datetime.now()
+        now = dt.datetime.now(dt.timezone.utc) if self._utc else dt.datetime.now()
 
         if self._fmt == "iso":
             event_dict["timestamp"] = now.isoformat()
@@ -519,7 +520,7 @@ class AsyncLogWriter:
                                 "level": "warning",
                                 "dropped": self._overflow_count,
                                 "service": SERVICE_NAME,
-                                "ts": _dt.datetime.now(_dt.timezone.utc).isoformat(
+                                "ts": dt.datetime.now(dt.timezone.utc).isoformat(
                                     timespec="milliseconds",
                                 ),
                             }
@@ -798,7 +799,7 @@ def add_envelope(
     caller) take precedence over context-var defaults.
     """
     defaults: dict[str, Any] = {
-        "ts": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="milliseconds"),
+        "ts": dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds"),
         "service": SERVICE_NAME,
         "host": _HOST,
         "pid": os.getpid(),
@@ -866,7 +867,7 @@ def configure_structured_logging(
     global _configured, _main_writer, _audit_writer  # pylint: disable=global-statement
     # Deliberate module-level singleton configuration entry point.
 
-    renderer: Processor
+    renderer: Renderer
     if json_output:
         renderer = _JSONRenderer(
             sort_keys=False,
@@ -876,7 +877,7 @@ def configure_structured_logging(
         renderer = _ConsoleRenderer()
 
     # Build the processor pipeline
-    processors: list[Processor] = [
+    processors: list[Processor | Renderer] = [
         _add_log_level,
         _level_filter,
         add_envelope,
@@ -1098,7 +1099,7 @@ def log_audit(event: str, **fields: Any) -> None:
     # Write to audit (stderr) channel
     if _audit_writer is not None:
         audit_record = {
-            "ts": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="milliseconds"),
+            "ts": dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds"),
             "event": event,
             "level": "warning",
             "channel": "audit",

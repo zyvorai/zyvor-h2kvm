@@ -131,7 +131,7 @@ class NetworkTopology:
         self,
         graph: TopologyGraph,
         cfg: NetworkConfig,
-        data: dict[str, Any],
+        data: Any,
     ) -> None:
         """
         Parse netplan YAML and add devices to topology graph.

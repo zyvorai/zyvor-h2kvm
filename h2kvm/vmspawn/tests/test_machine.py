@@ -5,6 +5,7 @@
 """Unit tests for vmspawn Machine class."""
 
 import unittest
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -22,9 +23,9 @@ class TestVMConfig(unittest.TestCase):
 
     def test_minimal_config(self):
         """Test creating config with minimal parameters."""
-        config = VMConfig(name="test-vm", image="/path/to/image.qcow2")
+        config = VMConfig(name="test-vm", image=Path("/path/to/image.qcow2"))
         assert config.name == "test-vm"
-        assert config.image == "/path/to/image.qcow2"
+        assert config.image == Path("/path/to/image.qcow2")
         assert config.memory_mb == 2048
         assert config.cpus == 2
 
@@ -37,7 +38,7 @@ class TestVMConfig(unittest.TestCase):
         # avoids coupling correctness tests to unrelated benchmark tests.
         config = VMConfig(
             name="test-vm",
-            image="/path/to/image.qcow2",
+            image=Path("/path/to/image.qcow2"),
             memory_mb=4096,
             cpus=4,
             tpm=True,
@@ -54,16 +55,16 @@ class TestVMConfig(unittest.TestCase):
     def test_invalid_memory(self):
         """Test that invalid memory raises error."""
         with pytest.raises(ValueError, match="VM memory must be a positive number"):
-            VMConfig(name="test-vm", image="/path/to/image.qcow2", memory_mb=0)
+            VMConfig(name="test-vm", image=Path("/path/to/image.qcow2"), memory_mb=0)
 
     def test_invalid_cpus(self):
         """Test that invalid cpus raises error."""
         with pytest.raises(ValueError, match="VM CPU count must be a positive number"):
-            VMConfig(name="test-vm", image="/path/to/image.qcow2", cpus=0)
+            VMConfig(name="test-vm", image=Path("/path/to/image.qcow2"), cpus=0)
 
     def test_memory_property(self):
         """Test memory property alias."""
-        config = VMConfig(name="test", image="/tmp/test.qcow2", memory_mb=8192)
+        config = VMConfig(name="test", image=Path("/tmp/test.qcow2"), memory_mb=8192)
         assert config.memory == 8192
         config.memory = 16384
         assert config.memory_mb == 16384
@@ -76,7 +77,7 @@ class TestMachine(unittest.TestCase):
         """Set up test fixtures."""
         self.config = VMConfig(
             name="test-vm",
-            image="/path/to/image.qcow2",
+            image=Path("/path/to/image.qcow2"),
             memory_mb=2048,
             cpus=2,
         )
@@ -110,7 +111,7 @@ class TestMachine(unittest.TestCase):
 
         config = VMConfig(
             name="test-vm",
-            image="/path/to/image.qcow2",
+            image=Path("/path/to/image.qcow2"),
             vsock=True,
         )
         machine = Machine(config)

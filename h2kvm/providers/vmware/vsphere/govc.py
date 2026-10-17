@@ -24,8 +24,8 @@ try:
     from h2kvm.providers.vmware.transports.govc_common import GovcRunner, normalize_ds_path
 except ImportError:
     # fallback for minimal environment
-    GovcRunner = None
-    normalize_ds_path = None
+    GovcRunner = None  # type: ignore[assignment,misc]  # optional-import fallback
+    normalize_ds_path = None  # type: ignore[assignment]  # optional-import fallback
 
 
 # Small generic helpers
@@ -62,10 +62,10 @@ def _require(args: Any, name: str) -> Any:
     Keep this for action-specific required args (not global argparse requirements).
     """
     if not hasattr(args, name):
-        raise VMwareError(f"Missing required arg: {name}")
+        raise VMwareError(msg=f"Missing required arg: {name}")
     v = getattr(args, name)
     if v is None:
-        raise VMwareError(f"Missing required arg: {name}")
+        raise VMwareError(msg=f"Missing required arg: {name}")
     return v
 
 
@@ -109,7 +109,7 @@ def _merged_cfg(args: Any, conf: dict[str, Any] | None) -> dict[str, Any]:
 
 
 def _as_payload(obj: Any) -> Any:
-    if is_dataclass(obj):
+    if is_dataclass(obj) and not isinstance(obj, type):
         return asdict(obj)
     return obj
 
@@ -193,7 +193,7 @@ class GovmomiCLI(GovcRunner):
             check=False,
         )
         if p.returncode != 0:
-            raise VMwareError(f"govc failed ({p.returncode}): {p.stderr.strip()}")
+            raise VMwareError(msg=f"govc failed ({p.returncode}): {p.stderr.strip()}")
         return p.stdout or ""
 
     def list_vm_names(self) -> list[str]:
@@ -216,7 +216,7 @@ class GovmomiCLI(GovcRunner):
 
         ds, remote = normalize_ds_path(datastore, ds_path)
         if not remote:
-            raise VMwareError("govc datastore.download: empty ds_path after normalization")
+            raise VMwareError(msg="govc datastore.download: empty ds_path after normalization")
 
         self._run_text(["datastore.download", "-ds", str(ds), remote, str(local_path)])
 
