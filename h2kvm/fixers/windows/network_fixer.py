@@ -105,9 +105,9 @@ from pathlib import Path
 from typing import Any
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 from h2kvm.core.guest_utils import (
     guest_mkdir_p as _guest_mkdir_p,

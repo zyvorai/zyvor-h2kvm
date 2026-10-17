@@ -162,7 +162,7 @@ def _print_panel(title: str, body: str = "") -> None:
     │ ✓ Export completed successfully! │
     ╰─────────────────────────────────────────────────────────╯
     """
-    inner_w = max(57, len(title) + 6, *(len(x) + 4 for x in body.splitlines() if x.strip()))  # type: ignore[arg-type]
+    inner_w = max(57, len(title) + 6, *(len(x) + 4 for x in body.splitlines() if x.strip()))
     line = "─" * inner_w
     print(f"╭{line}╮")
 
@@ -587,7 +587,7 @@ def _run_streaming(  # pylint: disable=too-many-locals,too-many-branches,too-man
                 rc = p.poll()
 
                 rlist = list(open_streams.keys())
-                ready, _, _ = select.select(rlist, [], [], 0.2)  # type: ignore[arg-type]
+                ready, _, _ = select.select(rlist, [], [], 0.2)
                 if not ready:
                     if rc is not None:
                         break

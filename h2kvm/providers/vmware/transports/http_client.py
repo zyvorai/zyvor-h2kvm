@@ -33,8 +33,8 @@ except ImportError:  # pragma: no cover
 # pylint: disable=duplicate-code
 # Optional: HTTP download (requests)
 try:
-    import requests  # type: ignore
-    import requests.adapters  # type: ignore
+    import requests
+    import requests.adapters
 
     REQUESTS_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -171,7 +171,7 @@ class HTTPDownloadClient:
         if not self.insecure or urllib3 is None:
             return
         try:
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # type: ignore[attr-defined]
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         # best-effort warning suppression; must not fail client construction
         except Exception:  # pylint: disable=broad-exception-caught
             pass

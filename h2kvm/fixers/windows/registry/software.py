@@ -51,7 +51,7 @@ from .system import _hive_backup_best_effort
 if TYPE_CHECKING:
     import logging
 
-    import guestfs  # type: ignore
+    import guestfs
 else:
     try:
         import guestfs  # type: ignore
@@ -59,9 +59,9 @@ else:
         guestfs = None  # type: ignore
 
 try:
-    import hivex  # type: ignore
+    import hivex
 except ImportError:
-    hivex = None  # type: ignore
+    hivex = None
 
 
 def _safe_logger(self) -> logging.Logger:

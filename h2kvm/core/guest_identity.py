@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 # Canonical Windows detection from your repo (fixers/windows/virtio/core.py)
 try:
-    from h2kvm.fixers.windows.virtio.core import is_windows as _wv_is_windows  # type: ignore
+    from h2kvm.fixers.windows.virtio.core import is_windows as _wv_is_windows
 
     _WIN_VIRTIO_DETECT_OK = True
 except ImportError:  # pragma: no cover
@@ -225,7 +225,7 @@ class GuestDetector:
         if isinstance(mps, (list, tuple)):
             for item in mps:
                 try:
-                    dev, mp = item  # type: ignore[misc]
+                    dev, mp = item
                     if isinstance(dev, str) and isinstance(mp, str):
                         out.append((dev, mp))
                 except (TypeError, ValueError):
@@ -388,7 +388,7 @@ class GuestDetector:
 
         shim = _WvShim(logger=logger, inspect_root=root)
         try:
-            ok = bool(_wv_is_windows(shim, g))  # type: ignore[misc]
+            ok = bool(_wv_is_windows(shim, g))
             return (GuestType.WINDOWS if ok else None, None)
         except Exception as e:  # pylint: disable=broad-exception-caught
             # The external windows_virtio detection module's exception

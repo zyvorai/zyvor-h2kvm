@@ -60,17 +60,17 @@ from h2kvm.core.utils import U
 from h2kvm.fixers.network.dhcp_fallback import ensure_dhcp_fallback
 
 # Delegated fixers (keep OfflineFSFix "thin")
-from .filesystem import fixer as filesystem_fixer  # type: ignore
+from .filesystem import fixer as filesystem_fixer
 from .filesystem.fstab import (
     FstabMode,
     parse_btrfsvol_spec,
 )
 from .injectors import (
-    firstboot_injector,  # type: ignore
-    hostname_config_injector,  # type: ignore
-    network_config_injector,  # type: ignore
-    service_config_injector,  # type: ignore
-    user_config_injector,  # type: ignore
+    firstboot_injector,
+    hostname_config_injector,
+    network_config_injector,
+    service_config_injector,
+    user_config_injector,
 )
 from .offline.config_rewriter import FstabCrypttabRewriter
 
@@ -1880,7 +1880,7 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         if self.resize:
             self.report["analysis"]["image_resize"] = self._run_stage(
                 "image_resize", self._resize_image_container
-            )  # type: ignore
+            )
 
         gk = guestkit_client.migrate_repair(
             self.image,

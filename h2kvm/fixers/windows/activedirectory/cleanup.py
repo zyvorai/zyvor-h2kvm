@@ -13,9 +13,9 @@ from enum import Enum
 from typing import Any, Optional
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 logger = logging.getLogger(__name__)
 

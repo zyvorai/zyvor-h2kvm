@@ -15,7 +15,7 @@ from typing import Any
 from h2kvm.core.exceptions import ManifestError
 
 try:
-    import yaml  # type: ignore
+    import yaml
 
     YAML_AVAILABLE = True
 except ImportError:

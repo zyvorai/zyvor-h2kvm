@@ -22,7 +22,7 @@ try:
     from .libvirt_manager import LIBVIRT_AVAILABLE, LibvirtManager
     from .pool_manager import PoolManager
 except ImportError:
-    LIBVIRT_AVAILABLE = False  # type: ignore
+    LIBVIRT_AVAILABLE = False
     LibvirtManager = None  # type: ignore
     PoolManager = None  # type: ignore
 

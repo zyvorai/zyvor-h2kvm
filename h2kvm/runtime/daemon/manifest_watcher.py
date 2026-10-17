@@ -91,7 +91,7 @@ class ManifestHandler:
 if WATCHDOG_AVAILABLE:
     # Use watchdog for efficient file watching
 
-    class WatchdogManifestHandler(FileSystemEventHandler):  # type: ignore
+    class WatchdogManifestHandler(FileSystemEventHandler):
         """Watchdog-based file system event handler."""
 
         def __init__(self, handler: ManifestHandler):
@@ -116,7 +116,7 @@ if WATCHDOG_AVAILABLE:
             self.processor_callback = processor_callback
             self.handler = ManifestHandler(processor_callback)
             self.fs_handler = WatchdogManifestHandler(self.handler)
-            self.observer = Observer()  # type: ignore
+            self.observer = Observer()
             self._running = False
 
         def start(self):

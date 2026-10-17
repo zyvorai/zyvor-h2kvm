@@ -22,11 +22,11 @@ import tempfile
 from typing import Any
 
 try:
-    import hivex as _hivex_mod  # type: ignore
+    import hivex as _hivex_mod
 
     HIVEX_AVAILABLE = True
 except ImportError:
-    _hivex_mod = None  # type: ignore
+    _hivex_mod = None
     HIVEX_AVAILABLE = False
 
 logger = logging.getLogger(__name__)

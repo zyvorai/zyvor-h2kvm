@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     import logging
 
 try:
-    import yaml  # type: ignore
+    import yaml
 
     YAML_AVAILABLE = True
 except ImportError:

@@ -345,7 +345,7 @@ def _read_structured_file(path: Path) -> dict[str, Any]:
     elif sfx in (".yml", ".yaml"):
         if not YAML_AVAILABLE:
             raise RuntimeError("YAML support not available (PyYAML not installed). Use JSON instead.")
-        parsed = yaml.safe_load(raw)  # type: ignore[attr-defined]
+        parsed = yaml.safe_load(raw)
     else:
         # Try JSON first, then YAML if available (nice UX for no-suffix files)
         try:
@@ -353,7 +353,7 @@ def _read_structured_file(path: Path) -> dict[str, Any]:
         except json.JSONDecodeError:
             if not YAML_AVAILABLE:
                 raise
-            parsed = yaml.safe_load(raw)  # type: ignore[attr-defined]
+            parsed = yaml.safe_load(raw)
     if not isinstance(parsed, dict):
         raise TypeError("top-level config must be a mapping/object (dict)")
     return parsed

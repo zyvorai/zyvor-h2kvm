@@ -98,7 +98,7 @@ _auto_detect_libguestfs_hv()
 
 # Check native guestfs availability (import + supermin appliance)
 try:
-    import guestfs  # type: ignore
+    import guestfs
 
     GUESTFS_AVAILABLE = True
 except ImportError:
@@ -108,7 +108,7 @@ except ImportError:
 def _guestkit_available() -> bool:
     """Return True if the GuestKit Python module is importable."""
     try:
-        import guestkit  # type: ignore  # noqa: F401  # pylint: disable=import-outside-toplevel,unused-import
+        import guestkit  # noqa: F401  # pylint: disable=import-outside-toplevel,unused-import
 
         return True
     except ImportError:
@@ -136,7 +136,7 @@ def _guestfs_appliance_available() -> bool:
 def _create_guestkit() -> Any:
     """Instantiate GuestKit Guestfs (PyO3 bindings)."""
     try:
-        from guestkit import Guestfs  # type: ignore  # pylint: disable=import-outside-toplevel
+        from guestkit import Guestfs  # pylint: disable=import-outside-toplevel
     except ImportError as e:
         raise ImportError(
             "GuestKit backend requested but the 'guestkit' Python module is not installed.\n"

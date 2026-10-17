@@ -31,7 +31,7 @@ from .exceptions import Fatal
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Iterable
 
-    import guestfs  # type: ignore
+    import guestfs
 
 
 def effective_cpu_count() -> int:

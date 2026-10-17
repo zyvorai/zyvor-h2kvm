@@ -19,14 +19,14 @@ from typing import Optional
 # registry/system.py (and appcompat/detector.py) -- kept per-module so each
 # fixer stays independently importable.
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 try:
-    import hivex  # type: ignore
+    import hivex
 except ImportError:
-    hivex = None  # type: ignore
+    hivex = None
 # pylint: enable=duplicate-code
 
 from h2kvm.fixers.windows.registry.encoding import _close_best_effort, _detect_current_controlset

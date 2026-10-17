@@ -268,7 +268,7 @@ class JobSubmitResponse(BaseModel):
     job_id: str = Field(..., description="Unique job identifier")
     state: JobState = Field(..., description="Initial job state")
     message: str = Field(..., description="Human-readable message")
-    queue_position: Optional[int] = Field(None, description="Position in queue (if queued)")
+    queue_position: Optional[int] = Field(default=None, description="Position in queue (if queued)")
 
 
 class JobStatusResponse(BaseModel):
@@ -278,8 +278,8 @@ class JobStatusResponse(BaseModel):
     spec: JobSpec
     state: JobState
     state_history: list[dict[str, Any]] = Field(..., description="State transitions with timestamps")
-    result: Optional[JobResult] = Field(None, description="Final result if completed")
-    latest_event: Optional[ProgressEvent] = Field(None, description="Most recent progress event")
+    result: Optional[JobResult] = Field(default=None, description="Final result if completed")
+    latest_event: Optional[ProgressEvent] = Field(default=None, description="Most recent progress event")
 
 
 class JobListResponse(BaseModel):

@@ -45,9 +45,7 @@ def _refresh_datacenter_cache(client: Any) -> None:
     """Rebuild client's datacenter object/name caches from the inventory."""
     _require_pyvmomi(client)
     content = _content(client)
-    view = content.viewManager.CreateContainerView(  # type: ignore[attr-defined]
-        content.rootFolder, [vim.Datacenter], True
-    )
+    view = content.viewManager.CreateContainerView(content.rootFolder, [vim.Datacenter], True)
     try:
         dcs = list(view.view)
         names = sorted([str(getattr(dc, "name", "")) for dc in dcs if getattr(dc, "name", None)])
@@ -88,9 +86,7 @@ def _refresh_host_cache(client: Any) -> None:
     """Rebuild client's ESXi host name cache from the inventory."""
     _require_pyvmomi(client)
     content = _content(client)
-    view = content.viewManager.CreateContainerView(  # type: ignore[attr-defined]
-        content.rootFolder, [vim.HostSystem], True
-    )
+    view = content.viewManager.CreateContainerView(content.rootFolder, [vim.HostSystem], True)
     try:
         client._host_name_cache = sorted(
             [str(getattr(h, "name", "")) for h in view.view if getattr(h, "name", None)]
@@ -120,9 +116,7 @@ def get_vm_by_name(client: Any, name: str) -> Any:
         return client._vm_obj_by_name_cache[n]
 
     content = _content(client)
-    view = content.viewManager.CreateContainerView(  # type: ignore[attr-defined]
-        content.rootFolder, [vim.VirtualMachine], True
-    )
+    view = content.viewManager.CreateContainerView(content.rootFolder, [vim.VirtualMachine], True)
     try:
         for vm_obj in view.view:
             if getattr(vm_obj, "name", None) == n:
@@ -141,7 +135,7 @@ def vm_to_datacenter(client: Any, vm_obj: Any) -> Any:
     for _ in range(64):
         if obj is None:
             break
-        if isinstance(obj, vim.Datacenter):  # type: ignore[attr-defined]
+        if isinstance(obj, vim.Datacenter):
             return obj
         obj = getattr(obj, "parent", None)
     return None
@@ -350,9 +344,9 @@ def download_datastore_file(
 def wait_for_task(client: Any, task: Any) -> None:
     """Block until a vSphere Task completes, raising VMwareError if it fails."""
     _require_pyvmomi(client)
-    while task.info.state not in (vim.TaskInfo.State.success, vim.TaskInfo.State.error):  # type: ignore[attr-defined]
+    while task.info.state not in (vim.TaskInfo.State.success, vim.TaskInfo.State.error):
         time.sleep(DELAY_STATUS_POLL)
-    if task.info.state == vim.TaskInfo.State.error:  # type: ignore[attr-defined]
+    if task.info.state == vim.TaskInfo.State.error:
         raise VMwareError(f"vSphere task failed: {task.info.error}")
 
 
@@ -412,7 +406,7 @@ def _list_vm_directory_files(client: Any, vm_obj: Any) -> tuple[str, str, list[s
     q.details.modification = True
     q.details.fileType = True
 
-    task = browser.SearchDatastoreSubFolders_Task(search_root, q)  # type: ignore[attr-defined]
+    task = browser.SearchDatastoreSubFolders_Task(search_root, q)
     wait_for_task(client, task)
 
     results = getattr(task.info, "result", None) or []

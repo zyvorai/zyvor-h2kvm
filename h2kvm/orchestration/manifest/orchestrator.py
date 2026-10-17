@@ -20,7 +20,7 @@ try:
 
     _GUESTFS_AVAILABLE = True
 except ImportError:
-    guestfs = None  # type: ignore[assignment]
+    guestfs = None
     _GUESTFS_AVAILABLE = False
 
 

@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 
 try:
-    import yaml  # type: ignore
+    import yaml
 
     YAML_AVAILABLE = True
 except ImportError:
@@ -96,7 +96,7 @@ def _write_atomic_or_plain(
     """
     # If you already have a helper, use it.
     if hasattr(self, "write_file_atomic"):
-        self.write_file_atomic(g, path, data)  # type: ignore[attr-defined]
+        self.write_file_atomic(g, path, data)
         return
 
     # Minimal atomic fallback

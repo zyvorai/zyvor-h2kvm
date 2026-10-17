@@ -214,7 +214,7 @@ class VsphereExporter:
         failures: list[str] = []
 
         # SYNC context manager (no async-with)
-        with VMwareClient(  # type: ignore[misc]
+        with VMwareClient(
             self.logger,
             host=str(creds.host),
             user=str(creds.user),
@@ -253,7 +253,7 @@ class VsphereExporter:
 
                     Log.trace(self.logger, "🧭 export_mode=%s job_dir=%s", export_mode, job_dir)
 
-                    opt = ExportOptions(  # type: ignore[misc]
+                    opt = ExportOptions(
                         vm_name=vm_name,
                         export_mode=export_mode,
                         datacenter=datacenter,
@@ -266,7 +266,7 @@ class VsphereExporter:
                     )
 
                     # This must be SYNC in VMwareClient implementation
-                    out_path = vc.export_vm(opt)  # type: ignore[attr-defined]
+                    out_path = vc.export_vm(opt)
                     Log.trace(self.logger, "📤 export_vm returned: %r", out_path)
 
                     if export_mode == "download_only":

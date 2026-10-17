@@ -60,7 +60,7 @@ try:
 
     PARAMIKO_AVAILABLE = True
 except ImportError:
-    paramiko = None  # type: ignore
+    paramiko = None
     PARAMIKO_AVAILABLE = False
 
 # Pydantic (configuration validation)

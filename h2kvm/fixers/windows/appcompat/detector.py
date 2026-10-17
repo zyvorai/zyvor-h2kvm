@@ -20,14 +20,14 @@ from h2kvm.fixers.windows.registry.io import detect_windows_hive, download_and_o
 
 # pylint: disable=duplicate-code  # shared optional-dependency import boilerplate, also present in registry/firstboot.py
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 try:
-    import hivex  # type: ignore
+    import hivex
 except ImportError:
-    hivex = None  # type: ignore
+    hivex = None
 # pylint: enable=duplicate-code
 
 logger = logging.getLogger(__name__)

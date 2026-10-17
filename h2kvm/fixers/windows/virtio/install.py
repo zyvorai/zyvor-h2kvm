@@ -22,9 +22,9 @@ from pathlib import Path
 from typing import Any
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 from h2kvm.fixers.windows.registry.firstboot import (
     log_firstboot_provision_summary,

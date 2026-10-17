@@ -352,7 +352,7 @@ class OVF:
         """
         try:
             # pylint: disable-next=import-outside-toplevel  # keeps the qemu converter (and its deps) optional for callers that only extract
-            from h2kvm.converters.qemu.converter import Convert  # type: ignore
+            from h2kvm.converters.qemu.converter import Convert
         except ImportError as e:
             U.die(logger, f"QCOW2 conversion requested but Convert could not be imported: {e}", 1)
             raise  # unreachable

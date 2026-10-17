@@ -39,11 +39,11 @@ from h2kvm.core.exceptions import InfrastructureError
 from .libvirt_utils import sanitize_name
 
 try:
-    import libvirt  # type: ignore
+    import libvirt
 
     LIBVIRT_AVAILABLE = True
 except ImportError:
-    libvirt = None  # type: ignore
+    libvirt = None
     LIBVIRT_AVAILABLE = False
 
 

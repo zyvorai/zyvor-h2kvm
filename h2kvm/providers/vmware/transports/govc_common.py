@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 # Optional: use project JSON helpers if present (keeps formatting consistent)
 try:  # pragma: no cover
-    from ....core.utils import U  # type: ignore
+    from ....core.utils import U
 except ImportError:  # pragma: no cover
     U = None  # type: ignore
 

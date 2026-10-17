@@ -17,11 +17,11 @@ the single canonical probe; callers do::
 from __future__ import annotations
 
 try:
-    import hivex  # type: ignore
+    import hivex
 
     HIVEX_AVAILABLE = True
 except ImportError:
-    hivex = None  # type: ignore
+    hivex = None
     HIVEX_AVAILABLE = False
 
 __all__ = ["HIVEX_AVAILABLE", "hivex"]

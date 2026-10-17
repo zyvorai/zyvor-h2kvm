@@ -20,9 +20,9 @@ from pathlib import Path
 from typing import Any
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 from h2kvm.core.utils import U
 from h2kvm.fixers.windows.bitlocker import check_bitlocker_before_migration

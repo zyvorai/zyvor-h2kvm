@@ -77,7 +77,7 @@ except ImportError:
             """Return a no-op context manager."""
             return contextlib.nullcontext()
 
-    class Summary:  # type: ignore
+    class Summary:
         """No-op stand-in for prometheus_client.Summary."""
 
         def __init__(self, *args, **kwargs):

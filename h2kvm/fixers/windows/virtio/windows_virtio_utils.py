@@ -15,9 +15,9 @@ from pathlib import Path
 from typing import Any
 
 try:
-    import guestfs  # type: ignore
+    import guestfs
 except ImportError:
-    guestfs = None  # type: ignore
+    guestfs = None
 
 # Import shared logging utilities (use directly, no wrappers)
 # Import shared guest utilities (use directly, no wrappers)

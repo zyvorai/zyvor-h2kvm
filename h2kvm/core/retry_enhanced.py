@@ -83,7 +83,7 @@ def retry_network_operation(
 
     if TENACITY_AVAILABLE:
         # Use tenacity for advanced retry logic
-        return tenacity_retry(  # type: ignore
+        return tenacity_retry(
             stop=stop_after_attempt(max_attempts),
             wait=wait_exponential(multiplier=1, min=min_wait, max=max_wait),
             retry=retry_if_exception_type(exceptions),
@@ -121,12 +121,12 @@ def retry_vmware_api(
             return vmware_client.get_vm_by_name(vm_name)
     """
     if PYVMOMI_AVAILABLE:
-        exceptions = (vim.fault.NotAuthenticated, ConnectionError, OSError)  # type: ignore
+        exceptions = (vim.fault.NotAuthenticated, ConnectionError, OSError)
     else:
         exceptions = (ConnectionError, OSError)
 
     if TENACITY_AVAILABLE:
-        return tenacity_retry(  # type: ignore
+        return tenacity_retry(
             stop=stop_after_attempt(max_attempts),
             wait=wait_exponential(multiplier=2, min=min_wait, max=max_wait),
             retry=retry_if_exception_type(exceptions),
@@ -164,7 +164,7 @@ def retry_file_operation(
     exceptions = (OSError, IOError)
 
     if TENACITY_AVAILABLE:
-        return tenacity_retry(  # type: ignore
+        return tenacity_retry(
             stop=stop_after_attempt(max_attempts),
             wait=wait_fixed(wait_time),
             retry=retry_if_exception_type(exceptions),

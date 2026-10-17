@@ -51,7 +51,7 @@ def auto_detect_ovmf() -> str:
 
 
 try:
-    from .linux_domain import LinuxDomainConfig, emit_linux_domain  # type: ignore
+    from .linux_domain import LinuxDomainConfig, emit_linux_domain
 
     _LINUX_DOMAIN_OK = True
 except ImportError:  # pragma: no cover
@@ -61,7 +61,7 @@ except ImportError:  # pragma: no cover
 
 
 try:
-    from .windows_domain import WinDomainSpec, render_windows_domain_xml  # type: ignore
+    from .windows_domain import WinDomainSpec, render_windows_domain_xml
 
     _WIN_DOMAIN_OK = True
 except ImportError:  # pragma: no cover
@@ -320,7 +320,7 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
             getattr(args, "win_hyperv", True),
         )
 
-        spec = WinDomainSpec(  # type: ignore[misc]
+        spec = WinDomainSpec(
             name=name,
             img_path=str(img),
             firmware=win_firmware,
@@ -347,7 +347,7 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
             disk_boot_order=getattr(args, "boot_disk_index", None),
         )
 
-        xml = render_windows_domain_xml(spec, stage=stage)  # type: ignore[misc]
+        xml = render_windows_domain_xml(spec, stage=stage)
         xml_path = domain_dir / f"{name}.xml"
         _write_text(xml_path, xml)
         logger.debug("Windows domain XML written: %s (%d bytes)", xml_path, len(xml))
@@ -436,7 +436,7 @@ def emit_from_args(  # pylint: disable=too-many-locals,too-many-branches,too-man
     firmware: Firmware = "uefi" if uefi else "bios"
     # minimal-bios-gui only supports BIOS; auto-switch to default for UEFI
     profile: Profile = "default" if firmware == "uefi" else "minimal-bios-gui"
-    config = LinuxDomainConfig(  # type: ignore[misc]
+    config = LinuxDomainConfig(
         name=name,
         image_path=img,
         out_dir=domain_dir,

@@ -757,7 +757,7 @@ class Flatten:  # pylint: disable=too-few-public-methods  # namespaced static-me
             with contextlib.suppress(Exception):
                 sel.close()
             try:
-                process.stderr.close()  # type: ignore[union-attr]
+                process.stderr.close()
             except Exception:  # pylint: disable=broad-exception-caught  # best-effort cleanup, must not mask the real return value
                 pass
 
@@ -963,7 +963,7 @@ class Fetch:  # pylint: disable=too-few-public-methods  # namespaced static-meth
         ]
         for c in cmds:
             try:
-                cp = run(c)  # type: ignore[misc]
+                cp = run(c)
                 out = getattr(cp, "stdout", None)
                 if out is None:
                     if isinstance(cp, tuple) and len(cp) >= 2:

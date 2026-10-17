@@ -192,7 +192,7 @@ def _redact_in_obj(obj: Any, redact_tokens: set[str]) -> Any:
                     out[k] = _redact_in_obj(v, redact_tokens)
             return out
         if _is_sequence(obj):
-            return obj.__class__(_redact_in_obj(v, redact_tokens) for v in obj)  # type: ignore[misc]
+            return obj.__class__(_redact_in_obj(v, redact_tokens) for v in obj)
         return obj
     except Exception:  # pylint: disable=broad-exception-caught  # best-effort redaction over arbitrary check-result objects, must not crash the suite
         return obj

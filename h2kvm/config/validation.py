@@ -42,18 +42,18 @@ class ConfigValidationError(ConfigurationError):
 # Base configuration classes
 if PYDANTIC_AVAILABLE:
     # Use pydantic for validation
-    class NetworkConfigBase(BaseModel):  # type: ignore
+    class NetworkConfigBase(BaseModel):
         """Network configuration with pydantic validation."""
 
-        model_config = ConfigDict(extra="forbid")  # type: ignore
+        model_config = ConfigDict(extra="forbid")
 
-        interface_name: str = Field(..., pattern=r"^[a-zA-Z][a-zA-Z0-9._-]*$")  # type: ignore
-        mac_address: str | None = Field(None, pattern=r"^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$")  # type: ignore
-        ip_address: str | None = Field(None, pattern=r"^\d{1,3}(\.\d{1,3}){3}$")  # type: ignore
+        interface_name: str = Field(..., pattern=r"^[a-zA-Z][a-zA-Z0-9._-]*$")
+        mac_address: str | None = Field(default=None, pattern=r"^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$")
+        ip_address: str | None = Field(default=None, pattern=r"^\d{1,3}(\.\d{1,3}){3}$")
         gateway: str | None = None
-        dns_servers: list[str] = Field(default_factory=list)  # type: ignore
+        dns_servers: list[str] = Field(default_factory=list)
 
-        @field_validator("dns_servers")  # type: ignore
+        @field_validator("dns_servers")
         @classmethod
         def validate_dns(cls, v):
             """Reject more than 3 DNS servers."""
@@ -63,7 +63,7 @@ if PYDANTIC_AVAILABLE:
                 )
             return v
 
-        @field_validator("ip_address", "gateway")  # type: ignore
+        @field_validator("ip_address", "gateway")
         @classmethod
         def validate_ip(cls, v):
             """Validate an IPv4-formatted address string."""
@@ -192,22 +192,22 @@ class NetworkConfig(NetworkConfigBase):
 # VMware source configuration
 if PYDANTIC_AVAILABLE:
 
-    class VMwareSourceConfigBase(BaseModel):  # type: ignore
+    class VMwareSourceConfigBase(BaseModel):
         """VMware source configuration with pydantic."""
 
-        model_config = ConfigDict(extra="forbid")  # type: ignore
+        model_config = ConfigDict(extra="forbid")
 
         host: str
         username: str
-        password: str = Field(..., repr=False)  # type: ignore
+        password: str = Field(..., repr=False)
         vm_name: str | None = None
         vm_uuid: str | None = None
         datacenter: str | None = None
         datastore: str | None = None
-        port: int = Field(default=443, ge=1, le=65535)  # type: ignore
+        port: int = Field(default=443, ge=1, le=65535)
         verify_ssl: bool = True
 
-        @field_validator("vm_name")  # type: ignore
+        @field_validator("vm_name")
         @classmethod
         def require_identifier(cls, v, info):
             """Require that either vm_name or vm_uuid is set."""
@@ -293,17 +293,17 @@ class VMwareSourceConfig(VMwareSourceConfigBase):
 # Disk configuration
 if PYDANTIC_AVAILABLE:
 
-    class DiskConfigBase(BaseModel):  # type: ignore
+    class DiskConfigBase(BaseModel):
         """Disk configuration with pydantic validation."""
 
-        model_config = ConfigDict(extra="forbid")  # type: ignore
+        model_config = ConfigDict(extra="forbid")
 
         source_path: Path
-        output_format: str = Field(default="qcow2", pattern=r"^(qcow2|raw|vmdk|vhd)$")  # type: ignore
+        output_format: str = Field(default="qcow2", pattern=r"^(qcow2|raw|vmdk|vhd)$")
         compression: bool = True
-        size_gb: int | None = Field(None, ge=1, le=16384)  # type: ignore
+        size_gb: int | None = Field(default=None, ge=1, le=16384)
 
-        @field_validator("source_path")  # type: ignore
+        @field_validator("source_path")
         @classmethod
         def disk_exists(cls, v):
             """Validate that the source path exists and is a regular file."""

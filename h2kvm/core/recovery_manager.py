@@ -99,7 +99,7 @@ def _atomic_write_text(path: Path, text: str, *, encoding: str = "utf-8") -> Non
                 os.close(fd)
         if tmp_name:
             try:
-                Path(tmp_name).unlink(missing_ok=True)  # type: ignore[arg-type]
+                Path(tmp_name).unlink(missing_ok=True)
             except Exception:  # pylint: disable=broad-exception-caught
                 # Best-effort temp-file cleanup; must not mask the real write outcome.
                 pass
@@ -1072,7 +1072,7 @@ class RecoveryManager:  # pylint: disable=too-many-instance-attributes
         self.logger.info("Cleaning %d old checkpoints", len(to_delete))
         for p in to_delete:
             try:
-                p.unlink(missing_ok=True)  # type: ignore[arg-type]
+                p.unlink(missing_ok=True)
                 self.logger.debug("Cleaned old checkpoint: %s", p.name)
             except Exception:  # pylint: disable=broad-exception-caught
                 # Best-effort retention cleanup; a single stuck/missing file must not abort the loop.

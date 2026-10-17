@@ -57,7 +57,7 @@ from .software import add_software_run_key as _add_software_run_key
 if TYPE_CHECKING:
     import logging
 
-    import guestfs  # type: ignore
+    import guestfs
 else:
     try:
         import guestfs  # type: ignore
@@ -65,9 +65,9 @@ else:
         guestfs = None  # type: ignore
 
 try:
-    import hivex  # type: ignore
+    import hivex
 except ImportError:
-    hivex = None  # type: ignore
+    hivex = None
 
 # Logging helper
 

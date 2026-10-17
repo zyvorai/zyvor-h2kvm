@@ -386,7 +386,7 @@ class VHD:  # pylint: disable=too-few-public-methods  # deliberately exposes onl
             # Lazy import: keep vhd.py importable even if the converter module fails,
             # and give a friendly error only when conversion is actually requested.
             # pylint: disable-next=import-outside-toplevel
-            from h2kvm.converters.qemu.converter import Convert  # type: ignore
+            from h2kvm.converters.qemu.converter import Convert
         except Exception as e:
             U.die(logger, f"QCOW2 conversion requested but Convert could not be imported: {e}", 1)
             raise

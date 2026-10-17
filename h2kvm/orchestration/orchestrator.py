@@ -1090,7 +1090,7 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
                 propagate_linux_metadata_from_report,
             )
 
-            self.args.last_fixer_report = report  # type: ignore[attr-defined]
+            self.args.last_fixer_report = report
             propagate_linux_metadata_from_report(self.args, report)
             variant = getattr(self.args, "k8s_os_variant", None)
             pretty = getattr(self.args, "linux_os_pretty_name", None)

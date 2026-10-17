@@ -17,7 +17,7 @@ from h2kvm.core.exceptions import ProfileError
 from .profile_cache import ProfileCache, get_global_cache
 
 try:
-    import yaml  # type: ignore
+    import yaml
 
     YAML_AVAILABLE = True
 except ImportError:

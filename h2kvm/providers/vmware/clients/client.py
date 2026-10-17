@@ -48,7 +48,7 @@ try:
 except ImportError:  # pragma: no cover
     HTTPDownloadClient = None  # type: ignore
     try:
-        from ....core.exceptions import VMwareError  # type: ignore
+        from ....core.exceptions import VMwareError
     except ImportError:  # pragma: no cover
 
         class VMwareError(RuntimeError):
@@ -57,7 +57,7 @@ except ImportError:  # pragma: no cover
 
 # ✅ shared credential resolver (supports vs_password_env + vc_password_env)
 try:
-    from ....core.cred import resolve_vsphere_creds  # type: ignore
+    from ....core.cred import resolve_vsphere_creds
 except ImportError:  # pragma: no cover
     try:
         from ....core.creds import resolve_vsphere_creds  # type: ignore
@@ -66,7 +66,7 @@ except ImportError:  # pragma: no cover
 
 # Optional: vSphere / vCenter integration (pyvmomi)
 try:
-    from pyVim.connect import Disconnect, SmartConnect  # type: ignore
+    from pyVim.connect import Disconnect, SmartConnect
 
     PYVMOMI_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -76,7 +76,7 @@ except ImportError:  # pragma: no cover
 
 # Optional: requests library for HTTP operations (availability probe only; not referenced directly here)
 try:  # pragma: no cover
-    import requests  # type: ignore  # noqa: F401  # pylint: disable=unused-import
+    import requests  # noqa: F401  # pylint: disable=unused-import
 
     REQUESTS_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -84,7 +84,7 @@ except ImportError:  # pragma: no cover
 
 # Optional: silence urllib3 TLS warnings when verify=False (availability probe only)
 try:  # pragma: no cover
-    import urllib3  # type: ignore  # noqa: F401  # pylint: disable=unused-import
+    import urllib3  # noqa: F401  # pylint: disable=unused-import
 except ImportError:  # pragma: no cover
     pass
 
@@ -542,7 +542,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
                 try:
                     # Attempt connection
-                    self.si = SmartConnect(  # type: ignore[misc]
+                    self.si = SmartConnect(
                         host=self.host,
                         user=self.user,
                         pwd=self.password,
@@ -633,7 +633,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         """Disconnect from vSphere/vCenter and clear cached session state."""
         try:
             if self.si is not None:
-                Disconnect(self.si)  # type: ignore[misc]
+                Disconnect(self.si)
         except Exception as e:  # pylint: disable=broad-exception-caught  # pyvmomi raises dynamic/untyped errors; cleanup must still clear local state below
             self.logger.exception("Error during disconnect: %s", e)
         finally:

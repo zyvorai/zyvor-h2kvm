@@ -691,7 +691,7 @@ class AMI:  # pylint: disable=too-few-public-methods  # namespace-style extracto
             # converter subsystem, and turns any import failure into a graceful EX_CONVERT_FAILED
             # error instead of crashing the whole module at import time.
             from h2kvm.converters.qemu.converter import (  # pylint: disable=import-outside-toplevel
-                Convert,  # type: ignore
+                Convert,
             )
         except Exception as e:
             U.die(

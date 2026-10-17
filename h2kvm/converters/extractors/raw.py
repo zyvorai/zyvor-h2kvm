@@ -312,7 +312,7 @@ def safe_extract_one(  # pylint: disable=too-many-arguments,too-many-locals,too-
     try:
         # tmp_path must not already exist, and must not be a symlink
         if tmp_path.exists():
-            tmp_path.unlink(missing_ok=True)  # type: ignore[attr-defined]
+            tmp_path.unlink(missing_ok=True)
         fd = _open_for_write_nofollow(tmp_path, overwrite=False)
 
         with f, os.fdopen(fd, "wb") as out_f:
