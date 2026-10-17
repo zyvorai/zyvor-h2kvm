@@ -55,6 +55,7 @@ from h2kvm.core.guestfs_factory import create_guestfs
 from h2kvm.core.structured_log import PhaseTimer
 from h2kvm.core.sudo import run_sudo
 from h2kvm.core.utils import U
+from h2kvm.fixers.network.dhcp_fallback import ensure_dhcp_fallback
 
 # Delegated fixers (keep OfflineFSFix "thin")
 from .filesystem import fixer as filesystem_fixer  # type: ignore
@@ -1899,7 +1900,9 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         }
         self.logger.info("GuestKit migration repair: %s", gk.get("message", ""))
 
-        if self._has_injectors():
+        # Always reopen the image (unless this is a dry run): besides the user's injectors, a guest that
+        # arrives with no network configuration at all gets a DHCP fallback so it is reachable on first boot.
+        if self._has_injectors() or not self.dry_run:
             g = self.open()
             try:
                 with PhaseTimer(
@@ -1910,8 +1913,15 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
                     "guest_validation_start", "guest_validation_complete", phase="guest_validation"
                 ):
                     self._validate_guest(g)
-                inject_results = self._apply_injectors_only(g)
-                self.report["analysis"]["injectors"] = inject_results
+                if self._has_injectors():
+                    inject_results = self._apply_injectors_only(g)
+                    self.report["analysis"]["injectors"] = inject_results
+                if not self.network_config_inject:
+                    self.report["analysis"]["dhcp_fallback"] = self._run_stage(
+                        "dhcp_fallback",
+                        lambda: ensure_dhcp_fallback(g, self.logger, dry_run=self.dry_run),
+                        default={"installed": False, "reason": "stage failed"},
+                    )
                 if not self.dry_run:
                     self._run_stage("guestfs_sync", g.sync, default=None)
                 self._safe_umount_all(g)

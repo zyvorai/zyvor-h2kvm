@@ -108,3 +108,34 @@ def test_fixer_installs_fallback_when_no_configs_found():
     assert result["dhcp_fallback"]["installed"] is True
     assert NETPLAN_PATH in g.written
     assert "installed a DHCP fallback" in result["recommendations"][0]
+
+
+def test_ensure_installs_when_no_configs(monkeypatch):
+    from h2kvm.fixers.network import dhcp_fallback
+    from h2kvm.fixers.network.discovery import NetworkDiscovery
+
+    monkeypatch.setattr(NetworkDiscovery, "find_network_configs", lambda self, g: [])
+    g = FakeGuest(dirs={"/etc/netplan"})
+    res = dhcp_fallback.ensure_dhcp_fallback(g, LOG)
+    assert res["installed"] is True and NETPLAN_PATH in g.written
+
+
+def test_ensure_leaves_configured_guest_alone(monkeypatch):
+    from h2kvm.fixers.network import dhcp_fallback
+    from h2kvm.fixers.network.discovery import NetworkDiscovery
+
+    monkeypatch.setattr(NetworkDiscovery, "find_network_configs", lambda self, g: [object()])
+    g = FakeGuest(dirs={"/etc/netplan"})
+    res = dhcp_fallback.ensure_dhcp_fallback(g, LOG)
+    assert res["installed"] is False and "already has 1 network configuration" in res["reason"]
+    assert not g.written
+
+
+def test_ensure_skips_windows_like_guest(monkeypatch):
+    from h2kvm.fixers.network import dhcp_fallback
+    from h2kvm.fixers.network.discovery import NetworkDiscovery
+
+    monkeypatch.setattr(NetworkDiscovery, "find_network_configs", lambda self, g: [])
+    g = FakeGuest(files={"/Windows/System32/config/SYSTEM"})
+    res = dhcp_fallback.ensure_dhcp_fallback(g, LOG)
+    assert res["installed"] is False and res["backend"] is None and not g.written
