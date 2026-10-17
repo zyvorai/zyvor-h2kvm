@@ -126,11 +126,9 @@ class ManifestReporter:
     def _get_h2kvm_version(self) -> str:
         """Get h2kvm version."""
         try:
-            # __version__ may not be defined on h2kvm.orchestration; keep this import scoped to
-            # the try/except so a missing attribute here doesn't fail module import for callers who
-            # never need the version string
+            # Lazy: keep the (top-level package) import out of module import time
             # pylint: disable-next=import-outside-toplevel,cyclic-import
-            from h2kvm.orchestration import __version__
+            from h2kvm import __version__
 
             return __version__
         except ImportError:

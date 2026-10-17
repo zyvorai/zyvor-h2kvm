@@ -143,7 +143,7 @@ class OfflineFixConfig:  # pylint: disable=too-many-instance-attributes
     luks_enable: bool = False
     luks_passphrase: str | None = None
     luks_passphrase_env: str | None = None
-    luks_keyfile: Path | None = None
+    luks_keyfile: str | Path | None = None
     luks_mapper_prefix: str = "h2kvm-crypt"
 
     # Filesystem repair
@@ -225,6 +225,9 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         self.recovery_manager = config.recovery_manager
         self.resize = config.resize
         self.virtio_drivers_dir = config.virtio_drivers_dir
+        # Set by DiskProcessor after construction (pipeline-level options)
+        self.initramfs_add_drivers: list[str] | None = None
+        self.serial_console: bool = True
 
         # LUKS configuration
         self.luks_enable = bool(config.luks_enable)

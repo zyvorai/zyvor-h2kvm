@@ -546,6 +546,8 @@ class ManifestOrchestrator:
 
         libvirt_config = self.loader.get_libvirt_integration_config()
 
+        if self.output_dir is None:
+            return {"enabled": False, "reason": "output directory not set"}
         domain_xml_path = self.output_dir / "domain.xml"
         if not domain_xml_path.exists():
             self.logger.warning("⚠️  Domain XML not found: %s", domain_xml_path)

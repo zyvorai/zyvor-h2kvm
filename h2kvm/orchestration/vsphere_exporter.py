@@ -236,15 +236,17 @@ class VsphereExporter:
                                 code=50,
                                 msg=vm_not_found_error(vm_name, vcenter=str(creds.host)),
                             )
-                        # NOTE: VMwareClient does not yet implement create_snapshot()/
-                        # snapshot_moref() (same gap as VsphereCommands.create_snapshot()
-                        # in providers/vmware/vsphere/command.py) -- a known missing
-                        # feature, not guessed at here.
-                        snap_obj = vc.create_snapshot(  # pylint: disable=no-member
-                            vm_obj, name=f"h2kvm-{vm_name}", quiesce=True, memory=False
+                        # VMwareClient does not implement create_snapshot()/snapshot_moref()
+                        # (same gap as VsphereCommands.create_snapshot() in
+                        # providers/vmware/vsphere/command.py). Fail with a clear message
+                        # rather than an AttributeError.
+                        raise VMwareError(
+                            code=50,
+                            msg=(
+                                f"Snapshot creation for '{vm_name}' is not implemented yet; "
+                                "create the snapshot in vSphere and pass its moref via --vs-snapshot-moref"
+                            ),
                         )
-                        snap_moref = vc.snapshot_moref(snap_obj)  # pylint: disable=no-member
-                        self.logger.info("📸 Snapshot created: %s (moref=%s)", vm_name, snap_moref)
 
                     job_dir = out_root / "vsphere-export" / vm_name
                     U.ensure_dir(job_dir)

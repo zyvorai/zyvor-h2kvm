@@ -7,6 +7,7 @@
 # h2kvm/modes/inventory_mode.py
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -224,12 +225,15 @@ class InventoryMode:
             ),
         )
 
-        desc = Fetch.fetch_descriptor_and_extent(
-            self.logger,
-            sshc,
-            remote,
-            fetch_dir,
-            bool(getattr(self.args, "esxi_fetch_all", False)),
+        # Fetch.fetch_descriptor_and_extent is a coroutine; this code path is synchronous
+        desc = asyncio.run(
+            Fetch.fetch_descriptor_and_extent(
+                self.logger,
+                sshc,
+                remote,
+                fetch_dir,
+                bool(getattr(self.args, "esxi_fetch_all", False)),
+            )
         )
 
         item = self._describe_path(Path(desc).resolve())
