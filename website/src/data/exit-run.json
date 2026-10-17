@@ -1,14 +1,31 @@
 {
-  "image": "Alpine 3.24 tiny cloud image",
-  "note": "The Ubuntu 24.04 run replaces these numbers when it is recorded.",
+  "image": "Ubuntu 24.04 cloud image",
+  "note": "One unattended run; see results.json for the raw stages.",
   "passed": 7,
   "total": 7,
-  "seconds": 145,
-  "pingLoss": 0,
+  "seconds": 747,
+  "landed": 2,
   "stages": [
-    {"label": "Export", "seconds": 2, "text": "< 2 s"},
-    {"label": "Convert (h2kvm)", "seconds": 32, "text": "32 s", "accent": true},
-    {"label": "Boot on KVM", "seconds": 35, "text": "35 s"},
-    {"label": "Boot on KubeVirt", "seconds": 75, "text": "75 s"}
+    {
+      "label": "Export",
+      "seconds": 16,
+      "text": "16 s"
+    },
+    {
+      "label": "Convert (h2kvm)",
+      "seconds": 277,
+      "text": "277 s",
+      "accent": true
+    },
+    {
+      "label": "Boot on KVM",
+      "seconds": 79,
+      "text": "79 s"
+    },
+    {
+      "label": "Boot on KubeVirt",
+      "seconds": 335,
+      "text": "335 s"
+    }
   ]
 }

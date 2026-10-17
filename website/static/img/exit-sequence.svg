@@ -53,14 +53,14 @@ svg{--c-fg:#1d1d1f;--c-mut:#6e6e73;--c-line:#c7c7cc;--c-card:#fff;--c-bg2:#f5f5f
 <text x="490.0" y="349" class="fg tm" text-anchor="middle">run, --cmd local --vmdk &lt;disk> --emit-domain-xml</text>
 <rect x="760.0" y="392" width="260" height="30" rx="9" class="chip"/>
 <text x="890" y="412" class="fg ts" text-anchor="middle">inspect, repair, convert, checksum</text>
-<rect x="755.0" y="432" width="270" height="30" rx="9" class="chip"/>
-<text x="890" y="452" class="fg ts" text-anchor="middle">repair skipped on the test image</text>
-<circle cx="769.0" cy="447" r="4" class="or"/>
+<rect x="740.0" y="432" width="300" height="30" rx="9" class="chip"/>
+<text x="890" y="452" class="fg ts" text-anchor="middle">no network config: install DHCP fallback</text>
+<circle cx="754.0" cy="447" r="4" class="or"/>
 <path d="M896 510 L1086 510" class="lnb" marker-end="url(#ab)"/>
 <rect x="896.9" y="484" width="186.20000000000002" height="22" rx="7" class="pill"/>
 <text x="990.0" y="499" class="fg ts" text-anchor="middle">boot the converted disk</text>
 <path d="M1084 560 L96 560" class="ln" marker-end="url(#a)"/>
 <rect x="480" y="534" width="240" height="22" rx="7" class="pill"/>
-<text x="600" y="549" class="fg ts" text-anchor="middle">guest answers ping: 0% loss</text>
-<text x="20" y="624" class="mut ts" text-anchor="start">Real run: 7 of 7 stages, 145 s. The Prism endpoint was a simulator.</text>
+<text x="600" y="549" class="fg ts" text-anchor="middle">guest gets a lease, answers ping</text>
+<text x="20" y="624" class="mut ts" text-anchor="start">Real run (Ubuntu 24.04): 7 of 7 stages, 747 s. The Prism endpoint was a simulator.</text>
 </svg>
