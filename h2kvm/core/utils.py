@@ -23,7 +23,7 @@ import threading
 import time
 from pathlib import Path
 from shutil import which as _which
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NoReturn
 
 from .constants import SIZE_1_MIB
 from .exceptions import Fatal
@@ -80,7 +80,7 @@ class U:
     """Grab-bag of static utility helpers (process running, sizing, paths) used across h2kvm."""
 
     @staticmethod
-    def die(logger: logging.Logger | None, msg: str, code: int = 1) -> None:
+    def die(logger: logging.Logger | None, msg: str, code: int = 1) -> NoReturn:
         """Log an error (if a logger is given) and raise a Fatal with the given exit code."""
         if logger:
             logger.error(msg)

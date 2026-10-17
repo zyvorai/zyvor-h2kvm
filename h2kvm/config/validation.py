@@ -85,8 +85,9 @@ if PYDANTIC_AVAILABLE:
             return v
 
 else:
-    # Fallback to manual validation (stdlib only)
-    class NetworkConfigBase:  # pylint: disable=too-few-public-methods
+    # Fallback to manual validation (stdlib only).
+    # The classes below intentionally redefine the pydantic ones above (type: ignore[no-redef]).
+    class NetworkConfigBase:  # type: ignore[no-redef]  # pylint: disable=too-few-public-methods
         """Network configuration with manual validation (no pydantic).
 
         Mirrors the pydantic model's public surface (dict() + attribute
@@ -222,7 +223,7 @@ if PYDANTIC_AVAILABLE:
 
 else:
 
-    class VMwareSourceConfigBase:  # pylint: disable=too-many-instance-attributes,too-few-public-methods
+    class VMwareSourceConfigBase:  # type: ignore[no-redef]  # pylint: disable=too-many-instance-attributes,too-few-public-methods
         # Mirrors the pydantic model's fields 1:1 (host/username/password/vm identity/
         # datacenter/datastore/port/verify_ssl) and its public surface (dict()); not
         # meant to grow more public methods or shed fields.
@@ -315,7 +316,7 @@ if PYDANTIC_AVAILABLE:
 
 else:
 
-    class DiskConfigBase:  # pylint: disable=too-few-public-methods
+    class DiskConfigBase:  # type: ignore[no-redef]  # pylint: disable=too-few-public-methods
         # Mirrors the pydantic model's public surface (dict() + attribute access);
         # not meant to grow more public methods.
         """Disk configuration with manual validation."""
