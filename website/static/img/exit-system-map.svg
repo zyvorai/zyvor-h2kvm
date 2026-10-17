@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600" role="img" aria-labelledby="t1 d1"><title id="t1">How Transiva, h2kvm and the landing targets fit together</title><desc id="d1">Nutanix Prism v4 is exported by Transiva into a qcow2 and manifest, h2kvm repairs and converts it, and it lands on KVM, KubeVirt with Zorvia (both run), or Kairon and Machina (not run yet). Chimera is a test stand-in for Nutanix.</desc>
+<style>
+svg{--c-fg:#1d1d1f;--c-mut:#6e6e73;--c-line:#c7c7cc;--c-card:#fff;--c-bg2:#f5f5f7;--c-bgp:#fff;--c-blue:#0071e3;--c-blue2:#2997ff;--c-or:#ff6a2a;--c-ok:#1d8a3a;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+@media (prefers-color-scheme:dark){svg{--c-fg:#f5f5f7;--c-mut:#a1a1a6;--c-line:#3a3a3c;--c-card:#111114;--c-bg2:#0b0b0f;--c-bgp:#000;--c-blue:#0a84ff;--c-blue2:#64b5ff;--c-ok:#30d158}}
+.fg{fill:var(--zx-fg,var(--c-fg))}.mut{fill:var(--zx-mut,var(--c-mut))}.ok{fill:var(--zx-ok,var(--c-ok))}.or{fill:var(--c-or)}
+.card{fill:var(--zx-card,var(--c-card));stroke:var(--zx-line,var(--c-line));stroke-width:1.5}
+.hl{fill:var(--zx-card,var(--c-card));stroke:var(--zx-blue,var(--c-blue));stroke-width:2}
+.chip{fill:var(--zx-bg2,var(--c-bg2));stroke:none}.pill{fill:var(--zx-bgp,var(--c-bgp))}
+.dash{stroke-dasharray:7 6}
+.ln{stroke:var(--zx-mut,var(--c-mut));stroke-width:1.6;fill:none}
+.lnb{stroke:var(--zx-blue,var(--c-blue));stroke-width:2.4;fill:none}
+.lnd{stroke:var(--zx-mut,var(--c-mut));stroke-width:1.6;fill:none;stroke-dasharray:6 6}
+.life{stroke:var(--zx-line,var(--c-line));stroke-width:1.5;stroke-dasharray:3 5}
+.ah{fill:var(--zx-mut,var(--c-mut))}.ahb{fill:var(--zx-blue,var(--c-blue))}
+.t{font-size:16px}.tb{font-size:20px;font-weight:700}.ts{font-size:14px}.tm{font-family:Menlo,Consolas,monospace;font-size:14px}.th{font-size:12px;font-weight:700;letter-spacing:.06em}
+</style>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" class="ah"/></marker>
+<marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" class="ahb"/></marker></defs>
+<text x="20" y="36" class="mut th" text-anchor="start">SOURCE</text>
+<rect x="20" y="60" width="190" height="100" rx="16" class="card dash"/>
+<text x="115" y="94" class="fg tb" text-anchor="middle">Chimera</text>
+<text x="115" y="116" class="mut ts" text-anchor="middle">test double (simulator)</text>
+<text x="115" y="136" class="mut ts" text-anchor="middle">Prism v4 + NFS</text>
+<rect x="20" y="250" width="190" height="150" rx="16" class="card"/>
+<text x="115" y="290" class="fg tb" text-anchor="middle">Nutanix</text>
+<text x="115" y="316" class="mut ts" text-anchor="middle">Prism Central v4</text>
+<text x="115" y="338" class="mut ts" text-anchor="middle">storage container</text>
+<text x="115" y="360" class="mut ts" text-anchor="middle">(NFS)</text>
+<path d="M115 160 L115 250" class="lnd" marker-end="url(#a)"/>
+<text x="125" y="210" class="mut ts" text-anchor="start">stands in for</text>
+<text x="260" y="36" class="mut th" text-anchor="start">EXPORT</text>
+<rect x="260" y="215" width="220" height="240" rx="16" class="hl"/>
+<text x="370" y="250" class="fg tb" text-anchor="middle">Transiva</text>
+<text x="370" y="272" class="mut ts" text-anchor="middle">discover and export</text>
+<rect x="280" y="292" width="180" height="30" rx="9" class="chip"/><text x="370.0" y="312" class="fg tm" text-anchor="middle">hyperexport</text>
+<rect x="280" y="332" width="180" height="30" rx="9" class="chip"/><text x="370.0" y="352" class="fg ts" text-anchor="middle">daemon + REST API</text>
+<rect x="280" y="372" width="180" height="30" rx="9" class="chip"/><text x="370.0" y="392" class="fg ts" text-anchor="middle">web dashboard</text>
+<rect x="280" y="412" width="180" height="30" rx="9" class="chip"/><text x="370.0" y="432" class="fg tm" text-anchor="middle">qemu-img convert</text>
+<path d="M210 325 L260 325" class="lnb" marker-end="url(#ab)"/>
+<text x="235" y="312" class="mut ts" text-anchor="middle">v4</text>
+<text x="530" y="36" class="mut th" text-anchor="start">ARTIFACT</text>
+<rect x="530" y="270" width="170" height="130" rx="16" class="card"/>
+<text x="615" y="308" class="fg tb" text-anchor="middle">Artifact</text>
+<rect x="545" y="322" width="140" height="30" rx="9" class="chip"/><text x="615.0" y="342" class="fg tm" text-anchor="middle">disk.qcow2</text>
+<rect x="545" y="358" width="140" height="30" rx="9" class="chip"/><text x="615.0" y="378" class="fg tm" text-anchor="middle">manifest.json</text>
+<path d="M480 335 L530 335" class="lnb" marker-end="url(#ab)"/>
+<text x="750" y="36" class="mut th" text-anchor="start">REPAIR AND CONVERT</text>
+<rect x="750" y="215" width="210" height="240" rx="16" class="hl"/>
+<text x="855" y="250" class="fg tb" text-anchor="middle">h2kvm</text>
+<text x="855" y="272" class="mut ts" text-anchor="middle">first-boot science</text>
+<rect x="770" y="292" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="312" class="fg ts" text-anchor="middle">GuestKit repair</text>
+<rect x="770" y="332" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="352" class="fg ts" text-anchor="middle">convert + checksum</text>
+<rect x="770" y="372" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="392" class="fg ts" text-anchor="middle">domain XML</text>
+<rect x="770" y="412" width="170" height="30" rx="9" class="chip"/><text x="855.0" y="432" class="fg ts" text-anchor="middle">Windows, UEFI: not run</text>
+<path d="M700 335 L750 335" class="lnb" marker-end="url(#ab)"/>
+<text x="1030" y="36" class="mut th" text-anchor="start">LAND</text>
+<rect x="1030" y="60" width="230" height="100" rx="16" class="card"/>
+<text x="1048" y="98" class="fg tb" text-anchor="start">Linux KVM</text>
+<text x="1048" y="122" class="mut ts" text-anchor="start">libvirt: boots, answers ping</text>
+<circle cx="1236" cy="84" r="11" class="ok"/><path d="M1230 84 l4 4 l8 -9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M960 335 C995 335 995 110 1030 110" class="lnb" marker-end="url(#ab)"/>
+<rect x="1030" y="178" width="230" height="100" rx="16" class="card"/>
+<text x="1048" y="216" class="fg tb" text-anchor="start">KubeVirt + Zorvia</text>
+<text x="1048" y="240" class="mut ts" text-anchor="start">Ready, Zorvia lists it</text>
+<circle cx="1236" cy="202" r="11" class="ok"/><path d="M1230 202 l4 4 l8 -9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M960 335 C995 335 995 228 1030 228" class="lnb" marker-end="url(#ab)"/>
+<rect x="1030" y="296" width="230" height="100" rx="16" class="card dash"/>
+<text x="1048" y="334" class="fg tb" text-anchor="start">Kairon</text>
+<text x="1048" y="358" class="mut ts" text-anchor="start">via Veyron: not run yet</text>
+<path d="M960 335 C995 335 995 346 1030 346" class="lnd" marker-end="url(#a)"/>
+<rect x="1030" y="414" width="230" height="100" rx="16" class="card dash"/>
+<text x="1048" y="452" class="fg tb" text-anchor="start">Machina</text>
+<text x="1048" y="476" class="mut ts" text-anchor="start">libvirt host: not run yet</text>
+<path d="M960 335 C995 335 995 464 1030 464" class="lnd" marker-end="url(#a)"/>
+<rect x="20" y="528" width="1240" height="52" rx="12" class="chip"/>
+<circle cx="46" cy="554" r="8" class="ok"/><text x="62" y="559" class="mut ts" text-anchor="start">run end to end</text>
+<rect x="210" y="546" width="30" height="16" rx="5" class="card dash"/><text x="250" y="559" class="mut ts" text-anchor="start">not run yet, or a test stand-in</text>
+<text x="560" y="559" class="mut ts" text-anchor="start">Chimera stands in for a real Prism in tests.</text>
+</svg>
