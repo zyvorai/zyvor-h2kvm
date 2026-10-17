@@ -404,6 +404,7 @@ def _list_vm_directory_files(client: Any, vm_obj: Any) -> tuple[str, str, list[s
     search_root = f"[{ds_name}] {folder_rel}" if folder_rel else f"[{ds_name}]"
     browser = _get_vm_datastore_browser(client, vm_obj)
 
+    # pylint: disable=c-extension-no-member  # pyVmomi.vim types are generated at runtime, invisible to static analysis
     q = vim.HostDatastoreBrowserSearchSpec()  # type: ignore[attr-defined]
     q.matchPattern = ["*"]
     q.details = vim.HostDatastoreBrowserFileInfoDetails()  # type: ignore[attr-defined]

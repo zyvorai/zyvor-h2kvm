@@ -21,6 +21,7 @@ from typing import Literal
 
 from h2kvm.core.xml_utils import xml_escape as _xml
 
+from .firmware import resolve_ovmf_code, resolve_ovmf_vars
 from .libvirt_utils import (
     find_qemu_binary,
     sanitize_name as _sanitize_name,
@@ -412,8 +413,6 @@ def _render_minimal_bios_gui_xml(spec: LinuxDomainSpec) -> str:
 
 
 def _default_ovmf_vars_template() -> Path | None:
-    from .firmware import resolve_ovmf_vars
-
     return resolve_ovmf_vars()
 
 
@@ -890,8 +889,6 @@ def emit_linux_domain(config: LinuxDomainConfig) -> LinuxDomainPaths:
     ovmf_vars_template = config.ovmf_vars_template
 
     if config.firmware == "uefi":
-        from .firmware import resolve_ovmf_code
-
         resolved_code = resolve_ovmf_code(config.ovmf_code)
         if resolved_code is None:
             raise FileNotFoundError(

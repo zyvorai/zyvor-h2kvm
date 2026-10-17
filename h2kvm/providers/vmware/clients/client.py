@@ -20,6 +20,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from h2kvm.core.retry_decorator import api_retry
+from h2kvm.core.structured_log import log_event
 from h2kvm.providers.vmware.utils.compat import vim
 
 # govc helpers (single source of truth)
@@ -85,9 +87,6 @@ try:  # pragma: no cover
     import urllib3  # type: ignore  # noqa: F401  # pylint: disable=unused-import
 except ImportError:  # pragma: no cover
     pass
-
-from h2kvm.core.retry_decorator import api_retry
-from h2kvm.core.structured_log import log_event
 
 _BACKING_RE = re.compile(r"\[(.+?)\]\s+(.*)")
 
@@ -160,7 +159,7 @@ class ExportOptions:  # pylint: disable=too-many-instance-attributes  # models e
 
 
 # Import ovftool operations
-from h2kvm.providers.vmware.transports.ovftool_loader import (  # pylint: disable=wrong-import-position
+from h2kvm.providers.vmware.transports.ovftool_loader import (  # pylint: disable=wrong-import-position,ungrouped-imports  # deliberately after the config dataclass
     _build_ovftool_source_url as _ovftool_build_ovftool_source_url,
     _ovftool_deploy_options as _ovftool_ovftool_deploy_options,
     _ovftool_export_options as _ovftool_ovftool_export_options,

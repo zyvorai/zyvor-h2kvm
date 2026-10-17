@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import os
 import shutil
+import warnings
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -159,7 +160,7 @@ def _normalize_backend(backend: str) -> str:
 
 def create_guestfs(
     *,
-    python_return_dict: bool = True,
+    python_return_dict: bool = True,  # pylint: disable=unused-argument  # kept for call-site compatibility; GuestKit ignores it
     backend: str | None = None,
     conversion_dir: str | None = None,
     allowed_dirs: list[str] | None = None,
@@ -207,8 +208,6 @@ def create_guestfs(
     if env_backend:
         backend = env_backend.lower()
         if backend in ("vmcraft", "namespace"):
-            import warnings
-
             warnings.warn(
                 f"backend '{backend}' is deprecated; use 'guestkit'",
                 DeprecationWarning,

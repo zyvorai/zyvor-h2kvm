@@ -3,6 +3,7 @@
 # https://zyvor.dev · info@zyvor.dev
 
 # pylint: disable=too-many-lines  # cohesive offline-fixing orchestrator; splitting would fragment the fix pipeline
+# pylint: disable=broad-exception-caught  # every fix stage is best-effort: errors are recorded in the report, never abort the migration
 """
 Offline guest fixing for migrated VMs.
 
@@ -50,6 +51,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 # chain), the top-level h2kvm package is already fully initialized in
 # sys.modules -- this import cannot actually trigger a circular ImportError.
 from h2kvm import __version__  # pylint: disable=cyclic-import
+from h2kvm.core import guestkit_client
 from h2kvm.core.constants import DEFAULT_CONTAINER_ISOLATION
 from h2kvm.core.guestfs_factory import create_guestfs
 from h2kvm.core.structured_log import PhaseTimer
@@ -306,11 +308,11 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
         try:
             yield
         finally:
-            dt = time.time() - t0
-            self._timings[name] = dt
+            elapsed = time.time() - t0
+            self._timings[name] = elapsed
             try:
                 self.report.setdefault("analysis", {}).setdefault("stages", {})[name] = {
-                    "duration_s": round(dt, 6),
+                    "duration_s": round(elapsed, 6),
                 }
             except (KeyError, TypeError) as e:
                 self.logger.debug(f"Failed to record stage timing for {name}: {e}")
@@ -1865,8 +1867,6 @@ class OfflineFSFix:  # pylint: disable=too-many-instance-attributes,too-many-pub
 
     def _run_guestkit_pipeline(self) -> None:
         """Delegate boot/fstab/grub/virtio repair to GuestKit; run injectors locally."""
-        from h2kvm.core import guestkit_client
-
         if self.backend == "guestfs":
             self.logger.warning("backend 'guestfs' is ignored; h2kvm uses GuestKit only")
 

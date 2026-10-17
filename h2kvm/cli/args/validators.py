@@ -375,7 +375,8 @@ def validate_deploy_exclusive(args: argparse.Namespace, conf: dict[str, Any]) ->
         )
     if deploy_kairon and (deploy_k8s or deploy_openstack):
         raise SystemExit(
-            "deploy_kairon is mutually exclusive with deploy_k8s and deploy_openstack; enable only one remote deploy target."
+            "deploy_kairon is mutually exclusive with deploy_k8s and deploy_openstack; "
+            "enable only one remote deploy target."
         )
     if deploy_kairon and libvirt_on:
         raise SystemExit(

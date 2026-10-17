@@ -6,15 +6,18 @@
 
 from __future__ import annotations
 
+import importlib
 from pathlib import Path
 from typing import Any
 
 from h2kvm.core.guestfs_factory import create_guestfs
 
 
-def _require_guestkit():
+def _guestkit() -> Any:
+    """Import and return the optional ``guestkit`` module (typed Any: native extension)."""
     try:
-        import guestkit  # noqa: F401
+        # import_module (not an import statement): the native extension exposes no static members
+        return importlib.import_module("guestkit")
     except ImportError as exc:
         raise ImportError(
             "GuestKit is required for offline disk operations.\n"
@@ -25,7 +28,7 @@ def _require_guestkit():
 
 def open_guest(path: str | Path, *, backend: str = "guestkit") -> Any:
     """Return a GuestFS-compatible handle for *path*."""
-    _require_guestkit()
+    _guestkit()
     g = create_guestfs(backend=backend)
     g.add_drive_ro(str(path))
     g.launch()
@@ -40,10 +43,7 @@ def doctor(
     verbose: bool = False,
 ) -> dict[str, Any]:
     """Run GuestKit bootability doctor."""
-    _require_guestkit()
-    import guestkit
-
-    return guestkit.run_doctor(str(path), target=target, explain=explain, verbose=verbose)
+    return _guestkit().run_doctor(str(path), target=target, explain=explain, verbose=verbose)
 
 
 def boot_inspect(
@@ -53,10 +53,7 @@ def boot_inspect(
     verbose: bool = False,
 ) -> dict[str, Any]:
     """Summarize boot-related guest state from an offline disk."""
-    _require_guestkit()
-    import guestkit
-
-    return guestkit.run_boot_inspect(str(path), target=target, verbose=verbose)
+    return _guestkit().run_boot_inspect(str(path), target=target, verbose=verbose)
 
 
 def migrate_plan(
@@ -68,10 +65,7 @@ def migrate_plan(
     export_fix_plan: bool = False,
 ) -> dict[str, Any]:
     """Generate a hypervisor-aware migration plan."""
-    _require_guestkit()
-    import guestkit
-
-    return guestkit.run_migrate_plan(
+    return _guestkit().run_migrate_plan(
         str(path),
         target=target,
         explain=explain,
@@ -89,10 +83,7 @@ def repair_boot(
     validate_fstab: bool = False,
 ) -> dict[str, Any]:
     """Generate or apply a boot repair plan (fstab/grub/initramfs)."""
-    _require_guestkit()
-    import guestkit
-
-    return guestkit.run_repair_plan(
+    return _guestkit().run_repair_plan(
         str(path),
         dry_run=dry_run,
         verbose=verbose,
@@ -101,6 +92,7 @@ def repair_boot(
     )
 
 
+# pylint: disable-next=too-many-arguments  # keyword-only mirror of guestkit.run_migrate_repair
 def migrate_repair(
     path: str | Path,
     *,
@@ -111,10 +103,7 @@ def migrate_repair(
     verbose: bool = False,
 ) -> dict[str, Any]:
     """Generate or apply a hypervisor-aware migration repair plan."""
-    _require_guestkit()
-    import guestkit
-
-    return guestkit.run_migrate_repair(
+    return _guestkit().run_migrate_repair(
         str(path),
         target=target,
         apply=apply,
@@ -133,8 +122,5 @@ def convert_disk(
     flatten: bool = True,
 ) -> dict[str, Any]:
     """Convert a disk image using GuestKit DiskConverter."""
-    _require_guestkit()
-    from guestkit import DiskConverter
-
-    converter = DiskConverter()
+    converter = _guestkit().DiskConverter()
     return converter.convert(str(source), str(output), fmt, compress=compress, flatten=flatten)
