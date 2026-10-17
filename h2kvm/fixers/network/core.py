@@ -13,6 +13,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from .backend import NetworkFixersBackend
+from .dhcp_fallback import install_dhcp_fallback
 from .discovery import NetworkDiscovery
 from .model import FixLevel, FixResult, NetworkConfig, NetworkConfigType
 from .topology import NetworkTopology
@@ -139,6 +140,7 @@ class NetworkFixer:  # pylint: disable=too-many-instance-attributes  # orchestra
         configs = self.discovery.find_network_configs(g)
         if not configs:
             self.logger.info("No network configuration files found")
+            fallback = install_dhcp_fallback(g, self.logger, dry_run=self.dry_run)
             return {
                 "stats": {
                     "total_files": 0,
@@ -151,8 +153,13 @@ class NetworkFixer:  # pylint: disable=too-many-instance-attributes  # orchestra
                     "details": [],
                 },
                 "warnings": [],
+                "dhcp_fallback": fallback,
                 "recommendations": [
-                    "No network configuration files found. Manual network setup may be required."
+                    (
+                        f"No network configuration files found; installed a DHCP fallback at {fallback['path']}."
+                        if fallback["installed"]
+                        else "No network configuration files found. Manual network setup may be required."
+                    )
                 ],
             }
 
