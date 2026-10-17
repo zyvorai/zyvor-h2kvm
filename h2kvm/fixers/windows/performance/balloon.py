@@ -55,7 +55,7 @@ def configure_balloon_driver(  # pylint: disable=too-many-locals
     """
     logger.info("Configuring VirtIO balloon driver")
 
-    results = {
+    results: dict[str, Any] = {
         "success": False,
         "balloon_configured": False,
         "memory_stats_interval": memory_stats_interval,

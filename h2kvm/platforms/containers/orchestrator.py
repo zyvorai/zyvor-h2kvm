@@ -57,7 +57,7 @@ class ContainerExtractionOrchestrator:
         Returns:
             Extraction result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "success": False,
             "runtime_detected": None,
             "containers_found": 0,
@@ -119,7 +119,12 @@ class ContainerExtractionOrchestrator:
         self, vmcraft_instance, runtime: ContainerRuntime, containers: list, output_dir: Path
     ) -> dict[str, Any]:
         """Extract containers for Kubernetes deployment."""
-        result = {"success": False, "containers_extracted": 0, "manifests_generated": [], "errors": []}
+        result: dict[str, Any] = {
+            "success": False,
+            "containers_extracted": 0,
+            "manifests_generated": [],
+            "errors": [],
+        }
 
         try:
             # Select appropriate extractor
@@ -195,7 +200,12 @@ class ContainerExtractionOrchestrator:
         self, vmcraft_instance, runtime: ContainerRuntime, containers: list, output_dir: Path
     ) -> dict[str, Any]:
         """Extract containers for Docker environment."""
-        result = {"success": False, "containers_extracted": 0, "manifests_generated": [], "errors": []}
+        result: dict[str, Any] = {
+            "success": False,
+            "containers_extracted": 0,
+            "manifests_generated": [],
+            "errors": [],
+        }
 
         try:
             # Select appropriate extractor

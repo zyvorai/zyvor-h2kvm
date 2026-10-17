@@ -281,7 +281,7 @@ class FilesystemUUIDRegenerator:
         Only returns LVM LVs, never plain partitions.
         Skips swap volumes (handled separately).
         """
-        devices = []
+        devices: list[Any] = []
         try:
             lvs = g.lvs()
         except Exception:  # pylint: disable=broad-exception-caught  # no LVM support is a normal, expected outcome

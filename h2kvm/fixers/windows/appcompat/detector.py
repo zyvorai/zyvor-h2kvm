@@ -192,7 +192,7 @@ def detect_hardware_dependent_apps(g: "guestfs.GuestFS", root: str) -> list[AppC
     """
     logger.info("Scanning for hardware-dependent applications")
 
-    findings = []
+    findings: list[Any] = []
 
     try:
         software_path = detect_windows_hive(g, root, "SOFTWARE")
@@ -235,7 +235,7 @@ def _scan_uninstall_key(hive: "hivex.Hivex", uninstall_path: str) -> list[AppCom
     Returns:
         List of findings for detected applications
     """
-    findings = []
+    findings: list[Any] = []
 
     try:
         root = hive.root()
@@ -357,7 +357,7 @@ def detect_license_services(  # pylint: disable=too-many-locals  # single-pass S
     """
     logger.info("Scanning for license manager services")
 
-    findings = []
+    findings: list[Any] = []
 
     # pylint: disable=duplicate-code
     # reason: SYSTEM-hive open + current-controlset resolution mirrors the

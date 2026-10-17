@@ -15,6 +15,7 @@ import json
 import logging
 import sys
 from pathlib import Path
+from typing import Any
 
 from .boot import (
     BootEnvironment,
@@ -138,7 +139,7 @@ def cmd_analyze_boot(args):
     """Analyze boot performance"""
     analyzer = BootPerformanceAnalyzer()
 
-    results = {}
+    results: dict[str, Any] = {}
 
     # Get boot time
     boot_time = analyzer.get_boot_time()

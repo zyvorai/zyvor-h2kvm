@@ -130,7 +130,7 @@ class ContainerDetector:
 
     def _detect_docker_containers(self, g) -> list[ContainerInfo]:
         """Detect Docker containers."""
-        containers = []
+        containers: list[Any] = []
 
         # Check if Docker is installed
         if not any(g.exists(p) for p in ("/usr/bin/docker", "/usr/local/bin/docker", "/bin/docker")):
@@ -275,7 +275,7 @@ class ContainerDetector:
 
     def _detect_podman_containers(self, g) -> list[ContainerInfo]:
         """Detect Podman containers."""
-        containers = []
+        containers: list[Any] = []
 
         # Check if Podman is installed
         if not any(g.exists(p) for p in ("/usr/bin/podman", "/usr/local/bin/podman", "/bin/podman")):
@@ -317,7 +317,7 @@ class ContainerDetector:
         Returns:
             List of detected containers
         """
-        containers = []
+        containers: list[Any] = []
 
         # Podman stores container config in overlay-containers directory
         containers_dir = f"{storage_root}/overlay-containers"
@@ -512,7 +512,7 @@ class ContainerDetector:
         Returns:
             Summary dict
         """
-        summary = {
+        summary: dict[str, Any] = {
             "total_containers": len(containers),
             "by_runtime": {},
             "by_image": {},

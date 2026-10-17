@@ -51,7 +51,7 @@ def detect_bitlocker(g: guestfs.GuestFS, root: str) -> dict[str, Any]:
     Raises:
         WindowsFixerError: If BitLocker is detected (blocks migration)
     """
-    result = {
+    result: dict[str, Any] = {
         "bitlocker_detected": False,
         "encrypted_volumes": [],
         "protection_status": {},
@@ -235,7 +235,7 @@ def _check_bitlocker_registry(g: guestfs.GuestFS, root: str) -> dict[str, Any]:
         HKLM\\SYSTEM\\CurrentControlSet\\Services\\BDESVC (BitLocker Drive Encryption Service)
         HKLM\\SOFTWARE\\Policies\\Microsoft\\FVE (Full Volume Encryption policies)
     """
-    result = {"found": False, "volumes": [], "status": {}}
+    result: dict[str, Any] = {"found": False, "volumes": [], "status": {}}
 
     try:
         # Check for BitLocker service (BDESVC)

@@ -12,7 +12,7 @@ import logging
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 # pylint: disable=duplicate-code
 # reason: shared optional-dependency import boilerplate, also present in
@@ -80,7 +80,7 @@ def detect_sql_server_instances(g: "guestfs.GuestFS", root: str) -> list[SQLServ
     """
     logger.info("Detecting SQL Server instances")
 
-    instances = []
+    instances: list[Any] = []
 
     try:
         software_path = detect_windows_hive(g, root, "SOFTWARE")
@@ -127,7 +127,7 @@ def _scan_sql_instances(  # pylint: disable=too-many-locals  # enumerates instan
     Returns:
         List of detected instances
     """
-    instances = []
+    instances: list[Any] = []
 
     try:
         root_node = hive.root()

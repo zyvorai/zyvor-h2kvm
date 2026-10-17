@@ -60,7 +60,7 @@ def enable_msi_interrupts(
     # reason: mirrors the results-dict-init + SYSTEM-hive-lookup-guard shape
     # in h2kvm/fixers/windows/performance/trim.py's enable_trim_discard()
     # -- coincidental, each fixer's results dict has different keys.
-    results = {
+    results: dict[str, Any] = {
         "success": False,
         "devices_configured": [],
         "devices_skipped": [],

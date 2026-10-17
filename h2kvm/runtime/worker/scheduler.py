@@ -17,6 +17,7 @@ import threading
 from collections import deque
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from .schemas import JobSpec, JobState, WorkerCapabilities
 from .state_machine import JobRegistry
@@ -127,7 +128,7 @@ class JobQueue:
 
     def list_jobs(self) -> list[JobSpec]:
         """List all jobs in queue (in priority order)."""
-        jobs = []
+        jobs: list[Any] = []
         with self._lock:
             for priority in sorted(self._queues.keys()):
                 jobs.extend(self._queues[priority])

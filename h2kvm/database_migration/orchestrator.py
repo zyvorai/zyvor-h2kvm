@@ -115,7 +115,7 @@ class DatabaseMigrationOrchestrator:
         """
         self.logger.info("Running pre-migration health checks...")
 
-        results = {"all_healthy": True, "checks": [], "critical_errors": [], "warnings": []}
+        results: dict[str, Any] = {"all_healthy": True, "checks": [], "critical_errors": [], "warnings": []}
 
         for db_info in databases:
             handler = self.get_handler(db_info)
@@ -161,7 +161,12 @@ class DatabaseMigrationOrchestrator:
         """
         self.logger.info("Quiescing databases for snapshot...")
 
-        results = {"success": True, "databases": [], "total_duration_seconds": 0.0, "errors": []}
+        results: dict[str, Any] = {
+            "success": True,
+            "databases": [],
+            "total_duration_seconds": 0.0,
+            "errors": [],
+        }
 
         for db_info in databases:
             handler = self.get_handler(db_info)
@@ -295,7 +300,7 @@ class DatabaseMigrationOrchestrator:
         """
         self.logger.info("Generating KVM performance tuning recommendations...")
 
-        results = {"databases": [], "all_applied": [], "all_recommended": []}
+        results: dict[str, Any] = {"databases": [], "all_applied": [], "all_recommended": []}
 
         for db_info in databases:
             handler = self.get_handler(db_info)
@@ -414,7 +419,7 @@ class DatabaseMigrationOrchestrator:
         """
         self.logger.info("Starting database-aware migration workflow...")
 
-        result = {
+        result: dict[str, Any] = {
             "success": False,
             "databases_detected": 0,
             "health_checks_passed": False,

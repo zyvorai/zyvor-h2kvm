@@ -266,7 +266,7 @@ class BackupRestoreOrchestrator:
             print(f"Verified {summary['total_vms']} VMs")
             print(f"Valid: {summary['valid_vms']}, Invalid: {summary['invalid_vms']}")
         """
-        summary = {
+        summary: dict[str, Any] = {
             "total_sources": len(self._sources),
             "total_vms": 0,
             "valid_vms": 0,
@@ -342,7 +342,7 @@ class BackupRestoreOrchestrator:
         # Sort VMs by size (smallest first)
         sorted_vms = sorted(vms, key=lambda x: x[1].backup_size_gb if x else 0)
 
-        plan = {
+        plan: dict[str, Any] = {
             "total_vms": len(vms),
             "vms_in_plan": 0,
             "total_size_gb": 0.0,

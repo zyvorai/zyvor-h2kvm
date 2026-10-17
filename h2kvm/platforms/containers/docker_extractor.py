@@ -52,7 +52,7 @@ class DockerExtractor:
         Returns:
             Export result dict
         """
-        result = {"success": False, "image_file": None, "image_size_mb": 0.0, "errors": []}
+        result: dict[str, Any] = {"success": False, "image_file": None, "image_size_mb": 0.0, "errors": []}
 
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -92,7 +92,7 @@ class DockerExtractor:
         Returns:
             Generation result dict
         """
-        result = {"success": False, "dockerfile": None, "errors": []}
+        result: dict[str, Any] = {"success": False, "dockerfile": None, "errors": []}
 
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -180,7 +180,7 @@ class DockerExtractor:
         Returns:
             Generation result dict
         """
-        result = {"success": False, "compose_file": None, "errors": []}
+        result: dict[str, Any] = {"success": False, "compose_file": None, "errors": []}
 
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -244,7 +244,7 @@ class DockerExtractor:
 
                 # Resources
                 if container.memory_limit or container.cpu_shares:
-                    deploy = {"resources": {"limits": {}}}
+                    deploy: dict[str, Any] = {"resources": {"limits": {}}}
                     if container.memory_limit:
                         deploy["resources"]["limits"]["memory"] = container.memory_limit
                     if container.cpu_shares:
@@ -328,7 +328,12 @@ class DockerExtractor:
         Returns:
             Export result dict
         """
-        result = {"success": False, "volumes_exported": [], "total_size_mb": 0.0, "errors": []}
+        result: dict[str, Any] = {
+            "success": False,
+            "volumes_exported": [],
+            "total_size_mb": 0.0,
+            "errors": [],
+        }
 
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)

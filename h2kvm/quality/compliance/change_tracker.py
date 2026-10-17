@@ -304,7 +304,7 @@ class ChangeTracker:
         Returns:
             List of matching Change objects
         """
-        changes = []
+        changes: list[Any] = []
 
         try:
             if not self.change_file.exists():
@@ -351,7 +351,7 @@ class ChangeTracker:
         """
         changes = self.get_changes()
 
-        summary = {
+        summary: dict[str, Any] = {
             "total_changes": len(changes),
             "by_type": {},
             "reversible_count": 0,

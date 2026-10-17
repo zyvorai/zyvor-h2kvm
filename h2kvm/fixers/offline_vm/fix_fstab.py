@@ -24,7 +24,7 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .utils import (
     create_backup,
@@ -160,7 +160,13 @@ class FstabFixer:
         """
         self.logger.info("Starting fstab fix: mode=%s, dry_run=%s", self.mode.value, self.dry_run)
 
-        results = {"success": False, "backup_path": None, "stats": {}, "warnings": [], "errors": []}
+        results: dict[str, Any] = {
+            "success": False,
+            "backup_path": None,
+            "stats": {},
+            "warnings": [],
+            "errors": [],
+        }
 
         # Validate fstab exists
         if not self.fstab_path.exists():

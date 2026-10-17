@@ -25,7 +25,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .utils import create_backup, detect_os_from_root, run_command
 
@@ -141,7 +141,7 @@ class InitramfsFixer:
         """
         self.logger.info("Starting initramfs fix: dry_run=%s, force=%s", self.dry_run, self.force_rebuild)
 
-        results = {"success": False, "stats": {}, "warnings": [], "errors": []}
+        results: dict[str, Any] = {"success": False, "stats": {}, "warnings": [], "errors": []}
 
         try:
             # Step 1: Detect OS and tool

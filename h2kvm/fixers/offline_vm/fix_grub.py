@@ -25,7 +25,7 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .utils import create_backup, detect_os_from_root, run_command
 
@@ -115,7 +115,7 @@ class GrubFixer:  # pylint: disable=too-many-instance-attributes  # tracks detec
         """
         self.logger.info("Starting GRUB fix: boot_disk=%s, dry_run=%s", self.boot_disk, self.dry_run)
 
-        results = {"success": False, "stats": {}, "warnings": [], "errors": []}
+        results: dict[str, Any] = {"success": False, "stats": {}, "warnings": [], "errors": []}
 
         try:
             # Step 1: Detect OS, boot mode, GRUB version

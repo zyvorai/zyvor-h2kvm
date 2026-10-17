@@ -21,7 +21,7 @@ import traceback
 import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
 from ...core.guestfs_factory import create_guestfs
 from .capabilities import CapabilityDetector, CapabilityLevel, get_detector
@@ -787,7 +787,7 @@ class WorkerEngine:
                     entry["uuid"] = None
                 filesystems.append(entry)
 
-            lvm = {
+            lvm: dict[str, Any] = {
                 "physical_volumes": [],
                 "volume_groups": [],
                 "logical_volumes": [],

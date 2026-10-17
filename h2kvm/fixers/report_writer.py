@@ -435,7 +435,7 @@ def _md_build_validation_section(
     critical_failed: list[str],
 ) -> list[str]:
     """Build validation section of markdown report."""
-    md = []
+    md: list[str] = []
     if validation_payload is None:
         return md
 
@@ -471,7 +471,7 @@ def _md_build_fstab_table(
     analysis: dict[str, Any],
 ) -> list[str]:
     """Build fstab changes table."""
-    md = []
+    md: list[str] = []
     fstab_changes = sections.get("fstab_changes", []) or []
     if not fstab_changes:
         return md

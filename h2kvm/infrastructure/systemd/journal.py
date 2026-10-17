@@ -14,7 +14,7 @@ import logging
 import time
 from collections.abc import Iterator
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Optional
 
 try:
     # This imports the third-party python-systemd package (systemd.journal),
@@ -240,7 +240,7 @@ class JournalMonitor:
         if not self.reader:
             return {}
 
-        report = {
+        report: dict[str, Any] = {
             "total_operations": 0,
             "successful": 0,
             "failed": 0,

@@ -16,7 +16,7 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 try:
     import psutil
@@ -258,7 +258,7 @@ class SystemdResourceControl:
         Returns:
             Dictionary of current limits
         """
-        limits = {}
+        limits: dict[str, Any] = {}
         cgroup_path = self.get_cgroup_path(pid)
 
         if not cgroup_path:

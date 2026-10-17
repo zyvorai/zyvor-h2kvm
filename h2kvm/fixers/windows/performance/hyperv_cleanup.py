@@ -76,7 +76,7 @@ def cleanup_hyperv_enlightenments(
     """
     logger.info("Checking for Hyper-V enlightenments")
 
-    results = {
+    results: dict[str, Any] = {
         "success": False,
         "hyperv_detected": False,
         "services_disabled": [],

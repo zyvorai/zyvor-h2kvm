@@ -274,7 +274,7 @@ class DatabaseDetector:
 
     def _parse_mysql_config(self, config_content: str) -> dict[str, Any]:
         """Parse MySQL/MariaDB configuration file."""
-        config = {}
+        config: dict[str, Any] = {}
         current_section = None
 
         # pylint: disable=duplicate-code
@@ -344,7 +344,7 @@ class DatabaseDetector:
                     "requires_special_handling": list[str]
                 }
         """
-        summary = {
+        summary: dict[str, Any] = {
             "total_databases": len(databases),
             "by_engine": {},
             "total_size_mb": 0.0,

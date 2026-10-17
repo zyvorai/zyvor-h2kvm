@@ -6,6 +6,7 @@
 
 import tempfile
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -85,7 +86,7 @@ def create_network_config(
     Returns:
         Path to network config file
     """
-    config = {"version": 2, "ethernets": {"eth0": {}}}
+    config: dict[str, Any] = {"version": 2, "ethernets": {"eth0": {}}}
 
     if static_ip:
         config["ethernets"]["eth0"]["addresses"] = [static_ip]

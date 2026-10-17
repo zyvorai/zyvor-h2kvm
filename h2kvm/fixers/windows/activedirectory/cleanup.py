@@ -75,7 +75,7 @@ def stage_cleanup_script(  # pylint: disable=too-many-arguments,too-many-positio
     """
     logger.info("Staging AD cleanup script for %s", old_computer_name)
 
-    results = {
+    results: dict[str, Any] = {
         "success": False,
         "script_path": None,
         "method": method.value,

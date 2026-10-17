@@ -366,7 +366,7 @@ class FstabStabilizer:
         Returns:
             Statistics dict with conversion results
         """
-        result = {
+        result: dict[str, Any] = {
             "success": False,
             "fstab_path": fstab_path,
             "stats": {},

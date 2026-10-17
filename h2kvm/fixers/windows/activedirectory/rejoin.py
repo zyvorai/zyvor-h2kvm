@@ -11,7 +11,7 @@ after VM migration, supporting credential-based, offline, and manual methods.
 import json
 import logging
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 
 from .extractor import DomainInfo
 
@@ -309,7 +309,7 @@ def stage_domain_rejoin_script(  # pylint: disable=too-many-arguments,too-many-p
     """
     logger.info("Staging domain rejoin script (method: %s)", method.value)
 
-    result = {
+    result: dict[str, Any] = {
         "success": False,
         "method": method.value,
         "script_path": None,

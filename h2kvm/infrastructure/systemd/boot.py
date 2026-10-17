@@ -836,7 +836,7 @@ StandardError=inherit
         Returns:
             Verification results dictionary
         """
-        results = {
+        results: dict[str, Any] = {
             "fstab_exists": False,
             "initramfs_exists": False,
             "grub_config_exists": False,
@@ -925,7 +925,7 @@ class SystemdBootIntegration:
         Returns:
             Results dictionary
         """
-        results = {
+        results: dict[str, Any] = {
             "success": False,
             "machine_id": None,
             "tmpfiles_created": False,
@@ -1004,7 +1004,7 @@ class SystemdBootIntegration:
             Boot performance analysis
         """
         try:
-            analysis = {
+            analysis: dict[str, Any] = {
                 "boot_time": self.analyzer.get_boot_time(),
                 "critical_chain": self.analyzer.get_critical_chain(),
                 "slow_services": [],

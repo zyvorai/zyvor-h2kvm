@@ -46,7 +46,7 @@ class GenericDatabaseHandler(DatabaseMigrationHandler):
         # same DatabaseMigrationHandler.pre_migration_check interface
         # independently; keeping separate avoids coupling per-engine
         # health-check logic.
-        result = {
+        result: dict[str, Any] = {
             "healthy": True,
             "checks": {
                 "accessible": False,
@@ -239,7 +239,7 @@ class GenericDatabaseHandler(DatabaseMigrationHandler):
         Returns:
             Backup result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "success": False,
             "log_files": [],
             "total_size_mb": 0.0,

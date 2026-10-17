@@ -49,7 +49,7 @@ class MongoDBHandler(DatabaseMigrationHandler):
         Returns:
             Health check result dict
         """
-        result = {
+        result: dict[str, Any] = {
             "healthy": True,
             "checks": {
                 "accessible": False,
@@ -109,7 +109,12 @@ class MongoDBHandler(DatabaseMigrationHandler):
         Returns:
             Quiesce result dict
         """
-        result = {"success": False, "method": "fsyncLock", "duration_seconds": 0.0, "errors": []}
+        result: dict[str, Any] = {
+            "success": False,
+            "method": "fsyncLock",
+            "duration_seconds": 0.0,
+            "errors": [],
+        }
 
         self.logger.info(f"Quiescing MongoDB instance: {self.db_info.instance_name}")
 
@@ -257,7 +262,7 @@ class MongoDBHandler(DatabaseMigrationHandler):
         Returns:
             Tuning result dict
         """
-        result = {"applied": [], "recommended": [], "errors": []}
+        result: dict[str, Any] = {"applied": [], "recommended": [], "errors": []}
 
         self.logger.info(f"Tuning MongoDB for KVM: {self.db_info.instance_name}")
 
@@ -295,7 +300,7 @@ class MongoDBHandler(DatabaseMigrationHandler):
         Returns:
             Configuration update result dict
         """
-        result = {"updated": [], "warnings": [], "errors": []}
+        result: dict[str, Any] = {"updated": [], "warnings": [], "errors": []}
 
         self.logger.info(f"Updating MongoDB configuration: {self.db_info.instance_name}")
 
