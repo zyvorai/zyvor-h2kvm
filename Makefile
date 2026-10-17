@@ -87,8 +87,11 @@ test-coverage: ## Run Python tests with coverage report
 
 ##@ Code Quality
 
-lint: ## Run linters (ruff + mypy + go vet)
+lint: ## Run linters (ruff + ruff format --check + mypy + pylint + go vet); needs pip install -e ".[dev,test,full]"
 	ruff check $(H2KVM_DIR)/
+	ruff format --check $(H2KVM_DIR)/
+	mypy $(H2KVM_DIR)/
+	pylint $(H2KVM_DIR)/
 	cd $(OPERATOR_DIR) && $(GO) vet ./...
 
 lint-fix: ## Run linters and auto-fix issues
@@ -323,8 +326,7 @@ changelog: ## Generate changelog from git commits
 	@echo ""
 	@echo "Changelog generated at CHANGELOG.generated.md"
 
-lint-all: lint ## Run all linters (ruff + mypy + go vet + shellcheck)
-	-mypy $(H2KVM_DIR)/ --ignore-missing-imports 2>/dev/null || echo "  mypy not installed or has errors"
+lint-all: lint ## Run all linters (ruff + mypy + pylint + go vet + shellcheck)
 	-shellcheck scripts/*.sh 2>/dev/null || echo "  shellcheck not installed: dnf install ShellCheck"
 
 version: ## Show all component versions

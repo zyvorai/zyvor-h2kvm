@@ -113,6 +113,15 @@ openstack = [
     "openstacksdk>=4.8.0",
 ]
 
+# Worker REST API (h2kvm.runtime.worker.api): FastAPI + SSE + Prometheus metrics
+api = [
+    "fastapi>=0.143.3",
+    "uvicorn[standard]>=0.54.0",
+    "sse-starlette>=3.0.0",
+    "prometheus-client>=0.26.0",
+    "httpx>=0.28.0",
+]
+
 # Async operations (parallel migrations)
 # Enables async VMware operations for 3-5x faster batch migrations
 async = [
@@ -151,6 +160,10 @@ full = [
     "hypersdk-guestkit>=1.2.0",
     "kubernetes>=34.0.0",
     "openstacksdk>=4.8.0",
+    "fastapi>=0.143.3",
+    "uvicorn[standard]>=0.54.0",
+    "sse-starlette>=3.0.0",
+    "prometheus-client>=0.26.0",
 ]
 
 # Development tools
@@ -226,6 +239,8 @@ disallow_untyped_defs = false
 
 # Hatch configuration
 [tool.hatch.envs.default]
+# mypy/pylint resolve types of installed packages, so lint with the full dependency set
+features = ["full", "test"]
 dependencies = [
     "pytest>=9.0.0",
     "pytest-cov>=7.0.0",
@@ -253,7 +268,9 @@ test-cov-all = "pytest tests/ --cov=h2kvm --cov-report=html --cov-report=term-mi
 # Code quality
 lint = [
     "ruff check h2kvm/",
-    "mypy h2kvm/ --ignore-missing-imports",
+    "ruff format --check h2kvm/",
+    "mypy h2kvm/",
+    "python -m pylint h2kvm/",
 ]
 fmt = [
     "ruff format h2kvm/",

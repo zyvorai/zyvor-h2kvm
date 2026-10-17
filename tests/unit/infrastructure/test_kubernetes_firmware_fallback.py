@@ -131,8 +131,6 @@ class TestCaptureSerialBootOutput:
             "h2kvm.infrastructure.deployers.kubernetes.shutil.which", return_value="/usr/bin/virtctl"
         ):
             with patch.object(dep, "_find_kubeconfig", return_value=None):
-                with patch(
-                    "h2kvm.infrastructure.deployers.kubernetes.subprocess.run", return_value=proc
-                ):
+                with patch("h2kvm.infrastructure.deployers.kubernetes.subprocess.run", return_value=proc):
                     out = dep._capture_serial_boot_output(timeout_s=10)
         assert out == "boot logwarn"
