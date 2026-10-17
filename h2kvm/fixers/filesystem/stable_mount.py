@@ -438,6 +438,4 @@ def get_recommended_fs_check_freq(  # pylint: disable=too-many-return-statements
 # Logging helper
 def log_fstab_conversion(original_spec: str, new_spec: str, mountpoint: str, fs_type: str) -> None:
     """Log fstab conversion for audit trail."""
-    logger.info(
-        "fstab stabilization: %s (%s): %s -> %s", mountpoint, fs_type, original_spec, new_spec
-    )
+    logger.info("fstab stabilization: %s (%s): %s -> %s", mountpoint, fs_type, original_spec, new_spec)

@@ -249,17 +249,11 @@ profile = loader.load_profile("production")
 profile = loader.load_profile("my_org", custom_profile_path="/etc/h2kvm/profiles")
 
 # Apply overrides
-overridden = loader.apply_overrides(profile, {
-    "pipeline": {
-        "convert": {
-            "compress_level": 9
-        }
-    }
-})
+overridden = loader.apply_overrides(profile, {"pipeline": {"convert": {"compress_level": 9}}})
 
 # Get profile info
 info = loader.get_profile_info("production")
-print(info['description'])
+print(info["description"])
 ```
 
 ---

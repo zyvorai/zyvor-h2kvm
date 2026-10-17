@@ -221,7 +221,9 @@ def _get_transport_preference(args: argparse.Namespace) -> str:
         v = os.environ.get("VMDK2KVM_VSPHERE_TRANSPORT") or os.environ.get("VSPHERE_TRANSPORT")
     v = str(v).strip().lower() if v else "https"
     if v not in ("https", "http", "auto"):
-        logging.getLogger(__name__).warning("Unsupported vSphere transport %r; using HTTPS /folder instead.", v)
+        logging.getLogger(__name__).warning(
+            "Unsupported vSphere transport %r; using HTTPS /folder instead.", v
+        )
     return "https"
 
 
@@ -436,6 +438,8 @@ def _update_progress(
 ) -> None:
     """No-op progress update (Rich progress has been removed)."""
     return
+
+
 # pylint: enable=too-many-arguments,too-many-positional-arguments,unused-argument
 
 
@@ -866,9 +870,7 @@ class VsphereMode:
                     }
                 )
             except Exception as e:  # pylint: disable=broad-exception-caught  # per-VM inventory detail lookup; one VM's failure must not abort listing the others
-                detailed.append(
-                    {"name": str(pth).rsplit("/", maxsplit=1)[-1], "path": pth, "error": str(e)}
-                )
+                detailed.append({"name": str(pth).rsplit("/", maxsplit=1)[-1], "path": pth, "error": str(e)})
 
         detailed = sorted(detailed, key=lambda x: x.get("name", ""))
         if _debug_enabled(self.args):

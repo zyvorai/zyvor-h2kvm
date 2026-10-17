@@ -230,12 +230,17 @@ class CommandRunner:
                 if result.success:
                     self.logger.debug(
                         "Command succeeded (exit=%s, duration=%.2fs): %s",
-                        result.exit_code, duration, cmd_str,
+                        result.exit_code,
+                        duration,
+                        cmd_str,
                     )
                 else:
                     self.logger.warning(
                         "Command failed (exit=%s, duration=%.2fs): %s\nstderr: %s",
-                        result.exit_code, duration, cmd_str, result.stderr[:500],
+                        result.exit_code,
+                        duration,
+                        cmd_str,
+                        result.stderr[:500],
                     )
 
                 # Check for errors
@@ -256,7 +261,9 @@ class CommandRunner:
                 if result.failed and attempt < retries:
                     self.logger.info(
                         "Command exited with code %s, retrying (%d/%d)...",
-                        result.exit_code, attempt + 1, retries,
+                        result.exit_code,
+                        attempt + 1,
+                        retries,
                     )
                     time.sleep(delay)
                     delay *= self.retry_backoff

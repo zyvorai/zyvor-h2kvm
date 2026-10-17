@@ -147,9 +147,7 @@ class TestParallelValidationPerformance:
 
         async def create_vms_parallel(count=10):
             manager = AsyncVMManager(max_parallel=10)
-            machines = [
-                AsyncMachine(name=f"vm-{i}", image="/path/to/image.qcow2") for i in range(count)
-            ]
+            machines = [AsyncMachine(name=f"vm-{i}", image="/path/to/image.qcow2") for i in range(count)]
             return await manager.validate_batch(machines, _MockValidator)
 
         results = await benchmark.pedantic(
@@ -167,9 +165,7 @@ class TestParallelValidationPerformance:
 
         async def validate_batch(vm_count):
             manager = AsyncVMManager(max_parallel=100)
-            machines = [
-                AsyncMachine(name=f"vm-{i}", image="/path/to/image.qcow2") for i in range(vm_count)
-            ]
+            machines = [AsyncMachine(name=f"vm-{i}", image="/path/to/image.qcow2") for i in range(vm_count)]
 
             start = time.perf_counter()
             await manager.validate_batch(machines, _MockValidator)

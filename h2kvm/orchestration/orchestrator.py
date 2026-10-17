@@ -758,9 +758,7 @@ class Orchestrator:  # pylint: disable=too-many-instance-attributes  # coordinat
                             "   Instance: %s (%s)", result.get("server_name"), result.get("server_id")
                         )
                 except Exception as e:  # pylint: disable=broad-exception-caught  # one image's deployment failure must not abort the rest
-                    err_text = (
-                        e.user_message(include_context=True) if isinstance(e, H2KvmError) else str(e)
-                    )
+                    err_text = e.user_message(include_context=True) if isinstance(e, H2KvmError) else str(e)
                     self.logger.exception("OpenStack deployment failed for '%s': %s", img, err_text)
                     if not self.config.openstack_continue_on_error:
                         raise Fatal(

@@ -335,9 +335,7 @@ class ManifestOrchestrator:
                                 "major_version": g.inspect_get_major_version(root),
                                 "minor_version": g.inspect_get_minor_version(root),
                             }
-                            self.logger.info(
-                                "   📦 Guest: %s", disk_result["guest"]["product_name"]
-                            )
+                            self.logger.info("   📦 Guest: %s", disk_result["guest"]["product_name"])
                     finally:
                         g.close()
                 except Exception as e:  # pylint: disable=broad-exception-caught

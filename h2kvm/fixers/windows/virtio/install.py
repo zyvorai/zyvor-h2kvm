@@ -498,8 +498,7 @@ def _virtio_stage_manual_setup_cmd(self, g: guestfs.GuestFS, result: dict[str, A
             inf_name = Path(str(inf)).name
             service_name = staged["service"]
             script_content += (
-                f'pnputil /add-driver "C:\\h2kvm\\drivers\\virtio\\{service_name}\\{inf_name}" '
-                "/install\r\n"
+                f'pnputil /add-driver "C:\\h2kvm\\drivers\\virtio\\{service_name}\\{inf_name}" /install\r\n'
             )
     script_content += "echo Done.\r\n"
 

@@ -300,6 +300,8 @@ def verify_rdp_enabled(
                 os.unlink(tmp_path)
 
     return result
+
+
 # pylint: enable=too-many-locals,too-many-branches,too-many-statements
 
 
@@ -420,6 +422,8 @@ def enable_rdp_if_disabled(
                 os.unlink(tmp_path)
 
     return result
+
+
 # pylint: enable=too-many-locals,too-many-branches,too-many-statements
 
 

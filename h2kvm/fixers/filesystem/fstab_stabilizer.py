@@ -282,7 +282,9 @@ class FstabStabilizer:
         except Exception as e:  # pylint: disable=broad-exception-caught  # guestfs API errors are dynamic/untyped; best-effort conversion must not abort
             conversion.reason = f"identifier_lookup_failed:{e}"
             self.stats["errors"] += 1
-            logger.warning("fstab:%s: Failed to get identifiers for %s: %s", entry.line_number, device_path, e)
+            logger.warning(
+                "fstab:%s: Failed to get identifiers for %s: %s", entry.line_number, device_path, e
+            )
             return conversion
 
         # Handle Btrfs subvolume specifications

@@ -322,7 +322,10 @@ class MultiBootloaderFixer:
     # Fixes (conservative)
 
     def apply_kvm_fixes(
-        self, g, *, root_dev: str | None = None  # pylint: disable=unused-argument  # reserved for future root-device-specific fixes; kept for API stability
+        self,
+        g,
+        *,
+        root_dev: str | None = None,  # pylint: disable=unused-argument  # reserved for future root-device-specific fixes; kept for API stability
     ) -> BootloaderFixResult:
         """Detect bootloaders and apply conservative KVM-friendly config edits to each."""
         result = self.detect_bootloaders(g)

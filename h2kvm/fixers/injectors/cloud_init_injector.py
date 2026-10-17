@@ -29,6 +29,7 @@ if TYPE_CHECKING:
         # pylint: disable=invalid-name,missing-class-docstring,too-few-public-methods
         class guestfs:  # type: ignore
             class GuestFS(Protocol): ...
+
         # pylint: enable=invalid-name,missing-class-docstring,too-few-public-methods
 
 

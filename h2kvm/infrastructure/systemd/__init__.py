@@ -118,8 +118,7 @@ except ImportError as e:
     import warnings
 
     warnings.warn(
-        f"Systemd integration dependencies not available: {e}. "
-        "Install with: pip install 'h2kvm[systemd]'",
+        f"Systemd integration dependencies not available: {e}. Install with: pip install 'h2kvm[systemd]'",
         ImportWarning,
         stacklevel=2,
     )

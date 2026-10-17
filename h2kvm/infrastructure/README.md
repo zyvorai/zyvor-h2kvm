@@ -45,11 +45,7 @@ SSH client and key management:
 ```python
 from h2kvm.infrastructure.ssh import inject_ssh_keys
 
-inject_ssh_keys(
-    guest_handle,
-    username="admin",
-    keys=["ssh-rsa AAAAB3..."]
-)
+inject_ssh_keys(guest_handle, username="admin", keys=["ssh-rsa AAAAB3..."])
 ```
 
 ### 3. **Hook System** (`hooks/`)
@@ -83,8 +79,7 @@ from h2kvm.infrastructure.hooks import HookRunner, HookType
 
 runner = HookRunner(logger)
 runner.run_hooks(
-    hook_type=HookType.POST_FIXING,
-    context={"vm_name": "webserver", "disk_path": "/path/to/disk"}
+    hook_type=HookType.POST_FIXING, context={"vm_name": "webserver", "disk_path": "/path/to/disk"}
 )
 ```
 
@@ -140,11 +135,7 @@ from h2kvm.infrastructure.deployers import LibvirtDeployer
 
 deployer = LibvirtDeployer(connection_uri="qemu:///system")
 deployer.deploy(
-    disk_path="/path/to/disk.qcow2",
-    vm_name="webserver",
-    memory_mb=4096,
-    vcpus=2,
-    network="default"
+    disk_path="/path/to/disk.qcow2", vm_name="webserver", memory_mb=4096, vcpus=2, network="default"
 )
 ```
 
@@ -159,7 +150,7 @@ create_firstboot_service(
     guest_handle,
     service_name="initial-setup",
     exec_start="/usr/local/bin/setup.sh",
-    description="Initial VM setup"
+    description="Initial VM setup",
 )
 ```
 
@@ -170,10 +161,7 @@ from h2kvm.fixers.offline_fixer import OfflineFSFix
 from h2kvm.infrastructure.hooks import HookRunner
 
 # Fixer with hooks
-fixer = OfflineFSFix(
-    disk_path="/path/to/disk.qcow2",
-    hook_runner=HookRunner(logger)
-)
+fixer = OfflineFSFix(disk_path="/path/to/disk.qcow2", hook_runner=HookRunner(logger))
 
 # Hooks run automatically at appropriate stages
 fixer.run()
@@ -183,6 +171,7 @@ fixer.run()
 
 ```python
 from h2kvm.infrastructure.rollback import with_rollback
+
 
 @with_rollback("/path/to/disk.qcow2")
 def risky_migration():

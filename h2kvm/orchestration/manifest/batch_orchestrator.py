@@ -279,7 +279,9 @@ class BatchOrchestrator:
                             "✅ Completed VM %s/%s: %s (%.2fs)", idx + 1, len(vms), vm.id, result.duration
                         )
                     else:
-                        self.logger.error("💥 Failed VM %s/%s: %s - %s", idx + 1, len(vms), vm.id, result.error)
+                        self.logger.error(
+                            "💥 Failed VM %s/%s: %s - %s", idx + 1, len(vms), vm.id, result.error
+                        )
 
                     if self.enable_checkpoint and self.checkpoint_manager:
                         self.results = [results_dict[i] for i in sorted(results_dict.keys())]
@@ -293,7 +295,9 @@ class BatchOrchestrator:
 
                 # one VM's unexpected failure must not abort the rest of the parallel batch
                 except Exception as e:  # pylint: disable=broad-exception-caught
-                    self.logger.exception("💥 Exception processing VM %s/%s (%s): %s", idx + 1, len(vms), vm.id, e)
+                    self.logger.exception(
+                        "💥 Exception processing VM %s/%s (%s): %s", idx + 1, len(vms), vm.id, e
+                    )
                     Log.trace(self.logger, "💥 VM processing exception", exc_info=True)
 
                     results_dict[idx] = VMConversionResult(

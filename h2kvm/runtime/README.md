@@ -178,10 +178,7 @@ kubectl get migrationjob migrate-vm-001 -w
 ```python
 from h2kvm.runtime.daemon import ManifestWorkflowDaemon
 
-daemon = ManifestWorkflowDaemon(
-    manifest_path="/path/to/manifest.yaml",
-    logger=logger
-)
+daemon = ManifestWorkflowDaemon(manifest_path="/path/to/manifest.yaml", logger=logger)
 
 # Run daemon (blocks)
 daemon.run()
@@ -213,7 +210,8 @@ result = engine.execute_job(job)
 
 import kopf
 
-@kopf.on.create('h2kvm.io', 'v1alpha1', 'migrationjobs')
+
+@kopf.on.create("h2kvm.io", "v1alpha1", "migrationjobs")
 def create_migration_job(spec, name, namespace, logger, **kwargs):
     # Create migration pod
     # Update status
@@ -307,14 +305,7 @@ h2kvm_worker_jobs_assigned
 All runtime components use structured logging:
 
 ```python
-logger.info(
-    "Migration started",
-    extra={
-        "job_id": job_id,
-        "source": source_disk,
-        "phase": "conversion"
-    }
-)
+logger.info("Migration started", extra={"job_id": job_id, "source": source_disk, "phase": "conversion"})
 ```
 
 ## Configuration

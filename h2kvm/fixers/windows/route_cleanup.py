@@ -189,9 +189,7 @@ def stage_route_cleanup(self, g: guestfs.GuestFS) -> dict[str, Any]:
                 "action": "written" if not dry_run else "dry_run",
             }
         )
-        result["notes"].append(
-            r"Route cleanup script staged at C:\h2kvm\route_cleanup\cleanup-routes.ps1"
-        )
+        result["notes"].append(r"Route cleanup script staged at C:\h2kvm\route_cleanup\cleanup-routes.ps1")
 
         _log(logger, logging.INFO, "Route cleanup script staged: %s", ps1_path)
 

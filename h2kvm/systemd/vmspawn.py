@@ -45,9 +45,7 @@ class SystemdVmspawn:
         check_systemd_binary_available(
             self.binary,
             "systemd-vmspawn",
-            solutions=[
-                "Install systemd-container (Debian/Ubuntu: apt install systemd-container)"
-            ],
+            solutions=["Install systemd-container (Debian/Ubuntu: apt install systemd-container)"],
         )
 
     def spawn(  # pylint: disable=too-many-arguments  # each argument maps 1:1 to a distinct systemd-vmspawn CLI flag

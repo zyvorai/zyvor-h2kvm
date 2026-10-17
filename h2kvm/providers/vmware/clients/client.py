@@ -979,9 +979,7 @@ class VMwareClient:  # pylint: disable=too-many-instance-attributes,too-many-pub
         """
         Export VM using specified export mode.
         """
-        log_event(
-            "vm_export_start", vm_name=opt.vm_name, export_mode=opt.export_mode
-        )
+        log_event("vm_export_start", vm_name=opt.vm_name, export_mode=opt.export_mode)
         mode = self._normalize_export_mode(opt.export_mode)
 
         # OVF Tool requested: if it fails, fall through to stable chain

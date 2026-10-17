@@ -1462,8 +1462,7 @@ def log_firstboot_provision_summary(
 
     feats = fb.get("enterprise_features") or {}
     logger.info(
-        "Firstboot: installed h2kvm-firstboot (virtio_packages=%d, rdp=%s, qemu_ga=%s, "
-        "enhanced_virtio=%s)",
+        "Firstboot: installed h2kvm-firstboot (virtio_packages=%d, rdp=%s, qemu_ga=%s, enhanced_virtio=%s)",
         virtio_packages,
         feats.get("enable_rdp", True),
         feats.get("install_qemu_guest_agent", True),

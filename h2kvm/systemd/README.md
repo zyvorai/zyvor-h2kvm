@@ -57,7 +57,7 @@ cat = SystemdCat()
 
 # Log a message
 cat.log("Migration started", priority=6)  # Info
-cat.log("Migration failed", priority=3)   # Error
+cat.log("Migration failed", priority=3)  # Error
 
 # Run command and log output
 result = cat.run(
@@ -191,9 +191,7 @@ creds = SystemdCreds()
 
 # Encrypt credential
 encrypted_path = creds.encrypt(
-    "my-password",
-    "vcenter-password",
-    output=Path("/etc/credentials/vcenter.cred")
+    "my-password", "vcenter-password", output=Path("/etc/credentials/vcenter.cred")
 )
 
 # Decrypt credential
@@ -216,7 +214,7 @@ enroll = SystemdCryptenroll()
 # Enroll TPM2 for auto-unlock
 enroll.enroll_tpm2(
     Path("/dev/sda1"),
-    tpm2_pcrs="7+14"  # Bind to PCR banks
+    tpm2_pcrs="7+14",  # Bind to PCR banks
 )
 
 # Generate recovery key
@@ -243,9 +241,9 @@ runner = SystemdRun()
 result = runner.run(
     ["qemu-img", "convert", "input.vmdk", "output.qcow2"],
     description="VM disk conversion",
-    memory_max="4G",      # Max 4GB RAM
-    cpu_quota="200%",     # 2 CPUs
-    io_weight=500,        # I/O priority
+    memory_max="4G",  # Max 4GB RAM
+    cpu_quota="200%",  # 2 CPUs
+    io_weight=500,  # I/O priority
 )
 ```
 
@@ -278,10 +276,7 @@ from h2kvm.systemd import SystemdMount
 mount = SystemdMount()
 
 # Mount disk image
-mountpoint = mount.mount(
-    Path("/dev/sdb1"),
-    options="ro"
-)
+mountpoint = mount.mount(Path("/dev/sdb1"), options="ro")
 print(f"Mounted at: {mountpoint}")
 
 # Mount with specific location
@@ -321,6 +316,7 @@ for name, value in all_paths.items():
 
 # Use for migration directories
 import os
+
 migration_tmp = os.path.join(temp_dir, "h2kvm")
 os.makedirs(migration_tmp, exist_ok=True)
 ```
@@ -335,11 +331,7 @@ from h2kvm.systemd import SystemdRepart
 repart = SystemdRepart()
 
 # Dry run first
-repart.apply(
-    Path("/dev/sda"),
-    definitions=Path("/etc/repart.d"),
-    dry_run=True
-)
+repart.apply(Path("/dev/sda"), definitions=Path("/etc/repart.d"), dry_run=True)
 
 # Actually repartition
 repart.apply(Path("/dev/sda"))
@@ -398,10 +390,7 @@ for cg in stats:
     print(f"{cg.path}: CPU {cg.cpu_percent}%, MEM {cg.memory_bytes / 1e6:.1f}MB")
 
 # Monitor specific service
-migration_stats = cgtop.monitor_service(
-    "h2kvm-migration.service",
-    duration=30
-)
+migration_stats = cgtop.monitor_service("h2kvm-migration.service", duration=30)
 
 # Calculate average CPU usage
 avg_cpu = sum(s.cpu_percent for s in migration_stats) / len(migration_stats)
@@ -552,10 +541,7 @@ integration.setup_luks_tpm2(Path("/dev/sda1"))
 
 # Convert with limits
 integration.run_conversion_with_limits(
-    Path("source.vmdk"),
-    Path("target.qcow2"),
-    memory_max="8G",
-    cpu_quota="300%"
+    Path("source.vmdk"), Path("target.qcow2"), memory_max="8G", cpu_quota="300%"
 )
 ```
 
@@ -633,11 +619,7 @@ notify.stopping()
 ```python
 # Store vCenter password encrypted
 creds = SystemdCreds()
-creds.encrypt(
-    vcenter_password,
-    "vcenter-password",
-    output=Path("/var/lib/h2kvm/vcenter.cred")
-)
+creds.encrypt(vcenter_password, "vcenter-password", output=Path("/var/lib/h2kvm/vcenter.cred"))
 
 # Later, retrieve it
 password = creds.decrypt(Path("/var/lib/h2kvm/vcenter.cred"))
@@ -669,7 +651,7 @@ runner.run(
     description="VM disk conversion",
     memory_max="4G",  # Limit to 4GB
     cpu_quota="150%",  # Use 1.5 CPUs
-    io_weight=100,     # Low I/O priority
+    io_weight=100,  # Low I/O priority
 )
 ```
 
@@ -680,10 +662,7 @@ runner.run(
 enroll = SystemdCryptenroll()
 
 # Enroll TPM2
-enroll.enroll_tpm2(
-    Path("/dev/mapper/luks-root"),
-    tpm2_pcrs="7+14"
-)
+enroll.enroll_tpm2(Path("/dev/mapper/luks-root"), tpm2_pcrs="7+14")
 
 # Generate recovery key
 recovery = enroll.enroll_recovery(Path("/dev/mapper/luks-root"))

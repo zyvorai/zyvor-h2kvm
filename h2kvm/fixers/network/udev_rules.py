@@ -203,6 +203,8 @@ def _extract_mac_iface_mapping(
 
     logger.debug("Extracted %d MAC->iface mappings: %s", len(mappings), mappings)
     return mappings
+
+
 # pylint: enable=too-many-locals,too-many-branches,too-many-statements
 # pylint: enable=too-many-nested-blocks,broad-exception-caught
 

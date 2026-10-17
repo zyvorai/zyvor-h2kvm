@@ -349,6 +349,5 @@ def get_cleanup_command(method: CleanupMethod) -> str:
     if method == CleanupMethod.MANUAL:
         return "notepad C:\\h2kvm\\activedirectory\\ad-cleanup.ps1"
     return (
-        "PowerShell.exe -ExecutionPolicy Bypass -NoProfile "
-        "-File C:\\h2kvm\\activedirectory\\ad-cleanup.ps1"
+        "PowerShell.exe -ExecutionPolicy Bypass -NoProfile -File C:\\h2kvm\\activedirectory\\ad-cleanup.ps1"
     )

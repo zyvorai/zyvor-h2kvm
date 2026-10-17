@@ -140,7 +140,9 @@ class ProfileCache:
 
             # Cache hit
             self._hits += 1
-            self.logger.debug("Profile cache: HIT for '%s' (accesses=%s)", profile_name, entry.access_count + 1)
+            self.logger.debug(
+                "Profile cache: HIT for '%s' (accesses=%s)", profile_name, entry.access_count + 1
+            )
             return entry.access()
 
     def put(

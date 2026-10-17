@@ -474,6 +474,7 @@ class VsphereCommands:
         self.emit.emit(out, human_msg=str(res))
         return out
 
+
 class _ArgsShim:  # pylint: disable=too-few-public-methods  # dynamic attribute bag standing in for an argparse.Namespace
     """Tiny shim so we can reuse action funcs without argparse objects."""
 

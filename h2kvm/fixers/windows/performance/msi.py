@@ -82,9 +82,7 @@ def enable_msi_interrupts(
         # results dict and hive-editing logic still differs.
         with tempfile.TemporaryDirectory() as tmpdir:
             local_hive = Path(tmpdir) / "SYSTEM"
-            hive, root_node, controlset_name = open_system_hive_for_edit(
-                logger, g, system_path, local_hive
-            )
+            hive, root_node, controlset_name = open_system_hive_for_edit(logger, g, system_path, local_hive)
 
             try:
                 for device in devices:
