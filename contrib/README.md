@@ -349,7 +349,7 @@ journalctl -u h2kvm-luks-unlock
 ## Support
 
 - **Documentation**: `h2kvm/luks/README.md`
-- **Issues**: https://github.com/anthropics/h2kvm/issues
+- **Issues**: https://github.com/zyvorai/h2kvm/issues
 - **Security**: security@h2kvm.io
 
 ---

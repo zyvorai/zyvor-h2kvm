@@ -21,6 +21,12 @@ echo "   Namespace: $NAMESPACE"
 echo "   PVC: $PVC_NAME"
 echo ""
 
+# Fail early if the image is missing
+if [ ! -f "$QCOW2_IMAGE" ]; then
+    echo "❌ Image not found: $QCOW2_IMAGE (set QCOW2_IMAGE to override)" >&2
+    exit 1
+fi
+
 # Ensure namespace exists
 kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
@@ -36,6 +42,18 @@ if ! command -v virtctl &> /dev/null; then
     exit 1
 fi
 
+# Resolve the CDI upload proxy URL (UPLOADPROXY_URL overrides the lookup).
+# Done outside the virtctl argument list so a failed lookup is not masked.
+if [ -z "${UPLOADPROXY_URL:-}" ]; then
+    PROXY_IP="$(kubectl get service -n cdi cdi-uploadproxy -o jsonpath='{.spec.clusterIP}')" || PROXY_IP=""
+    if [ -z "$PROXY_IP" ]; then
+        echo "❌ Could not determine the cdi-uploadproxy ClusterIP." >&2
+        echo "   Set UPLOADPROXY_URL (e.g. https://host:443) and retry." >&2
+        exit 1
+    fi
+    UPLOADPROXY_URL="https://${PROXY_IP}:443"
+fi
+
 # Upload the image
 echo "⏳ Uploading image (this may take several minutes)..."
 virtctl image-upload pvc "$PVC_NAME" \
@@ -44,7 +62,7 @@ virtctl image-upload pvc "$PVC_NAME" \
     --size="$PVC_SIZE" \
     --insecure \
     --force-bind \
-    --uploadproxy-url=https://$(kubectl get service -n cdi cdi-uploadproxy -o jsonpath='{.spec.clusterIP}'):443
+    --uploadproxy-url="$UPLOADPROXY_URL"
 
 echo ""
 echo "✅ Upload complete!"

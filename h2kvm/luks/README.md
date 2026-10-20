@@ -412,6 +412,6 @@ Apache-2.0
 
 ## Support
 
-- GitHub Issues: https://github.com/anthropics/h2kvm/issues
+- GitHub Issues: https://github.com/zyvorai/h2kvm/issues
 - Documentation: https://h2kvm.readthedocs.io/
 - Security: security@h2kvm.io

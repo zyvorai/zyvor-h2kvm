@@ -439,6 +439,6 @@ sudo h2kvmctl --config manifest.json -vvv
 ## Support
 
 For issues or questions:
-- File bug: `https://github.com/anthropics/h2kvm/issues`
+- File bug: `https://github.com/zyvorai/h2kvm/issues`
 - Documentation: `docs/` directory
 - Examples: `examples/` directory

@@ -170,8 +170,8 @@ Features are prioritized based on:
 
 We welcome community input on roadmap priorities:
 
-- 🐛 **Report Issues**: [GitHub Issues](https://github.com/anthropics/h2kvm/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/anthropics/h2kvm/discussions)
+- 🐛 **Report Issues**: [GitHub Issues](https://github.com/zyvorai/h2kvm/issues)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/zyvorai/h2kvm/discussions)
 - 🗳️ **Vote on Features**: Upvote issues/discussions you care about
 - 📝 **Submit Proposals**: Create detailed feature proposals in `docs/roadmap/`
 
