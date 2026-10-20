@@ -137,7 +137,7 @@ Requirements:
   • Hardware TPM 2.0
 
 For more information:
-  https://github.com/anthropics/h2kvm
+  https://github.com/zyvorai/h2kvm
     """)
     return 0
 

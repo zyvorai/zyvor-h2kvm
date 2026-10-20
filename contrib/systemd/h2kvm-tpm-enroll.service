@@ -9,7 +9,7 @@
 
 [Unit]
 Description=H2KVM TPM2 Auto-Enrollment
-Documentation=https://github.com/anthropics/h2kvm
+Documentation=https://github.com/zyvorai/h2kvm
 ConditionPathExists=!/var/lib/h2kvm/tpm-enrolled
 After=cryptsetup.target
 Before=multi-user.target

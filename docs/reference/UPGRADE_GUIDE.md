@@ -483,7 +483,7 @@ If you encounter issues:
 1. Check logs: `kubectl logs -n h2kvm-system deployment/h2kvm-operator`
 2. Review events: `kubectl get events --sort-by='.lastTimestamp' | grep -i migration`
 3. Check metrics: `curl http://localhost:8080/metrics`
-4. File issue: https://github.com/anthropics/h2kvm/issues
+4. File issue: https://github.com/zyvorai/h2kvm/issues
 
 ## Summary
 

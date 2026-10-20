@@ -767,6 +767,6 @@ Planned features (Priority 2+):
 ## Support
 
 For issues or questions:
-- GitHub Issues: https://github.com/anthropics/h2kvm/issues
+- GitHub Issues: https://github.com/zyvorai/h2kvm/issues
 - Documentation: Check docs/ directory
 - Examples: See test-confs/ directory

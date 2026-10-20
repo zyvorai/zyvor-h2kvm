@@ -406,4 +406,4 @@ class CheckpointManager:
 
 The checkpoint/resume feature makes batch migrations resilient to interruptions, enabling reliable long-running conversions without manual state tracking. Simply re-run the same command to resume from the last completed VM.
 
-For questions or issues, see the [main documentation](../../docs/Batch-Migration-Features-Guide.md) or file an issue at https://github.com/anthropics/h2kvm/issues.
+For questions or issues, see the [main documentation](../../docs/Batch-Migration-Features-Guide.md) or file an issue at https://github.com/zyvorai/h2kvm/issues.
