@@ -15,7 +15,7 @@ black>=25.0.0
 
 # Security scanning
 bandit>=1.9.4
-safety>=3.6.0
+safety>=3.8.1
 
 # Documentation
 sphinx>=8.0.0
