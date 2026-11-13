@@ -20,7 +20,7 @@ safety>=3.6.0
 # Documentation
 sphinx>=8.0.0
 sphinx-rtd-theme>=3.0.0
-myst-parser>=4.0.0
+myst-parser>=4.0.1
 
 # Type stubs
 types-PyYAML>=6.0.12.20260815
