@@ -15,6 +15,8 @@
 
 ### Any hypervisor to KVM. Fixed before first boot.
 
+[Client overview (PDF)](docs/h2kvm-Client-Overview.pdf)
+
 **Convert offline. Fix the guest. Land it on a stack that isn't another lock-in.** Pick up VMs from **vSphere, ESXi, Azure**, or any disk you already have (**VMDK, VHDX, VDI, raw, OVA/OVF**), fix the guest offline, then land it on **[Kairon](https://github.com/zyvorai/kairon)** (real VMs on Kubernetes, driven through **[Veyron](https://github.com/zyvorai/veyron)**) or **[Machina](https://zyvor.dev/machina?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)** (the private cloud you install before lunch). Web control plane and Kubernetes operator included.
 
 **0 pods per VM** · **7.4x faster to SSH than KubeVirt** · **Machina: 4 services, not OpenStack's 9+** · **Offline guest repair** · **CLI · web · operator · Helm**
