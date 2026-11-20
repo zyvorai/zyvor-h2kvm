@@ -28,18 +28,13 @@ Full text: [`LICENSE`](../LICENSE).
 
 ## Commercial license
 
-Production use requires a paid commercial license. For a known estate, pay per VM. For support at a fixed price, buy Enterprise.
+Production use requires a paid commercial license. For a known estate, pay per VM. For support at a quoted price, buy Enterprise.
 
 | License type | Price | Support and updates | Best for |
 | --- | --- | --- | --- |
-| Per VM | $100 per VM, one-time (N × $100) | No ongoing support | Converting N VMs |
-| Annual License | $25,000/year | All upgrades and Business Support included | Continuous updates and support |
-| Monthly License | $2,500/month | All upgrades and Business Support included | Pilots and short-term deployments |
-| Major Version License | $25,000 (one-time) | No ongoing support | Stable single major version |
-| Minor Version License | $15,000 (one-time) | No ongoing support | Locked version deployments |
+| Per migrated VM | INR 8,499 per migrated VM, one-time, including 18% GST (about USD 86, GST-free); included at no extra charge in a Transiva project | No ongoing support | Converting N VMs |
+| Enterprise subscription | Quoted by Zyvor ([sales@zyvor.dev](mailto:sales@zyvor.dev)) | Updates and the stated support level | Continuous updates and support |
 
-Annual, Monthly, Major Version, and Minor Version are Enterprise: one fixed price, not metered by VM count. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing.
-
-![h2kvm commercial pricing](social/h2kvm-pricing.jpg)
+The Enterprise subscription is one quoted price, not metered by VM count. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. h2kvm is included at no charge in a Transiva migration project.
 
 Details: [`COMMERCIAL_LICENSE.md`](../COMMERCIAL_LICENSE.md).

@@ -258,7 +258,7 @@ function Licensing() {
             Free for non-production. <Grad>Paid for production.</Grad>
           </>
         }
-        lede="Development, testing, evaluation and labs are free under the Zyvor Production License. Production use is $100 per VM, one-time, or Enterprise at a fixed price from $2,500/month."
+        lede="Development, testing, evaluation and labs are free under the Zyvor Production License. Production use is INR 8,499 per migrated VM, one-time, including GST, or an Enterprise subscription quoted by Zyvor."
       />
       <Actions>
         <Btn to="/docs/licensing">Read the licensing guide</Btn>
