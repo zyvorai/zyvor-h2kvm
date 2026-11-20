@@ -1,0 +1,142 @@
+.heroBanner {
+  padding: var(--zv-hero-space) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: clamp(3rem, 14vw, 6rem) 1.5rem;
+  }
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media screen and (max-width: 996px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 996px) {
+  .buttons {
+    justify-content: center;
+  }
+}
+
+.heroMedia img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.heroMediaCaption {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 0.75rem;
+}
+
+.sectionHeading {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
+.problem {
+  padding: var(--zv-section-space) 0;
+}
+
+.trust {
+  padding: var(--zv-section-space) 0;
+  background: var(--ifm-color-emphasis-100);
+}
+
+.trustGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+  .trustGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trustBadges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+@media screen and (max-width: 768px) {
+  .trustBadges {
+    align-items: center;
+  }
+}
+
+.enterprise {
+  padding: var(--zv-section-space) 0;
+}
+
+.enterpriseCopy {
+  max-width: 38rem;
+  margin: 0 auto 2rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.pricingAction {
+  margin-top: 2rem;
+}
+
+.diagram {
+  padding: var(--zv-section-space) 0 0;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c2410c;
+}
+
+.diagramFrame {
+  display: block;
+  margin-top: 1.5rem;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-top: 3px solid #f97316;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+}
+
+.diagramFrame img {
+  display: block;
+  width: 100%;
+}
+
+.diagramLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  font-weight: 600;
+}

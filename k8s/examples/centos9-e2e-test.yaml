@@ -1,0 +1,23 @@
+# CentOS 9 end-to-end smoke object.
+# The operator CRD is HyperConversion, not the retired MigrationJob kind.
+apiVersion: h2kvm.io/v1alpha1
+kind: HyperConversion
+metadata:
+  name: centos9-e2e-test
+  namespace: h2kvm-test
+  labels:
+    app: h2kvm
+    test: e2e
+    os: centos9
+spec:
+  source:
+    url: "https://example.invalid/centos9.qcow2"
+    format: qcow2
+  storage:
+    size: 20Gi
+    accessMode: ReadWriteOnce
+  vm:
+    cpu:
+      cores: 2
+    memory: 4Gi
+    firmware: bios

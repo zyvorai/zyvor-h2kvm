@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>h2kvm: where it lands</title>
+<!-- README card, 1600x400 at 2x. Build: ./docs/ux/build-readme-cards.sh -->
+<style>
+  :root { --acc:#2ec4b6; --sans:'SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif; --mono:'SF Mono',Menlo,Consolas,monospace; }
+  * { box-sizing:border-box; } html,body { margin:0; padding:0; }
+  body { width:1600px; min-height:400px; overflow:hidden; background:#000; color:#f5f5f7; font-family:var(--sans); position:relative; }
+  .glow { position:absolute; inset:0; background:radial-gradient(800px 420px at 92% -10%, color-mix(in srgb, var(--acc) 34%, transparent), transparent 65%),
+    radial-gradient(700px 380px at -5% 115%, rgba(0,113,227,.22), transparent 60%); }
+  .rail { position:absolute; left:0; top:0; bottom:0; width:6px; background:linear-gradient(180deg, var(--acc), rgba(41,151,255,.2)); }
+  .wrap { position:relative; padding:40px 64px 28px; }
+  .top { display:flex; align-items:center; justify-content:space-between; }
+  .brand { display:flex; align-items:center; gap:12px; font-family:var(--mono); font-size:15px; letter-spacing:.18em; text-transform:uppercase; color:#a1a1a6; }
+  .brand b { color:#fff; }
+  .kicker { font-family:var(--mono); font-size:15px; letter-spacing:.18em; text-transform:uppercase; color:var(--acc); }
+  h1 { margin:18px 0 0; font-size:50px; line-height:1.05; font-weight:800; letter-spacing:-.03em; white-space:nowrap; }
+  h1 em { font-style:normal; color:var(--acc); }
+  .foot { margin-top:28px; display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:16px; color:#8e8e93; padding-top:18px; border-top:1px solid rgba(255,255,255,.08); }
+  .foot b { color:#f5f5f7; font-size:17px; }
+  .card { border-radius:16px; background:linear-gradient(180deg, rgba(28,30,36,.92), rgba(14,15,19,.95)); border:1px solid rgba(255,255,255,.12); position:relative; overflow:hidden; }
+  .tag { display:inline-block; font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; padding:4px 10px; border-radius:10px; border:1px solid currentColor; }
+
+  .lands { margin-top:30px; display:grid; grid-template-columns:1.25fr 1.25fr .8fr; gap:24px; }
+  .land { padding:24px 26px 20px; }
+  .land.main { border-color:color-mix(in srgb, var(--c) 60%, transparent); box-shadow:0 0 40px color-mix(in srgb, var(--c) 18%, transparent); }
+  .land::before { content:''; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%); }
+  .land .row { display:flex; justify-content:space-between; align-items:center; position:relative; }
+  .land i { font-style:normal; font-family:var(--mono); font-size:16px; font-weight:700; }
+  .land h2 { margin:16px 0 4px; font-size:34px; font-weight:800; letter-spacing:-.02em; position:relative; }
+  .land .sub { font-size:18px; color:#a1a1a6; position:relative; }
+  .land ul { margin:14px 0 0; padding:0; list-style:none; position:relative; }
+  .land li { position:relative; padding:8px 0 8px 20px; font-size:18px; line-height:1.3; color:#d1d1d6; border-bottom:1px solid rgba(255,255,255,.07); }
+  .land li:last-child { border-bottom:0; }
+  .land li::before { content:''; position:absolute; left:2px; top:16px; width:7px; height:7px; border-radius:50%; background:var(--c); box-shadow:0 0 8px var(--c); }
+  .land.old { opacity:.55; border-style:dashed; }
+  .land.old li::before { box-shadow:none; }
+  .big { display:flex; gap:28px; margin-top:16px; position:relative; }
+  .big div b { display:block; font-size:34px; font-weight:800; letter-spacing:-.03em; color:#fff; }
+  .big div span { font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#8e8e93; }
+</style>
+</head>
+<body>
+<div class="glow"></div><div class="rail"></div>
+<div class="wrap">
+<div class="top"><div class="brand"><svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><defs><linearGradient id="zb" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff5a15"/><stop offset="1" stop-color="#cc420a"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#zb)"/><path d="M18.5,20.5 45.5,20.5 18.5,43.5 45.5,43.5" fill="none" stroke="#fff" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Zyvor</b><span>&middot;</span><span>h2kvm</span></div><div class="kicker">Where it lands</div></div>
+<h1>Fixed offline. <em>Landed on our stack.</em></h1>
+<div class="lands">
+  <div class="card land main" style="--c:#2997ff"><div class="row"><span class="tag" style="color:#2997ff">Kubernetes</span><i style="color:#2997ff">--deploy-kairon</i></div><h2>Kairon + Veyron</h2><div class="sub">Real VMs on Kubernetes. No pods pretending.</div>
+    <div class="big"><div><b>0</b><span>pods per VM</span></div><div><b>14x</b><span>lighter control plane</span></div><div><b>7.4x</b><span>faster to SSH</span></div></div>
+    <ul><li>Veyron import, pinned by sha256</li><li>No KubeVirt, no CDI, no PVC upload</li><li>QEMU, Cloud Hypervisor, Firecracker</li></ul></div>
+  <div class="card land main" style="--c:#64d2ff"><div class="row"><span class="tag" style="color:#64d2ff">Private cloud</span><i style="color:#64d2ff">--emit-domain-xml</i></div><h2>Machina</h2><div class="sub">The private cloud you install before lunch.</div>
+    <div class="big"><div><b>4</b><span>Rust services</span></div><div><b>1</b><span>command install</span></div><div><b>0</b><span>SQL clusters</span></div></div>
+    <ul><li>Fleet Cloud with an EC2-compatible API</li><li>HA, DRS, live migration, consoles</li><li>Native eBPF datapath, Zyra AI ops</li></ul></div>
+  <div class="card land old" style="--c:#8e8e93"><div class="row"><span class="tag" style="color:#8e8e93">Legacy</span></div><h2>Still supported</h2><div class="sub">When you are stuck on them.</div>
+    <ul><li>KubeVirt: --deploy-k8s<br><span style="color:#8e8e93;font-size:15px">a virt-launcher pod per VM</span></li><li>OpenStack: --deploy-openstack<br><span style="color:#8e8e93;font-size:15px">9+ services, MariaDB, RabbitMQ</span></li></ul></div>
+</div>
+<div class="foot"><b>github.com/zyvorai/zyvor-h2kvm</b><span>Kairon benchmark vs KubeVirt v1.9.0, 2026-10-04 &#183; Machina vs typical OpenStack IaaS</span></div>
+</div>
+<script>document.body.setAttribute('data-h', Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height));</script>
+</body>
+</html>

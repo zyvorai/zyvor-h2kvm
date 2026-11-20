@@ -1,0 +1,20 @@
+# h2kvm migration configuration
+# Testing with guestkit backend (default offline disk/repair)
+cmd: local
+
+# Input
+vmdk: ./esx8.0-rhel8.8-with-thin-provision-disk1.vmdk
+
+# Output
+output_dir: ./output
+to_output: rhel8.8-guestkit-fixed.qcow2
+out_format: qcow2
+compress: true
+
+# Conversion options
+flatten: true
+fstab_mode: stabilize-all
+regen_initramfs: true
+
+# Backend: guestkit (default)
+backend: guestkit

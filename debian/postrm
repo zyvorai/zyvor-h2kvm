@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+case "$1" in
+    purge)
+        # Remove user and group on purge
+        if getent passwd h2kvm >/dev/null; then
+            deluser --quiet h2kvm 2>/dev/null || true
+        fi
+        if getent group h2kvm >/dev/null; then
+            delgroup --quiet h2kvm 2>/dev/null || true
+        fi
+
+        # Remove log directory on purge
+        rm -rf /var/log/h2kvm
+        ;;
+esac
+
+exit 0

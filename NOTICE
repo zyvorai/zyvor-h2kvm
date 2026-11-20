@@ -1,0 +1,15 @@
+SPDX-FileCopyrightText: Copyright (c) 2026 ZyvorAI Labs Private Limited.
+SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+
+h2kvm
+Copyright (c) 2026 ZyvorAI Labs Private Limited.
+
+Licensed under the Zyvor Production License v1.0
+(SPDX: LicenseRef-Zyvor-Production-1.0).
+See LICENSE and LICENSES/LicenseRef-Zyvor-Production-1.0.txt.
+
+Non-production evaluation is free for 30 days per organization. Production use requires a paid commercial license.
+Contact: sales@zyvor.dev · https://zyvor.dev
+
+Third-party open-source components bundled or linked by h2kvm retain their
+own copyright notices and license terms.

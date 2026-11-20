@@ -1,0 +1,94 @@
+---
+# Service for worker metrics endpoint
+apiVersion: v1
+kind: Service
+metadata:
+  name: h2kvm-worker-metrics
+  namespace: h2kvm-workers
+  labels:
+    app: h2kvm-worker
+    component: metrics
+spec:
+  type: ClusterIP
+  clusterIP: None  # Headless service
+  selector:
+    app: h2kvm-worker
+  ports:
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+---
+# ServiceMonitor for Prometheus Operator
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: h2kvm-worker
+  namespace: h2kvm-workers
+  labels:
+    app: h2kvm-worker
+    prometheus: kube-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: h2kvm-worker
+      component: metrics
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+    scheme: http
+---
+# PrometheusRule for alerting
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: h2kvm-worker-alerts
+  namespace: h2kvm-workers
+  labels:
+    app: h2kvm-worker
+    prometheus: kube-prometheus
+spec:
+  groups:
+  - name: h2kvm-worker
+    interval: 30s
+    rules:
+    # Alert when worker pod is down
+    - alert: H2KVMWorkerDown
+      expr: up{job="h2kvm-worker-metrics"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "H2KVM worker is down"
+        description: "Worker {{ $labels.pod }} in namespace {{ $labels.namespace }} has been down for more than 5 minutes."
+    
+    # Alert when job fails
+    - alert: H2KVMJobFailed
+      expr: rate(h2kvm_migration_failures_total[5m]) > 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "H2KVM job failures detected"
+        description: "Worker {{ $labels.worker_id }} has {{ $value }} failed jobs per second."
+    
+    # Alert when migration takes too long
+    - alert: H2KVMMigrationSlow
+      expr: h2kvm_migration_duration_seconds > 7200
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "H2KVM migration taking too long"
+        description: "Job {{ $labels.job_id }} has been running for {{ $value }} seconds (>2 hours)."
+    
+    # Alert when conversion temp storage is full
+    - alert: H2KVMTempStorageFull
+      expr: h2kvm_conversion_temp_usage_bytes / h2kvm_conversion_temp_capacity_bytes > 0.9
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "H2KVM temp storage nearly full"
+        description: "Worker {{ $labels.worker_id }} temp storage is {{ $value | humanizePercentage }} full."

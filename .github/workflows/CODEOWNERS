@@ -1,0 +1,19 @@
+# Code owners for h2kvm project
+# These users will be automatically requested for review when PRs modify these files
+
+# Global owners
+* @ssahani
+
+# CI/CD workflows
+/.github/workflows/ @ssahani
+
+# Core conversion logic
+/h2kvm/converters/ @ssahani
+/h2kvm/fixers/ @ssahani
+
+# Tests
+/tests/ @ssahani
+
+# Documentation
+/docs/ @ssahani
+/*.md @ssahani

@@ -1,0 +1,57 @@
+# ============================================
+# Daemon Watch Mode: Auto-process dropped VMDKs
+# ============================================
+# Watches a directory for new VMDK/VHD/OVA files and automatically
+# converts them to qcow2 with guest fixes.
+#
+# Drop a VMDK into the watch directory → h2kvm picks it up,
+# converts it, applies fixes, and outputs a ready-to-use qcow2.
+#
+# Prerequisites:
+#   pip install watchdog
+#   # Or: pip install h2kvm[daemon]
+#
+# Usage:
+#   # Start daemon
+#   sudo h2kvmctl --config examples/yaml/70-complete-workflows/daemon-watch-mode.yaml
+#
+#   # Or run as systemd service
+#   sudo cp systemd/h2kvm.service /etc/systemd/system/
+#   sudo systemctl enable --now h2kvm
+#
+#   # Drop a VMDK to trigger processing
+#   cp /vmware/my-vm.vmdk /var/lib/h2kvm/incoming/
+# ============================================
+
+cmd: daemon
+
+# ── Watch directory ──
+watch_dir: /var/lib/h2kvm/incoming
+
+# ── Output settings ──
+output_dir: /var/lib/h2kvm/output
+out_format: qcow2
+flatten: true
+compress: true
+
+# ── Guest fixes (applied to every incoming disk) ──
+fstab_mode: stabilize-all
+regen_initramfs: true
+remove_vmware_tools: true
+
+# ── libvirt integration ──
+emit_domain_xml: true
+uefi: true
+machine: q35
+disk_bus: virtio
+disk_cache: none
+net_model: virtio
+libvirt_network: default
+guest_os: linux
+
+# ── Daemon settings ──
+# max_concurrent_jobs: 2          # Process up to 2 VMs simultaneously
+# checksum: true                  # Generate checksums for outputs
+
+verbose: 1
+log_file: /var/log/h2kvm/daemon.log

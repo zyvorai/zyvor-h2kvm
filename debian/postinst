@@ -1,0 +1,81 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+case "$1" in
+    configure)
+        # Create h2kvm system user and group if they don't exist
+        if ! getent group h2kvm >/dev/null; then
+            addgroup --system h2kvm
+        fi
+
+        if ! getent passwd h2kvm >/dev/null; then
+            adduser --system --ingroup h2kvm \
+                --home /var/lib/h2kvm \
+                --no-create-home \
+                --gecos "h2kvm daemon user" \
+                --shell /usr/sbin/nologin \
+                h2kvm
+        fi
+
+        # Add h2kvm user to necessary groups for QEMU and libvirt access
+        # Only add to groups that exist on the system
+        for group in qemu kvm libvirt disk; do
+            if getent group "$group" >/dev/null 2>&1; then
+                usermod -a -G "$group" h2kvm 2>/dev/null || true
+            fi
+        done
+
+        # Clean stale runtime state
+        rm -rf /var/lib/h2kvm/conversions 2>/dev/null || true
+        rm -rf /var/lib/h2kvm/output 2>/dev/null || true
+        rm -f /var/lib/h2kvm/daemon.pid 2>/dev/null || true
+
+        # Create runtime directories via tmpfiles.d (idempotent, survives reboot)
+        systemd-tmpfiles --create h2kvm.conf 2>/dev/null || true
+        mkdir -p /var/lib/h2kvm/conversions
+        mkdir -p /var/lib/h2kvm/output
+
+        # Set ownership and permissions
+        chown -R root:root /var/lib/h2kvm
+        chmod 750 /var/lib/h2kvm
+
+        if [ -d /var/log/h2kvm ]; then
+            chown root:root /var/log/h2kvm
+            chmod 750 /var/log/h2kvm
+        fi
+
+        if [ -d /etc/h2kvm ]; then
+            chown root:h2kvm /etc/h2kvm
+            chmod 750 /etc/h2kvm
+            chmod 755 /etc/h2kvm/migrations
+        fi
+
+        # Print helpful message
+        cat << 'EOMSG'
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+h2kvm has been installed successfully!
+
+Configuration files:
+  System config: /etc/h2kvm/config.yaml
+  Migrations:    /etc/h2kvm/migrations/
+
+Usage examples:
+  # Edit system config to add your VM directories
+  sudo vi /etc/h2kvm/config.yaml
+
+  # Copy and customize migration template
+  sudo cp /etc/h2kvm/migrations/photon-example.yaml \
+          /etc/h2kvm/migrations/my-vm.yaml
+
+  # Run migration
+  sudo h2kvmctl --config /etc/h2kvm/migrations/my-vm.yaml
+
+Documentation: /usr/share/doc/h2kvm/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EOMSG
+        ;;
+esac
+
+exit 0

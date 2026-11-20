@@ -1,0 +1,7 @@
+{
+  "output_dir": "/var/lib/h2kvm/out",
+  "watch_dir": "/var/lib/h2kvm/incoming",
+  "workdir": "/var/lib/h2kvm/work",
+  "verbose": 1,
+  "log_file": "/var/log/h2kvm.log"
+}
