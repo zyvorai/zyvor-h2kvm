@@ -15,8 +15,8 @@ h2kvm is licensed under the **[Zyvor Production License v1.0](https://github.com
 | Track | License | Cost |
 | --- | --- | --- |
 | Non-production | [Zyvor Production License v1.0](https://github.com/zyvorai/h2kvm/blob/main/LICENSE) | Free |
-| Per VM | [Commercial license](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | $100 per VM, one-time |
-| Enterprise | [Commercial license](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | Fixed price; see below |
+| Per migrated VM | [Commercial license](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | INR 8,499 per VM, one-time, including GST (about USD 86) |
+| Enterprise | [Commercial license](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | Quoted; see below |
 
 | Use case | Allowed without a commercial license? |
 | --- | --- |
@@ -30,15 +30,10 @@ h2kvm is licensed under the **[Zyvor Production License v1.0](https://github.com
 
 Production use requires a paid commercial license. Pay for the number of VMs you convert, or buy Enterprise at a fixed price (not metered by VM count). For anything else, contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing.
 
-![h2kvm commercial pricing. $100 times N VMs, or Enterprise at a fixed price. Custom pricing: sales@zyvor.dev.](/h2kvm-pricing.jpg)
-
 | License type | Price | Support and updates | Best for |
 | --- | --- | --- | --- |
-| Per VM | $100 × N, one-time | No ongoing support | Converting N VMs |
-| Annual | $25,000/year | All upgrades and Business Support | Continuous updates and support |
-| Monthly | $2,500/month | All upgrades and Business Support | Pilots and short-term deployments |
-| Major version | $25,000, one-time | No ongoing support | One major version |
-| Minor version | $15,000, one-time | No ongoing support | One locked version |
+| Per migrated VM | INR 8,499 per migrated VM, one-time, including 18% GST (about USD 86, GST-free); included at no extra charge in a Transiva project | No ongoing support | Converting N VMs |
+| Enterprise subscription | Quoted by Zyvor ([sales@zyvor.dev](mailto:sales@zyvor.dev)) | Updates and the stated support level | Continuous updates and support |
 
 **Custom pricing:** [sales@zyvor.dev](mailto:sales@zyvor.dev)
 

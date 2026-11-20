@@ -9,7 +9,7 @@ h2kvm is available under an annual **enterprise subscription** for production us
 | Enterprise | Advanced edition, updates and upgrades | Priority business hours, four-business-hour critical response |
 | Premium | Contracted enterprise scope and critical escalation | 24x7 critical intake, one-hour initial response target |
 
-Priced per Enterprise subscription, with an annual minimum. 
+Priced per Enterprise subscription, with an annual minimum. The standalone per-VM price is INR 8,499 per migrated VM including GST; h2kvm is included at no charge in a Transiva project. 
 
 Rates are quoted by Zyvor: contact [sales@zyvor.dev](mailto:sales@zyvor.dev).
 

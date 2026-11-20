@@ -17,7 +17,7 @@ ZyvorAI Labs Private Limited
     └── HyperSDK Platform (SDKs, tooling, integrations)
 ```
 
-**h2kvm (this repository) is licensed under the [Zyvor Production License v1.0](../../LICENSE).** Non-production use is free. Production requires a paid commercial license. Prices: $100 per VM, one-time (N × $100), or Enterprise at a fixed price ($25,000/year, $2,500/month, $25,000 major version, $15,000 minor version). See [LICENSING.md](../LICENSING.md) and [COMMERCIAL_LICENSE.md](../../COMMERCIAL_LICENSE.md).
+**h2kvm (this repository) is licensed under the [Zyvor Production License v1.0](../../LICENSE).** Non-production use is free. Production requires a paid commercial license. Prices: INR 8,499 per migrated VM, one-time, including 18% GST (about USD 86), or an Enterprise subscription quoted by Zyvor. See [LICENSING.md](../LICENSING.md) and [COMMERCIAL_LICENSE.md](../../COMMERCIAL_LICENSE.md).
 
 - **Other product code shipped from sibling repositories may still be proprietary** — no Apache, MIT, or other OSS distribution is implied here for PacketWolf, Ragnarok, Aether, HyperSDK, netctl, or netevd. **GuestKit** remains **LGPL-3.0-or-later** where that repository says so.
 - **Hosted SaaS**, AI rules, and sovereign features are **commercial** under MSA/ELA.

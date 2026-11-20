@@ -4,7 +4,7 @@
 
 | Product | License | Hosted SaaS | Trademark |
 |---------|---------|-------------|-----------|
-| **h2kvm** | Zyvor Production License v1.0 (free non-production; commercial $100/VM or Enterprise fixed) | N/A | h2kvm |
+| **h2kvm** | Zyvor Production License v1.0 (free non-production; commercial INR 8,499 per migrated VM incl. GST, or Enterprise quoted) | N/A | h2kvm |
 | **PacketWolf / NetPredator** | Proprietary EULA / ELA | Optional | PacketWolf, NetPredator |
 | **Ragnarok** | Proprietary EULA / ELA | Optional | Ragnarok |
 | **Aether** | Proprietary EULA / ELA | Optional | Aether |
