@@ -25,7 +25,7 @@ Pairs with: **[Transiva](https://github.com/zyvorai/transiva)** (export) → **h
 | Success metric | One VM converts and boots in a lab | Wave first-boot % · HA uptime · attributable cutovers |
 | Cost of staying on CE | No war-room · no SAN contracts · Issues | Avoided: failed Windows nights, storage tickets, unowned bridges |
 | Support | Community / self-serve | **SLA** · LTS · CVE response · war-room |
-| License | Zyvor Production License; free for non-production | INR 8,499 per migrated VM (incl. GST), or Enterprise quoted |
+| License | Zyvor Production License; free for non-production | INR 8,499 (India, incl. GST) / USD 86 (elsewhere, excl. tax) per migrated VM, or Enterprise quoted |
 
 ### Source connectors
 
@@ -115,6 +115,6 @@ Pairs with: **[Transiva](https://github.com/zyvorai/transiva)** (export) → **h
 
 **CE proves the science. Buy Enterprise when the estate must move.**
 
-Commercial prices: **INR 8,499 per migrated VM, one-time, including 18% GST** (about USD 86, GST-free; included at no charge in a Transiva project), or an Enterprise subscription quoted by Zyvor. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. See [COMMERCIAL_LICENSE.md](../COMMERCIAL_LICENSE.md) and [LICENSING.md](LICENSING.md).
+Commercial prices: **INR 8,499 per migrated VM, one-time, including 18% GST in India, or USD 86 excluding tax elsewhere** (included at no charge in a Transiva project), or an Enterprise subscription quoted by Zyvor. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. See [COMMERCIAL_LICENSE.md](../COMMERCIAL_LICENSE.md) and [LICENSING.md](LICENSING.md).
 
 **→ [Book a demo](https://zyvor.dev/schedule?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)** · **[30-day PoC](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)** · **[Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)** · **[h2kvm product](https://zyvor.dev/h2kvm?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_edition)**

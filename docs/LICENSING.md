@@ -32,9 +32,9 @@ Production use requires a paid commercial license. For a known estate, pay per V
 
 | License type | Price | Support and updates | Best for |
 | --- | --- | --- | --- |
-| Per migrated VM | INR 8,499 per migrated VM, one-time, including 18% GST (about USD 86, GST-free); included at no extra charge in a Transiva project | No ongoing support | Converting N VMs |
+| Per migrated VM | INR 8,499 per migrated VM, one-time, including 18% GST in India; USD 86 per migrated VM excluding tax elsewhere; included at no extra charge in a Transiva project | No ongoing support | Converting N VMs |
 | Enterprise subscription | Quoted by Zyvor ([sales@zyvor.dev](mailto:sales@zyvor.dev)) | Updates and the stated support level | Continuous updates and support |
 
-The Enterprise subscription is one quoted price, not metered by VM count. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. h2kvm is included at no charge in a Transiva migration project.
+The Enterprise subscription is one quoted price, not metered by VM count. Buy / get a quote: [zyvor.dev/buy](https://zyvor.dev/buy). Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. Prices: INR incl. 18% GST in India; US dollars excl. tax elsewhere (VAT, GST or sales tax added where applicable). Pay online by UPI, card or netbanking where a buy page exists; international cards work (charged in rupees); or request a US-dollar invoice by bank transfer. A 30-day trial key is available for production evaluation. h2kvm is included at no charge in a Transiva migration project.
 
 Details: [`COMMERCIAL_LICENSE.md`](../COMMERCIAL_LICENSE.md).
