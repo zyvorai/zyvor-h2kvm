@@ -16,6 +16,8 @@ import threading
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from h2kvm import licence
+
 if TYPE_CHECKING:
     import logging
     from collections.abc import Callable
@@ -138,6 +140,7 @@ class DaemonControl:
                     "status": "ok",
                     "paused": self.paused,
                     "draining": self.draining,
+                    "licence": licence.status(),
                 }
 
             if command == "stats":

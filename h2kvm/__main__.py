@@ -10,6 +10,7 @@ from __future__ import annotations
 import sys
 
 from .cli.args import parse_args_with_config
+from . import licence
 from .core.exceptions import Fatal, H2KvmError, format_exception_for_cli
 from .orchestration.manifest.orchestrator import ManifestOrchestrator
 from .orchestration.orchestrator import Orchestrator
@@ -41,6 +42,8 @@ def main() -> None:  # pylint: disable=too-many-branches,too-many-statements
     try:
         args, _conf, logger = parse_args_with_config()
         verbose = getattr(args, "verbose", 0)
+        # Soft licence status: informational only, nothing is ever disabled.
+        logger.info("Licence: %s", licence.status()["message"])
 
         # Check for manifest-driven workflow
         if hasattr(args, "manifest") and args.manifest:

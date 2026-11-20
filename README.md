@@ -367,6 +367,10 @@ GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvo
 
 ---
 
+## Licence key (30-day trial)
+
+h2kvm verifies a signed licence key (`ZYV1.`) offline against a public key built in; nothing is sent to Zyvor. A 30-day trial key from [sales@zyvor.dev](mailto:sales@zyvor.dev) applies to the paid production licence and support. Enforcement is soft: nothing is disabled when a trial or licence ends or when there is no key. Set `H2KVM_LICENCE_KEY` or put the key in `~/.config/h2kvm/licence.key` (or the file named by `H2KVM_LICENCE_FILE`). The status (`licensed`, `trial`, `licence_expired`, `unlicensed`, `invalid`) is logged at the start of each run and returned as `licence` by the daemon `status` control command.
+
 ## License
 
 h2kvm is source-available under the **[Zyvor Production License v1.0](LICENSE)** (SPDX `LicenseRef-Zyvor-Production-1.0`).
