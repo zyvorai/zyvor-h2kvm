@@ -1,6 +1,6 @@
 # Proprietary software policy (draft)
 
-**Exception:** h2kvm in this repository is licensed under the Zyvor Production License v1.0 (`LicenseRef-Zyvor-Production-1.0`). Production requires a paid commercial license. See [LICENSING.md](../LICENSING.md). The policy below applies to other Zyvor products that are still proprietary.
+**Exception:** h2kvm in this repository is licensed under the Zyvor Production Licence v2.0 (`LicenseRef-Zyvor-Production-2.0`). Production requires a paid commercial license. See [LICENSING.md](../LICENSING.md). The policy below applies to other Zyvor products that are still proprietary.
 
 ## Position
 

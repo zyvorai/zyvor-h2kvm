@@ -1,13 +1,13 @@
 <!-- Copyright (c) 2026 ZyvorAI Labs Private Limited. -->
-<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0 -->
+<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0 -->
 
 # Contributor License Agreement (CLA)
 
 Thank you for your interest in contributing to h2kvm, developed by
 **ZyvorAI Labs Private Limited** ("Zyvor", "we", "us").
 
-h2kvm is licensed under the [Zyvor Production License v1.0](LICENSE)
-(`LicenseRef-Zyvor-Production-1.0`). To accept your contribution, we need you
+h2kvm is licensed under the [Zyvor Production Licence v2.0](LICENSE)
+(`LicenseRef-Zyvor-Production-2.0`). To accept your contribution, we need you
 to agree to the terms below.
 
 This CLA is a short grant of rights. It does **not** transfer copyright
@@ -31,7 +31,7 @@ irrevocable license to:
    publicly perform, sublicense, and distribute your Contribution and such
    derivative works; and
 2. Relicense your Contribution (and derivative works thereof) under the
-   **Zyvor Production License v1.0**, under a commercial license, and/or
+   **Zyvor Production Licence v2.0**, under a commercial license, and/or
    under any other license Zyvor offers for h2kvm.
 
 You also grant Zyvor a perpetual, worldwide, non-exclusive, royalty-free,
@@ -54,7 +54,7 @@ You represent that:
 
 ## 4. License purpose
 
-You acknowledge that Zyvor offers h2kvm under the Zyvor Production License
+You acknowledge that Zyvor offers h2kvm under the Zyvor Production Licence
 v1.0, and that production use requires a separate commercial license. The
 grants in §2 exist so Zyvor can accept Contributions under that model without
 requiring a separate negotiation for each Contribution.

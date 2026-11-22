@@ -232,7 +232,7 @@ print(f'  Power: {vm[\"runtime\"][\"powerState\"]}')
     echo "  ║   ✓ KVM/libvirt + KubeVirt targets                   ║"
     echo "  ║   ✓ Windows + Linux guest support                    ║"
     echo "  ║   ✓ 1,273 tests passing                              ║"
-    echo "  ║   ✓ Zyvor Production License v1.0                      ║"
+    echo "  ║   ✓ Zyvor Production Licence v2.0                      ║"
     echo "  ║                                                      ║"
     echo "  ║   github.com/ssahani/h2kvm                       ║"
     echo "  ║                                                      ║"

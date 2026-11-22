@@ -1,5 +1,5 @@
 # Copyright (c) 2026 ZyvorAI Labs Private Limited.
-# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 # https://zyvor.dev · info@zyvor.dev
 
 """Tests for log_event, log_slow_phase, log_audit, log_isolation_status, log_execution_summary, _shutdown_logging."""

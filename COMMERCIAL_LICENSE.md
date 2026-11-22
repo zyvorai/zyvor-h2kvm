@@ -1,8 +1,8 @@
 <!-- Copyright (c) 2026 ZyvorAI Labs Private Limited. -->
-<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0 -->
+<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0 -->
 # h2kvm Commercial License
 
-h2kvm is licensed under the [Zyvor Production License v1.0](LICENSE). Production, SaaS, managed services, OEM, and redistribution require a separate paid commercial license from Zyvor.
+h2kvm is licensed under the [Zyvor Production Licence v2.0](LICENSE). Production, SaaS, managed services, OEM, and redistribution require a separate paid commercial license from Zyvor.
 
 This document summarizes commercial options. Binding commercial terms are provided by Zyvor sales when you purchase.
 

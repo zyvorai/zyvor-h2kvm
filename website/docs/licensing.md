@@ -4,26 +4,19 @@ title: Licensing
 ---
 # Licensing
 
-> **Note:** Zyvor is moving to an enterprise subscription model for new quotes: an annual subscription that includes updates and the stated support level, with open-source and non-production terms unchanged. See `docs/SUBSCRIPTION-MODEL.md` in this repository. Rates below apply to existing agreements; contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for current rates.
+> **Note:** Zyvor is moving to an enterprise subscription model for new quotes: an annual subscription that includes updates and the stated support level. See `docs/SUBSCRIPTION-MODEL.md` in this repository. Rates below apply to existing agreements; contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for current rates.
 
 
-h2kvm is licensed under the **[Zyvor Production License v1.0](https://github.com/zyvorai/h2kvm/blob/main/LICENSE)**.
+h2kvm is licensed under the **[Zyvor Production Licence v2.0](https://github.com/zyvorai/h2kvm/blob/main/LICENSE)**.
 
-- **Non-production use** (development, testing, evaluation, research, education, and non-production labs) is permitted by the licence
-- **Paid commercial license required** for production, customer workloads, SaaS, managed services, OEM, redistribution, and other revenue-generating use
+- A 30-day trial is available on request from sales@zyvor.dev (a paid evaluation Order at no charge); production and any other use needs a paid Order under the Zyvor Production Licence v2.0.
 
 | Track | License | Cost |
 | --- | --- | --- |
 | Per migrated VM | [Commercial license](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | INR 8,499 per VM, one-time, including GST (about USD 86) |
 | Enterprise | [Commercial license](https://github.com/zyvorai/h2kvm/blob/main/COMMERCIAL_LICENSE.md) | Quoted; see below |
 
-| Use case | Allowed without a commercial license? |
-| --- | --- |
-| Development, testing, evaluation, research, education | Yes |
-| Non-production laboratory environments | Yes |
-| Production environments and customer workloads | No |
-| SaaS, managed services, OEM, redistribution | No |
-| Embed h2kvm in a commercial product | No |
+
 
 ## Prices
 

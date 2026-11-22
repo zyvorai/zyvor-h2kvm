@@ -1,30 +1,23 @@
 <!-- Copyright (c) 2026 ZyvorAI Labs Private Limited. -->
-<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0 -->
+<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0 -->
 # Licensing
 
 > **Note:** Zyvor is moving to an enterprise subscription model for new quotes: an annual subscription that includes updates and the stated support level. See `docs/SUBSCRIPTION-MODEL.md` in this repository. Rates below apply to existing agreements; contact [sales@zyvor.dev](mailto:sales@zyvor.dev) for current rates.
 
 
-h2kvm is licensed under the **[Zyvor Production License v1.0](../LICENSE)**.
+h2kvm is licensed under the **[Zyvor Production Licence v2.0](../LICENSE)**.
 
-- **Non-production use** (development, testing, evaluation, research, education, and non-production labs) is permitted by the licence
-- **Paid commercial license required** for production, customer workloads, SaaS, managed services, OEM, redistribution, and other revenue-generating use
+- A 30-day trial is available on request from sales@zyvor.dev (a paid evaluation Order at no charge); production and any other use needs a paid Order under the Zyvor Production Licence v2.0.
 
 SPDX identifier used in source headers and package metadata:
-`LicenseRef-Zyvor-Production-1.0` (see [`LICENSES/`](../LICENSES/),
+`LicenseRef-Zyvor-Production-2.0` (see [`LICENSES/`](../LICENSES/),
 [`NOTICE`](../NOTICE)).
 
-Contributions require the [CLA](../CLA.md) and [DCO](../DCO.md) (`git commit -s`). New source files need the `LicenseRef-Zyvor-Production-1.0` SPDX header.
+Contributions require the [CLA](../CLA.md) and [DCO](../DCO.md) (`git commit -s`). New source files need the `LicenseRef-Zyvor-Production-2.0` SPDX header.
 
 Full text: [`LICENSE`](../LICENSE).
 
-| Use case | Allowed without a commercial license? |
-| --- | --- |
-| Development, testing, evaluation, research, education | Yes |
-| Non-production laboratory environments | Yes |
-| Production environments and customer workloads | No |
-| SaaS, managed services, OEM, redistribution | No |
-| Embed h2kvm in a commercial product | No |
+
 
 ## Commercial license
 

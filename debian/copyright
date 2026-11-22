@@ -5,12 +5,12 @@ Source: https://github.com/zyvorai/h2kvm
 
 Files: *
 Copyright: 2025-2026 ZyvorAI Labs Private Limited <ssahani@zyvor.dev>
-License: LicenseRef-Zyvor-Production-1.0
+License: LicenseRef-Zyvor-Production-2.0
 
-License: LicenseRef-Zyvor-Production-1.0
- Zyvor Production License v1.0. Non-production use is free. Production,
- SaaS, managed services, OEM, and redistribution require a separate paid
- commercial license. The full text is in the upstream LICENSE file.
+License: LicenseRef-Zyvor-Production-2.0
+ Zyvor Production Licence v2.0. A 30-day trial is available on request from
+ sales@zyvor.dev (a paid evaluation Order at no charge); production and any
+ other use needs a paid Order under the licence. The full text is in the upstream LICENSE file.
  Published price: INR 8,499 per migrated VM, one-time, including GST, or
  an Enterprise subscription quoted by Zyvor. Binding commercial terms are provided
  at purchase. See COMMERCIAL_LICENSE.md.

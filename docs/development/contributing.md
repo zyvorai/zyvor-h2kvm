@@ -197,7 +197,7 @@ ruff check --fix h2kvm/
 
 ## 📜 License
 
-h2kvm is licensed under the **Zyvor Production License v1.0**. By contributing, you agree to the [CLA](../../CLA.md) and certify the [DCO](../../DCO.md) (`git commit -s`). Include the `LicenseRef-Zyvor-Production-1.0` SPDX header in new source files.
+h2kvm is licensed under the **Zyvor Production Licence v2.0**. By contributing, you agree to the [CLA](../../CLA.md) and certify the [DCO](../../DCO.md) (`git commit -s`). Include the `LicenseRef-Zyvor-Production-2.0` SPDX header in new source files.
 
 See [LICENSE](../../LICENSE) and [LICENSING.md](../LICENSING.md).
 

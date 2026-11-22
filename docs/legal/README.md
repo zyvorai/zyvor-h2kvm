@@ -17,7 +17,7 @@ ZyvorAI Labs Private Limited
     └── HyperSDK Platform (SDKs, tooling, integrations)
 ```
 
-**h2kvm (this repository) is licensed under the [Zyvor Production License v1.0](../../LICENSE).** Production requires a paid commercial license. Prices: INR 8,499 per migrated VM, one-time, including 18% GST (about USD 86), or an Enterprise subscription quoted by Zyvor. See [LICENSING.md](../LICENSING.md) and [COMMERCIAL_LICENSE.md](../../COMMERCIAL_LICENSE.md).
+**h2kvm (this repository) is licensed under the [Zyvor Production Licence v2.0](../../LICENSE).** Production requires a paid commercial license. Prices: INR 8,499 per migrated VM, one-time, including 18% GST (about USD 86), or an Enterprise subscription quoted by Zyvor. See [LICENSING.md](../LICENSING.md) and [COMMERCIAL_LICENSE.md](../../COMMERCIAL_LICENSE.md).
 
 - **Other product code shipped from sibling repositories may still be proprietary** — no Apache, MIT, or other OSS distribution is implied here for PacketWolf, Ragnarok, Aether, HyperSDK, netctl, or netevd. **GuestKit** remains **LGPL-3.0-or-later** where that repository says so.
 - **Hosted SaaS**, AI rules, and sovereign features are **commercial** under MSA/ELA.
@@ -39,7 +39,7 @@ Customer
    → Acceptable Use Policy (AUP) + Export Compliance (incorporated by reference)
 ```
 
-Quick deploy / non-production: [LICENSE](../../LICENSE) (Zyvor Production License v1.0). Commercial production deals use [COMMERCIAL_LICENSE.md](../../COMMERCIAL_LICENSE.md) and the agreement stack above.
+Licence text: [LICENSE](../../LICENSE) (Zyvor Production Licence v2.0). Commercial production deals use [COMMERCIAL_LICENSE.md](../../COMMERCIAL_LICENSE.md) and the agreement stack above.
 
 ---
 
@@ -60,7 +60,7 @@ Quick deploy / non-production: [LICENSE](../../LICENSE) (Zyvor Production Licens
 | Order Form | [templates/ORDER-FORM.md](templates/ORDER-FORM.md) | Commercial terms |
 | AUP | [templates/ACCEPTABLE-USE.md](templates/ACCEPTABLE-USE.md) | Abuse, lawful use |
 | Export | [templates/EXPORT-COMPLIANCE.md](templates/EXPORT-COMPLIANCE.md) | Sanctions, export control |
-| Deploy license | [../../LICENSE](../../LICENSE) | Zyvor Production License v1.0 (commercial production terms in COMMERCIAL_LICENSE.md) |
+| Deploy license | [../../LICENSE](../../LICENSE) | Zyvor Production Licence v2.0 (commercial production terms in COMMERCIAL_LICENSE.md) |
 
 ---
 

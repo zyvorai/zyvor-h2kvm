@@ -13,7 +13,7 @@ authors = [
 maintainers = [
     {name = "ZyvorAI Labs Private Limited", email = "ssahani@zyvor.dev"}
 ]
-license = {text = "LicenseRef-Zyvor-Production-1.0"}
+license = {text = "LicenseRef-Zyvor-Production-2.0"}
 keywords = [
     "kvm",
     "qemu",

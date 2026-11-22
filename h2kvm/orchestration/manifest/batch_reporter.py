@@ -1,5 +1,5 @@
 # Copyright (c) 2026 ZyvorAI Labs Private Limited.
-# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 # https://zyvor.dev · info@zyvor.dev
 
 """Batch reporter - generates aggregate batch_report.json for multi-VM conversions."""

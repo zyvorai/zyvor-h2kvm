@@ -299,7 +299,7 @@ Both commands are functionally identical.
 - **Release:** https://pypi.org/project/h2kvm/1.4.0/
 - **GuestKit:** https://pypi.org/project/hypersdk-guestkit/
 - **GitHub:** https://github.com/zyvorai/h2kvm
-- **License:** Zyvor Production License v1.0
+- **License:** Zyvor Production Licence v2.0
 
 ---
 

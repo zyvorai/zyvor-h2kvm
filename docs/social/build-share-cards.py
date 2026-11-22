@@ -1,5 +1,5 @@
 # Copyright (c) 2026 ZyvorAI Labs Private Limited.
-# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 """Generate the h2kvm share cards (light + dark) and restyle the README flow diagram.
 
     python3 docs/social/build-share-cards.py docs/social
@@ -74,7 +74,7 @@ def share_card(p, dark):
         cx += w + 12
     hub_y = hub_cy - 56
     return f'''<!-- Copyright (c) 2026 ZyvorAI Labs Private Limited. -->
-<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0 -->
+<!-- SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="h2kvm — Any hypervisor to KVM. Convert offline, fix the guest, deploy with confidence. vSphere, ESXi, Azure and files in; Kairon and Machina out, with KubeVirt and OpenStack as legacy targets.">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="630" gradientUnits="userSpaceOnUse">
@@ -154,7 +154,7 @@ def share_card(p, dark):
   <!-- footer -->
   <line x1="72" y1="552" x2="1128" y2="552" stroke="{p["hair"]}"/>
   <text x="72" y="592" font-family="{MONO}" font-size="18" fill="{p["sec"]}">github.com/zyvorai/h2kvm</text>
-  <text x="1128" y="592" text-anchor="end" font-family="{SANS}" font-size="16" fill="{p["sec"]}">Zyvor Production License</text>
+  <text x="1128" y="592" text-anchor="end" font-family="{SANS}" font-size="16" fill="{p["sec"]}">Zyvor Production Licence</text>
 </svg>
 '''
 
