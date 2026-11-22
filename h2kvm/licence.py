@@ -1,5 +1,5 @@
 # Copyright (c) 2026 ZyvorAI Labs Private Limited.
-# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 # https://zyvor.dev · info@zyvor.dev
 
 # h2kvm/licence.py
@@ -10,7 +10,7 @@ Keys are issued by Zyvor; no issuing or signing code and no private key lives he
 
 Enforcement is soft: nothing in h2kvm is ever disabled, limited or deleted because there is no key or because a trial or
 licence ended. The status is information only. A 30-day trial key (edition "trial") applies to the paid production licence
-and support; free evaluation and non-production use under the Zyvor Production License is unchanged.
+and support.
 
 Key source: H2KVM_LICENCE_KEY, else the file named by H2KVM_LICENCE_FILE, else ~/.config/h2kvm/licence.key.
 States: licensed | trial | licence_expired | unlicensed | invalid.

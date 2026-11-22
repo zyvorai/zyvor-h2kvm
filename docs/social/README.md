@@ -35,4 +35,4 @@ in `h2kvm-flow.svg` and the dark copy is regenerated from it.
 The repository's Social preview image (shown when the repo URL is shared) is not settable through the API. Upload
 `docs/social/h2kvm-share-card.png` by hand under Settings, Social preview.
 
-Copy follows the project README. The licence line reads "Zyvor Production License"; see `LICENSE`.
+Copy follows the project README. The licence line reads "Zyvor Production Licence"; see `LICENSE`.

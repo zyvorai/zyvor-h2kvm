@@ -1,10 +1,10 @@
 # Product license matrix (draft)
 
-**h2kvm, this repository, is licensed under the Zyvor Production License v1.0.** Production requires a paid commercial license. Other products below stay on their own terms.
+**h2kvm, this repository, is licensed under the Zyvor Production Licence v2.0.** Production requires a paid commercial license. Other products below stay on their own terms.
 
 | Product | License | Hosted SaaS | Trademark |
 |---------|---------|-------------|-----------|
-| **h2kvm** | Zyvor Production License v1.0 (commercial INR 8,499 per migrated VM incl. GST, or Enterprise quoted) | N/A | h2kvm |
+| **h2kvm** | Zyvor Production Licence v2.0 (commercial INR 8,499 per migrated VM incl. GST, or Enterprise quoted) | N/A | h2kvm |
 | **PacketWolf / NetPredator** | Proprietary EULA / ELA | Optional | PacketWolf, NetPredator |
 | **Ragnarok** | Proprietary EULA / ELA | Optional | Ragnarok |
 | **Aether** | Proprietary EULA / ELA | Optional | Aether |

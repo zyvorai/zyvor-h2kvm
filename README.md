@@ -5,7 +5,7 @@
 [![Release](https://img.shields.io/github/v/release/zyvorai/zyvor-h2kvm?style=flat-square&color=0071e3&labelColor=1d1d1f)](https://github.com/zyvorai/zyvor-h2kvm/releases/latest)
 [![GuestKit](https://img.shields.io/pypi/v/zyvor-guestkit.svg?style=flat-square&color=0071e3&labelColor=1d1d1f&label=guestkit)](https://pypi.org/project/zyvor-guestkit/)
 [![Python](https://img.shields.io/badge/python-3.10+-0071e3.svg?style=flat-square&labelColor=1d1d1f)](https://www.python.org/)
-[![License: Zyvor Production License v1.0](https://img.shields.io/badge/license-Zyvor%20Production%20License%20v1.0-0071e3.svg?style=flat-square&labelColor=1d1d1f)](LICENSE)
+[![License: Zyvor Production Licence v2.0](https://img.shields.io/badge/license-Zyvor%20Production%20Licence%20v2.0-0071e3.svg?style=flat-square&labelColor=1d1d1f)](LICENSE)
 
 [![Book a demo](https://img.shields.io/badge/Book_a_demo-0071e3?style=for-the-badge)](https://zyvor.dev/schedule?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)
 [![30-day PoC](https://img.shields.io/badge/30--day_PoC-000000?style=for-the-badge)](https://zyvor.dev/poc?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_hero)
@@ -357,7 +357,7 @@ GuestKit and h2kvm fix the disk and land the VM. Where it lands decides the Zyvo
 
 </div>
 
-**VMware to Kairon or Machina:** [Transiva](https://github.com/zyvorai/zyvor-transiva) (export, Apache-2.0) → h2kvm (convert and deploy, Zyvor Production License) → GuestKit (repair, Apache-2.0) → [Kairon](https://github.com/zyvorai/kairon) + [Veyron](https://github.com/zyvorai/veyron) on Kubernetes, or [Machina](https://zyvor.dev/machina?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_suite) on your own hosts. Each is a separate tool with its own licence; h2kvm needs a paid licence for production use.
+**VMware to Kairon or Machina:** [Transiva](https://github.com/zyvorai/zyvor-transiva) (export, Apache-2.0) → h2kvm (convert and deploy, Zyvor Production Licence) → GuestKit (repair, Apache-2.0) → [Kairon](https://github.com/zyvorai/kairon) + [Veyron](https://github.com/zyvorai/veyron) on Kubernetes, or [Machina](https://zyvor.dev/machina?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_suite) on your own hosts. Each is a separate tool with its own licence; h2kvm needs a paid licence for production use.
 
 → [zyvor.dev](https://zyvor.dev)
 
@@ -369,14 +369,14 @@ h2kvm verifies a signed licence key (`ZYV1.`) offline against a public key built
 
 ## License
 
-h2kvm is source-available under the **[Zyvor Production License v1.0](LICENSE)** (SPDX `LicenseRef-Zyvor-Production-1.0`).
+h2kvm is source-available under the **[Zyvor Production Licence v2.0](LICENSE)** (SPDX `LicenseRef-Zyvor-Production-2.0`).
 
-- **Evaluation** (development, testing, evaluation, research, education, and non-production labs) is permitted for 30 days per organization by the licence.
-- **Production use** (customer workloads, SaaS, managed services, OEM, redistribution, and other revenue-generating use) requires an annual enterprise subscription. Plans, support levels and terms: [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md) · [licensing](docs/LICENSING.md) · [licensing model](docs/legal/LICENSING-MODEL.md) · [Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_license) · [sales@zyvor.dev](mailto:sales@zyvor.dev).
+- **Trial:** a 30-day trial is available on request from [sales@zyvor.dev](mailto:sales@zyvor.dev) (a paid evaluation Order at no charge).
+- **Production and any other use** (customer workloads, SaaS, managed services, OEM, redistribution, and other revenue-generating use) needs a paid Order under the Zyvor Production Licence v2.0, as an annual enterprise subscription. Plans, support levels and terms: [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md) · [licensing](docs/LICENSING.md) · [licensing model](docs/legal/LICENSING-MODEL.md) · [Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_license) · [sales@zyvor.dev](mailto:sales@zyvor.dev).
 
 Commercial terms are issued separately: [https://zyvor.dev](https://zyvor.dev?utm_source=github&utm_medium=h2kvm&utm_campaign=readme_footer). New quotes follow an annual enterprise subscription model (see `docs/SUBSCRIPTION-MODEL.md`); the published price is **INR 8,499 per migrated VM, one-time, including 18% GST in India, or USD 86 per migrated VM excluding tax elsewhere** (included at no charge in a Transiva project), or an Enterprise subscription quoted by Zyvor. A 30-day trial key is available for production evaluation. Buy / get a quote: [zyvor.dev/buy](https://zyvor.dev/buy#h2kvm) or [sales@zyvor.dev](mailto:sales@zyvor.dev) for custom pricing. Prices: INR incl. 18% GST in India; US dollars excl. tax elsewhere (VAT, GST or sales tax added where applicable). Pay online by UPI, card or netbanking where a buy page exists; international cards work (charged in rupees). Orders of USD 5,000 or more and quotes are invoiced in USD through Skydo. See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) and [docs/LICENSING.md](docs/LICENSING.md).
 
-Contributions: [CLA.md](CLA.md) + [DCO.md](DCO.md) (`git commit -s`); see [CONTRIBUTING.md](CONTRIBUTING.md). New source files need the `LicenseRef-Zyvor-Production-1.0` SPDX header. Report vulnerabilities privately per [SECURITY.md](SECURITY.md).
+Contributions: [CLA.md](CLA.md) + [DCO.md](DCO.md) (`git commit -s`); see [CONTRIBUTING.md](CONTRIBUTING.md). New source files need the `LicenseRef-Zyvor-Production-2.0` SPDX header. Report vulnerabilities privately per [SECURITY.md](SECURITY.md).
 
 ---
 
